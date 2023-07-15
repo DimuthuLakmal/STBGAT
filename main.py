@@ -7,7 +7,7 @@ from data_loader.data_loader import DataLoader
 from models.sgat_transformer.sgat_transformer import SGATTransformer
 from test import test
 from train import train
-from utils.math_utils import Masked_MAE_Loss
+from utils.masked_mae_loss import Masked_MAE_Loss
 
 
 def run(epochs: int, data_loader: DataLoader, device: str, model_input_path: str, model_output_path: str,

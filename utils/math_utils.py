@@ -92,21 +92,6 @@ def MAPE(v, v_, null_val=0.0):
         return np.mean(mape)
 
 
-class Masked_MAE_Loss(torch.nn.Module):
-    def __init__(self):
-        super(Masked_MAE_Loss, self).__init__()
-
-    def forward(self, v_, v):
-        mask = (v != 0.0)
-        mask = mask.float()
-        mask /= torch.mean((mask))
-        mask = torch.where(torch.isnan(mask), torch.zeros_like(mask), mask)
-        loss = torch.abs(v_ - v)
-        loss = loss * mask
-        loss = torch.where(torch.isnan(loss), torch.zeros_like(loss), loss)
-        return torch.mean(loss)
-
-
 def RMSE(v, v_):
     '''
     Mean squared error.
@@ -115,6 +100,19 @@ def RMSE(v, v_):
     :return: int, RMSE averages on all elements of input.
     '''
     return np.sqrt(np.mean((v_ - v) ** 2))
+
+
+def masked_RMSE(v, v_, null_val=0.0):
+    with np.errstate(divide='ignore', invalid='ignore'):
+        if np.isnan(null_val):
+            mask = ~np.isnan(v)
+        else:
+            mask = np.not_equal(v, null_val)
+        mask = mask.astype('float32')
+        mask /= np.mean(mask)
+        mse = np.square(np.subtract(v_, v)).astype('float32')
+        mse = np.nan_to_num(mse * mask)
+        return np.sqrt(np.mean(mse))
 
 
 def MAE(v, v_, inference=False):
@@ -129,7 +127,8 @@ def MAE(v, v_, inference=False):
 
     return np.mean(np.abs(v_ - v))
 
-def Masked_MAE(v, v_, null_val=0.0):
+
+def masked_MAE(v, v_, null_val=0.0):
     '''
     Mean absolute error.
     :param v: np.ndarray or int, ground truth.
@@ -184,8 +183,7 @@ def calculate_loss(y_pred, y, _max, _min):
     y_pred_inv = denormalize(y_pred_cpu, _max, _min)
     y_inv = denormalize(train_y_cpu, _max, _min)
 
-    # return MAE(y_inv, y_pred_inv), RMSE(y_inv, y_pred_inv), MAPE(y_inv, y_pred_inv)
-    return Masked_MAE(y_inv, y_pred_inv), RMSE(y_inv, y_pred_inv), MAPE(y_inv, y_pred_inv)
+    return masked_MAE(y_inv, y_pred_inv), masked_RMSE(y_inv, y_pred_inv), MAPE(y_inv, y_pred_inv)
 
 
 def calculate_loss_inference(y_pred, y, _max, _min):
@@ -194,7 +192,7 @@ def calculate_loss_inference(y_pred, y, _max, _min):
     y_pred_inv = denormalize(y_pred_cpu, _max, _min)
     y_inv = denormalize(train_y_cpu, _max, _min)
 
-    return Masked_MAE(y_inv, y_pred_inv), y_pred_inv, y_inv
+    return masked_MAE(y_inv, y_pred_inv), y_pred_inv, y_inv
 
 
 def max_min_normalization_astgnn(x, _max, _min):
