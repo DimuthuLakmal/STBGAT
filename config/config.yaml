@@ -28,3 +28,4 @@ graph_dec_input: False
 non_graph_enc_input: True
 non_graph_dec_input: True
 enc_features: 1
+multiple_cross_attention: True # If enc_features > 1, then multiple_cross_attention should be True

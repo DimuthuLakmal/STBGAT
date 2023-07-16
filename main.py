@@ -127,6 +127,7 @@ if __name__ == '__main__':
         enc_seq_len = configs['enc_seq_len'] if configs['enc_seq_len'] else 12
         dec_seq_len = configs['dec_seq_len'] if configs['dec_seq_len'] else 12
         enc_features = configs['enc_features'] if configs['enc_features'] else 5
+        multiple_cross_attention = configs['multiple_cross_attention'] if configs['multiple_cross_attention'] else False
 
     device = 'cuda'
 
