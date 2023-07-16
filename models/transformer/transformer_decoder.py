@@ -9,7 +9,8 @@ from models.transformer.token_embedding import TokenEmbedding
 
 class TransformerDecoder(nn.Module):
     def __init__(self, input_dim, out_dim, embed_dim, seq_len, num_layers=2, expansion_factor=4, n_heads=8, dropout=0.2,
-                 enc_features=5, sgat_settings=None, merge_embed=False, max_lookup_len=0):
+                 enc_features=5, sgat_settings=None, merge_embed=False, max_lookup_len=0,
+                 cross_attn_features=True, per_enc_feature_len=12):
 
         super(TransformerDecoder, self).__init__()
 
@@ -39,11 +40,21 @@ class TransformerDecoder(nn.Module):
         # self.seq_len = seq_len + self.offset
         # self.emb_dim = embed_dim
 
-        self.conv_k1_layers = nn.ModuleList([nn.Conv1d(in_channels=embed_dim, out_channels=embed_dim, kernel_size=3, stride=1, padding=1) for _ in range(num_layers)])
-        self.conv_k2_layers = nn.ModuleList([nn.Conv1d(in_channels=embed_dim, out_channels=embed_dim, kernel_size=3, stride=1, padding=1) for _ in range(num_layers)])
-        self.conv_k3_layers = nn.ModuleList([nn.Conv1d(in_channels=embed_dim, out_channels=embed_dim, kernel_size=3, stride=1, padding=1) for _ in range(num_layers)])
-        self.conv_k4_layers = nn.ModuleList([nn.Conv1d(in_channels=embed_dim, out_channels=embed_dim, kernel_size=3, stride=1, padding=1) for _ in range(num_layers)])
-        self.conv_k5_layers = nn.ModuleList([nn.Conv1d(in_channels=embed_dim, out_channels=embed_dim, kernel_size=3, stride=1, padding=1) for _ in range(num_layers)])
+        self.enc_features = enc_features
+        self.per_enc_feature_len = per_enc_feature_len
+        self.cross_attn_features = cross_attn_features
+        self.conv_k_layers = nn.ModuleList([
+            nn.ModuleList(
+                [nn.Conv1d(in_channels=embed_dim, out_channels=embed_dim, kernel_size=3, stride=1, padding=1) for i in
+                 range(cross_attn_features)])
+            for j in range(num_layers)
+        ])
+
+        # self.conv_k1_layers = nn.ModuleList([nn.Conv1d(in_channels=embed_dim, out_channels=embed_dim, kernel_size=3, stride=1, padding=1) for _ in range(num_layers)])
+        # self.conv_k2_layers = nn.ModuleList([nn.Conv1d(in_channels=embed_dim, out_channels=embed_dim, kernel_size=3, stride=1, padding=1) for _ in range(num_layers)])
+        # self.conv_k3_layers = nn.ModuleList([nn.Conv1d(in_channels=embed_dim, out_channels=embed_dim, kernel_size=3, stride=1, padding=1) for _ in range(num_layers)])
+        # self.conv_k4_layers = nn.ModuleList([nn.Conv1d(in_channels=embed_dim, out_channels=embed_dim, kernel_size=3, stride=1, padding=1) for _ in range(num_layers)])
+        # self.conv_k5_layers = nn.ModuleList([nn.Conv1d(in_channels=embed_dim, out_channels=embed_dim, kernel_size=3, stride=1, padding=1) for _ in range(num_layers)])
 
         self.layers = nn.ModuleList(
             [
@@ -107,14 +118,22 @@ class TransformerDecoder(nn.Module):
                 x = self.conv_q_layer(x.transpose(2, 1)).transpose(2, 1)
                 # x = self.calculate_masked_src(x, self.conv_q_layers[idx], tgt_mask_conv, device)
 
-            enc_x1 = self.conv_k1_layers[idx](enc_x[0].transpose(2, 1)).transpose(2, 1)
+            enc_xs = []
+            for idx_k, f_layer in enumerate(self.conv_k_layers[idx]):
+                if self.enc_features > 1:
+                    enc_xs.append(f_layer(enc_x[idx_k].transpose(2, 1)).transpose(2, 1))
+                else:
+                    start = idx_k * self.per_enc_feature_len
+                    enc_xs.append(f_layer(enc_x[0][:, start: start + self.per_enc_feature_len].transpose(2, 1)).transpose(2, 1))
+
+            # enc_x1 = self.conv_k1_layers[idx](enc_x[0].transpose(2, 1)).transpose(2, 1)
             # enc_x2 = self.conv_k2_layers[idx](enc_x[1].transpose(2, 1)).transpose(2, 1)
             # enc_x3 = self.conv_k3_layers[idx](enc_x[2].transpose(2, 1)).transpose(2, 1)
             # enc_x4 = self.conv_k4_layers[idx](enc_x[3].transpose(2, 1)).transpose(2, 1)
             # enc_x5 = self.conv_k5_layers[idx](enc_x[4].transpose(2, 1)).transpose(2, 1)
-
             # x = layer(x, [enc_x1, enc_x2, enc_x3, enc_x4, enc_x5], tgt_mask)
-            x = layer(x, [enc_x1], tgt_mask)
+
+            x = layer(x, enc_xs, tgt_mask)
 
         out = self.fc_out(x)
 

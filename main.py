@@ -11,7 +11,7 @@ from utils.masked_mae_loss import Masked_MAE_Loss
 
 
 def run(epochs: int, data_loader: DataLoader, device: str, model_input_path: str, model_output_path: str,
-        load_saved_model: bool, model_configs: dict, merge_emb: bool):
+        load_saved_model: bool, model_configs: dict):
     model = SGATTransformer(device=device,
                             sgat_first_in_f_size=1,
                             sgat_n_layers=2,
@@ -20,17 +20,19 @@ def run(epochs: int, data_loader: DataLoader, device: str, model_input_path: str
                             sgat_alpha=0.2,
                             sgat_dropout=0.2,
                             sgat_edge_dim=model_configs['edge_dim'],
-                            transformer_merge_emb=merge_emb,
+                            transformer_merge_emb=model_configs['merge_emb'],
                             transformer_enc_seq_len=model_configs['enc_seq_len'],
                             transformer_dec_seq_len=model_configs['dec_seq_len'],
                             transformer_dec_seq_offset=model_configs['dec_seq_offset'],
                             transformer_input_dim=model_configs['input_dim'],
+                            transfomer_cross_attn_features=model_configs['cross_attn_features'],
+                            transfomer_per_enc_feature_len=model_configs['per_enc_feature_len'],
                             transfomer_emb_dim=16,
                             # input to transformers will be embedded to this dim. Value is similar the last element of sgat_out_f_sizes if both embeddings merge together
                             transformer_n_layers=4,
                             transformer_expansion_factor=4,
                             transformer_n_heads=8,
-                            transformer_features=model_configs['enc_features'],  # number of encoders
+                            transformer_enc_features=model_configs['enc_features'],  # number of encoders
                             transformer_out_dim=1,
                             transformer_dropout=0.2,
                             transformer_lookup_index=True).to(device)
@@ -127,9 +129,11 @@ if __name__ == '__main__':
         enc_seq_len = configs['enc_seq_len'] if configs['enc_seq_len'] else 12
         dec_seq_len = configs['dec_seq_len'] if configs['dec_seq_len'] else 12
         enc_features = configs['enc_features'] if configs['enc_features'] else 5
-        multiple_cross_attention = configs['multiple_cross_attention'] if configs['multiple_cross_attention'] else False
 
-    device = 'cuda'
+        merge_emb = configs['merge_emb'] if configs['merge_emb'] else False
+        device = configs['device'] if configs['device'] else 'cpu'
+        cross_attn_features = configs['cross_attn_features'] if configs['cross_attn_features'] else 3
+        per_enc_feature_len = configs['per_enc_feature_len'] if configs['per_enc_feature_len'] else 12
 
     data_configs = {
         'num_of_vertices': num_of_vertices,
@@ -161,12 +165,14 @@ if __name__ == '__main__':
         model_input_path=model_input_path,
         model_output_path=model_output_path,
         load_saved_model=load_saved_model,
-        merge_emb=False,
         model_configs={
             'input_dim': input_dim,
             'edge_dim': edge_dim,
             'enc_seq_len': enc_seq_len,
             'dec_seq_len': dec_seq_len,
             'enc_features': enc_features,
-            'dec_seq_offset': dec_seq_offset
+            'dec_seq_offset': dec_seq_offset,
+            'merge_emb': merge_emb,
+            'cross_attn_features': cross_attn_features,
+            'per_enc_feature_len': per_enc_feature_len
         })

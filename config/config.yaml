@@ -1,8 +1,8 @@
 batch_size: 4
 epochs: 20
-model_output_path: "output/model/pems08/epoch_dec_conv_global_rep_v1_{}_model.pt"
+model_output_path: "output/model/pems08/epoch_dec_conv_global_rep_v3_{}_model.pt"
 model_input_path: "output/model/pems08/epoch_dec_conv_global_rep_v1_19_model.pt"
-load_saved_model: True
+load_saved_model: False
 edge_dim: 1
 input_dim: 1
 enc_seq_len: 36
@@ -23,9 +23,12 @@ num_of_days: 1
 num_of_hours: 1
 num_of_days_target: 1
 num_of_weeks_target: 1
-graph_enc_input: False
+graph_enc_input: False # IMPORTANT: Set true for all encode inputs if merge_emb is True
 graph_dec_input: False
 non_graph_enc_input: True
 non_graph_dec_input: True
 enc_features: 1
-multiple_cross_attention: True # If enc_features > 1, then multiple_cross_attention should be True
+merge_emb: False
+device: cuda
+cross_attn_features: 3
+per_enc_feature_len: 12
