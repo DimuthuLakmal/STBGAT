@@ -1,8 +1,8 @@
 batch_size: 4
 epochs: 20
-model_output_path: "output/model/pems08/epoch_dec_conv_global_rep_v3_{}_model.pt"
-model_input_path: "output/model/pems08/epoch_dec_conv_global_rep_v1_19_model.pt"
-load_saved_model: False
+model_output_path: "output/model/pems08/multi-cross-attn/epoch_dec_conv_global_rep_v3_{}_model.pt"
+model_input_path: "output/model/pems08/epoch_dec_conv_global_rep_v3_17_model.pt"
+load_saved_model: True
 edge_dim: 1
 input_dim: 1
 enc_seq_len: 36
