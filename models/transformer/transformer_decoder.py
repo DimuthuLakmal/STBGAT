@@ -31,14 +31,14 @@ class TransformerDecoder(nn.Module):
 
         self.conv_q_layer = nn.Conv1d(in_channels=embed_dim, out_channels=embed_dim, kernel_size=3, stride=1, padding=1)
 
-        # self.conv_q_layers = nn.ModuleList([
-        #         nn.Conv2d(in_channels=embed_dim, out_channels=embed_dim, kernel_size=(1, 3), stride=1, padding=(0, 1), bias=False)
-        #         for _ in range(num_layers)
-        #     ])
+        self.conv_q_layers = nn.ModuleList([
+                nn.Conv2d(in_channels=embed_dim, out_channels=embed_dim, kernel_size=(1, 3), stride=1, padding=(0, 1), bias=False)
+                for _ in range(num_layers)
+            ])
         # decoder input masking for convolution operation
-        # self.offset = dec_input_offset
-        # self.seq_len = seq_len + self.offset
-        # self.emb_dim = embed_dim
+        self.offset = 4
+        self.seq_len = seq_len + 4
+        self.emb_dim = embed_dim
 
         self.enc_features = enc_features
         self.per_enc_feature_len = per_enc_feature_len
@@ -49,12 +49,6 @@ class TransformerDecoder(nn.Module):
                  range(cross_attn_features)])
             for j in range(num_layers)
         ])
-
-        # self.conv_k1_layers = nn.ModuleList([nn.Conv1d(in_channels=embed_dim, out_channels=embed_dim, kernel_size=3, stride=1, padding=1) for _ in range(num_layers)])
-        # self.conv_k2_layers = nn.ModuleList([nn.Conv1d(in_channels=embed_dim, out_channels=embed_dim, kernel_size=3, stride=1, padding=1) for _ in range(num_layers)])
-        # self.conv_k3_layers = nn.ModuleList([nn.Conv1d(in_channels=embed_dim, out_channels=embed_dim, kernel_size=3, stride=1, padding=1) for _ in range(num_layers)])
-        # self.conv_k4_layers = nn.ModuleList([nn.Conv1d(in_channels=embed_dim, out_channels=embed_dim, kernel_size=3, stride=1, padding=1) for _ in range(num_layers)])
-        # self.conv_k5_layers = nn.ModuleList([nn.Conv1d(in_channels=embed_dim, out_channels=embed_dim, kernel_size=3, stride=1, padding=1) for _ in range(num_layers)])
 
         self.layers = nn.ModuleList(
             [
@@ -73,13 +67,13 @@ class TransformerDecoder(nn.Module):
 
         x = tgt_mask.transpose(2, 3) * x
         x = x.permute(0, 3, 1, 2)
-        x = conv_q(x).permute(0, 2, 3, 1)
+        x = conv_q(x)
 
-        out = torch.zeros((batch_size, self.seq_len, self.emb_dim)).to(device)
+        out = torch.zeros((batch_size, self.emb_dim, self.seq_len)).to(device)
         for i in range(self.seq_len):
-            out[:, i, :] = x[:, i, i, :]
+            out[:, :, i] = x[:, :, i, i]
 
-        return out
+        return out.permute(0, 2, 1)
 
     def create_conv_mask(self, x, device='cuda'):
         tri = torch.tril(torch.ones((self.seq_len, self.seq_len)))
@@ -88,7 +82,7 @@ class TransformerDecoder(nn.Module):
         tgt_mask_conv = tgt_mask_conv.expand(x.shape[0], self.seq_len, self.emb_dim, self.seq_len).to(device)
         return tgt_mask_conv
 
-    def forward(self, x, graph_x, enc_x, tgt_mask, local_trends=True, start_idx=None, end_idx=None, lookup_idx=None, device='cuda'):
+    def forward(self, x, graph_x, enc_x, tgt_mask, local_trends=True, lookup_idx=None, device='cuda'):
         embed_x = None
         embed_graph_x = None
         if x is not None:
@@ -111,12 +105,12 @@ class TransformerDecoder(nn.Module):
 
         x = self.position_embedding(embed_out)  # 32x10x512
 
-        # tgt_mask_conv = self.create_conv_mask(x, device)
+        tgt_mask_conv = self.create_conv_mask(x, device)
 
         for idx, layer in enumerate(self.layers):
-            if local_trends and idx == 0:
-                x = self.conv_q_layer(x.transpose(2, 1)).transpose(2, 1)
-                # x = self.calculate_masked_src(x, self.conv_q_layers[idx], tgt_mask_conv, device)
+            if local_trends:
+                # x = self.conv_q_layer(x.transpose(2, 1)).transpose(2, 1)
+                x = self.calculate_masked_src(x, self.conv_q_layers[idx], tgt_mask_conv, device)
 
             enc_xs = []
             for idx_k, f_layer in enumerate(self.conv_k_layers[idx]):
@@ -126,13 +120,6 @@ class TransformerDecoder(nn.Module):
                     start = idx_k * self.per_enc_feature_len
                     enc_xs.append(f_layer(enc_x[0][:, start: start + self.per_enc_feature_len].transpose(2, 1)).transpose(2, 1))
 
-            # enc_x1 = self.conv_k1_layers[idx](enc_x[0].transpose(2, 1)).transpose(2, 1)
-            # enc_x2 = self.conv_k2_layers[idx](enc_x[1].transpose(2, 1)).transpose(2, 1)
-            # enc_x3 = self.conv_k3_layers[idx](enc_x[2].transpose(2, 1)).transpose(2, 1)
-            # enc_x4 = self.conv_k4_layers[idx](enc_x[3].transpose(2, 1)).transpose(2, 1)
-            # enc_x5 = self.conv_k5_layers[idx](enc_x[4].transpose(2, 1)).transpose(2, 1)
-            # x = layer(x, [enc_x1, enc_x2, enc_x3, enc_x4, enc_x5], tgt_mask)
-
             x = layer(x, enc_xs, tgt_mask)
 
         out = self.fc_out(x)
@@ -140,8 +127,5 @@ class TransformerDecoder(nn.Module):
         out = out.permute(1, 0, 2)
         out = out.reshape(embed_shp[0], embed_shp[1], embed_shp[2], out.shape[-1])
         out = out.permute(1, 0, 2, 3)
-
-        if end_idx is not None:
-            out = out.view(embed_shp[0], embed_shp[1], embed_shp[2], embed_shp[3])[:, :, start_idx: end_idx]
 
         return out

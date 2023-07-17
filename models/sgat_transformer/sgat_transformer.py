@@ -92,8 +92,8 @@ class SGATTransformer(nn.Module):
                                           max_lookup_len=max_lookup_len_dec if max_lookup_len_dec else transformer_dec_seq_len)
 
     def create_mask(self, batch_size, device):
-        trg_mask = torch.triu(torch.ones((self.transformer_dec_seq_len, self.transformer_dec_seq_len)))\
-            .fill_diagonal_(0).bool().expand(batch_size * 8, self.transformer_dec_seq_len, self.transformer_dec_seq_len)
+        trg_mask = torch.triu(torch.ones((self.transformer_dec_seq_len + 4, self.transformer_dec_seq_len + 4)))\
+            .fill_diagonal_(0).bool().expand(batch_size * 8, self.transformer_dec_seq_len + 4, self.transformer_dec_seq_len + 4)
         return trg_mask.to(device)
 
     def forward(self, x, graph_x, y=None, graph_y=None, train=True):
@@ -112,18 +112,18 @@ class SGATTransformer(nn.Module):
         tgt_mask = self.create_mask(enc_outs.shape[1], self.device)
 
         if train:
-            dec_out = self.decoder(y, graph_y, enc_outs, tgt_mask=tgt_mask, local_trends=False,
+            dec_out = self.decoder(y, graph_y, enc_outs, tgt_mask=tgt_mask, local_trends=True,
                                    lookup_idx=self.lookup_idx_dec, device=self.device)
-            return dec_out
+            return dec_out[:, 2: -2]
         else:
             final_out = torch.zeros_like(y)
             for i in range(self.transformer_dec_seq_len):
-                dec_out = self.decoder(y, graph_y, enc_outs, tgt_mask=tgt_mask, local_trends=False,
+                dec_out = self.decoder(y, graph_y, enc_outs, tgt_mask=tgt_mask, local_trends=True,
                                        lookup_idx=self.lookup_idx_dec, device=self.device)
 
-                if i+1 < self.transformer_dec_seq_len:
-                    y[:, i+1] = dec_out[:, i]
+                if i < self.transformer_dec_seq_len:
+                    y[:, i+4] = dec_out[:, i + 2]
 
-                final_out[:, i] = dec_out[:, i]
+                final_out[:, i+4] = dec_out[:, i + 2]
 
-            return final_out
+            return final_out[:, 4:]

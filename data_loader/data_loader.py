@@ -246,84 +246,6 @@ class DataLoader:
         y = {'train': y_train[:, :, :, 0:1], 'val': y_val[:, :, :, 0:1], 'test': y_test[:, :, :, 0:1]}
         self.dataset = Dataset(data=data, y=y, stats_x=stats_x, stats_y=stats_y)
 
-    def load_node_data_astgnn(self, filename: str, percent: float = 1.0, seq_len: int = 12):
-        print('load file:', filename)
-
-        file_data = np.load(filename)
-        train_x = file_data['train_x']  # (10181, 307, 3, 12)
-        train_x = train_x[:, :, 0:1, :]
-        train_target = file_data['train_target']  # (10181, 307, 12)
-
-        # shuffling training data 0th axis
-        # idx_samples = np.arange(0, train_x.shape[0])
-        # np.random.shuffle(idx_samples)
-        # train_x = train_x[idx_samples]
-        # train_target = train_target[idx_samples]
-
-        train_x_length = train_x.shape[0]
-        scale = int(train_x_length * percent)
-        print('ori length:', train_x_length, ', percent:', percent, ', scale:', scale)
-        train_x = train_x[:scale]
-        train_target = train_target[:scale]
-
-        val_x = file_data['val_x']
-        val_x = val_x[:, :, 0:1, :]
-        val_target = file_data['val_target']
-
-        test_x = file_data['test_x']
-        test_x = test_x[:, :, 0:1, :]
-        test_target = file_data['test_target']
-
-        _max = file_data['mean']  # (1, 1, 3, 1)
-        _min = file_data['std']  # (1, 1, 3, 1)
-
-        train_target_norm = max_min_normalization_astgnn(train_target, _max[:, :, 0, :], _min[:, :, 0, :])
-        test_target_norm = max_min_normalization_astgnn(test_target, _max[:, :, 0, :], _min[:, :, 0, :])
-        val_target_norm = max_min_normalization_astgnn(val_target, _max[:, :, 0, :], _min[:, :, 0, :])
-
-        train_target_norm = np.expand_dims(train_target_norm.transpose(0, 2, 1), axis=3)
-        test_target_norm = np.expand_dims(test_target_norm.transpose(0, 2, 1), axis=3)
-        val_target_norm = np.expand_dims(val_target_norm.transpose(0, 2, 1), axis=3)
-
-        train_x = np.squeeze(train_x, axis=2)
-        val_x = np.squeeze(val_x, axis=2)
-        test_x = np.squeeze(test_x, axis=2)
-
-        train_week_data, train_day_data, train_hr_data = train_x[:, :, :seq_len], train_x[:, :,
-                                                                                  seq_len: seq_len * 2], train_x[:, :,
-                                                                                                         seq_len * 2:]
-        test_week_data, test_day_data, test_hr_data = test_x[:, :, :seq_len], test_x[:, :,
-                                                                              seq_len: seq_len * 2], test_x[:, :,
-                                                                                                     seq_len * 2:]
-        val_week_data, val_day_data, val_hr_data = val_x[:, :, :seq_len], val_x[:, :, seq_len: seq_len * 2], val_x[:, :,
-                                                                                                             seq_len * 2:]
-
-        train_week_data, train_day_data, train_hr_data = np.expand_dims(train_week_data, axis=3), np.expand_dims(
-            train_day_data, axis=3), np.expand_dims(train_hr_data, axis=3)
-        test_week_data, test_day_data, test_hr_data = np.expand_dims(test_week_data, axis=3), np.expand_dims(
-            test_day_data, axis=3), np.expand_dims(test_hr_data, axis=3)
-        val_week_data, val_day_data, val_hr_data = np.expand_dims(val_week_data, axis=3), np.expand_dims(val_day_data,
-                                                                                                         axis=3), np.expand_dims(
-            val_hr_data, axis=3)
-
-        self.n_batch_train = int(len(train_x) / self.batch_size)
-
-        self.n_batch_test = int(len(test_x) / self.batch_size)
-
-        self.n_batch_val = int(len(val_x) / self.batch_size)
-
-        train_x = np.concatenate((train_hr_data, train_day_data, train_week_data), axis=3).transpose(0, 2, 1, 3)
-        test_x = np.concatenate((test_hr_data, test_day_data, test_week_data), axis=3).transpose(0, 2, 1, 3)
-        val_x = np.concatenate((val_hr_data, val_day_data, val_week_data), axis=3).transpose(0, 2, 1, 3)
-
-        _max = _max[0][0][0][0]
-        _min = _min[0][0][0][0]
-
-        data = {'train': train_x, 'val': val_x, 'test': test_x}
-        y = {'train': train_target_norm, 'val': val_target_norm, 'test': test_target_norm}
-        self.dataset = Dataset(data=data, y=y, stats_x={'_max': _max, '_min': _min},
-                               stats_y={'_max': _max, '_min': _min})
-
     def load_edge_data_file(self, filename: str, scaling: bool = True):
         try:
             w = pd.read_csv(filename, header=None).values[1:]
@@ -370,7 +292,7 @@ class DataLoader:
         xs = xs[offset: limit, :, :, :]  # [9358, 13, 228, 1]
         ys = ys[offset: limit, :]
 
-        ys_input = np.copy(ys)[:, :-1 * self.dec_seq_offset]
+        ys_input = np.copy(ys)  # TODO: Change this and remove hard coded value
         if _type != 'train':
             ys_input[:, self.dec_seq_offset:, :, :] = 0
 
