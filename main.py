@@ -42,7 +42,7 @@ def run(epochs: int, data_loader: DataLoader, device: str, model_input_path: str
 
     # mse_loss_fn = nn.L1Loss()
     mse_loss_fn = Masked_MAE_Loss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.0004)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=5, gamma=0.75)
     optimizer.zero_grad()
 

@@ -1,8 +1,8 @@
 batch_size: 4
 epochs: 20
-model_output_path: "output/model/pems08/multi-cross-attn/epoch_dec_conv_global_rep_v3_{}_model.pt"
+model_output_path: "output/model/pems08/multi-cross-attn/base/epoch_v1_{}_model.pt"
 model_input_path: "output/model/pems08/epoch_dec_conv_global_rep_v3_17_model.pt"
-load_saved_model: True
+load_saved_model: False
 edge_dim: 1
 input_dim: 1
 enc_seq_len: 36
@@ -30,5 +30,5 @@ non_graph_dec_input: True
 enc_features: 1
 merge_emb: False
 device: cuda
-cross_attn_features: 3
-per_enc_feature_len: 12
+cross_attn_features: 1
+per_enc_feature_len: 36
