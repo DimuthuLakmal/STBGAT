@@ -1,13 +1,13 @@
 batch_size: 4
 epochs: 55
-model_output_path: "output/model/pems08/decoder-conv/epoch_v2_r2_{}_model.pt"
+model_output_path: "output/model/pems08/decoder-conv/epoch_v3_{}_model.pt"
 model_input_path: "output/model/pems08/decoder-conv/epoch_v2_44_model.pt"
-load_saved_model: True
+load_saved_model: False
 edge_dim: 1
 input_dim: 1
 enc_seq_len: 36
-dec_seq_len: 12
-dec_seq_offset: 4
+dec_seq_len: 16
+dec_seq_offset: 4 # Indicates how many timesteps in the previous hour consider as inputs in the decoder
 
 adj_filename: "data/PEMS08/PEMS08.csv"
 graph_signal_matrix_filename: "data/PEMS08/PEMS08.npz"
@@ -27,8 +27,10 @@ graph_enc_input: False # IMPORTANT: Set true for all encode inputs if merge_emb 
 graph_dec_input: False
 non_graph_enc_input: True
 non_graph_dec_input: True
-enc_features: 1
-merge_emb: False
+enc_features: 1 # To indicates multiple encoders (feature-wise). default is 1
+merge_emb: False # Indicate whether the graph embeddings merge with non-graph embedding.
 device: cuda
-cross_attn_features: 1
-per_enc_feature_len: 36
+cross_attn_features: 1 # Used to indicates how many feature-wise cross attentions in the decoder
+per_enc_feature_len: 36  # used in decoder cross attention (feature-wise cross attention)
+dec_out_start_idx: 2 # When set decoder offset, this indicates the start index of the decoder output to calculate loss
+dec_out_end_idx: -2 # When set decoder offset, this indicates the end index of the decoder output to calculate loss

@@ -10,7 +10,7 @@ from models.transformer.token_embedding import TokenEmbedding
 class TransformerDecoder(nn.Module):
     def __init__(self, input_dim, out_dim, embed_dim, seq_len, num_layers=2, expansion_factor=4, n_heads=8, dropout=0.2,
                  enc_features=5, sgat_settings=None, merge_embed=False, max_lookup_len=0,
-                 cross_attn_features=True, per_enc_feature_len=12):
+                 cross_attn_features=True, per_enc_feature_len=12, offset=1):
 
         super(TransformerDecoder, self).__init__()
 
@@ -36,8 +36,8 @@ class TransformerDecoder(nn.Module):
                 for _ in range(num_layers)
             ])
         # decoder input masking for convolution operation
-        self.offset = 4
-        self.seq_len = seq_len + 4
+        self.offset = offset
+        self.seq_len = seq_len
         self.emb_dim = embed_dim
 
         self.enc_features = enc_features

@@ -25,8 +25,10 @@ def run(epochs: int, data_loader: DataLoader, device: str, model_input_path: str
                             transformer_dec_seq_len=model_configs['dec_seq_len'],
                             transformer_dec_seq_offset=model_configs['dec_seq_offset'],
                             transformer_input_dim=model_configs['input_dim'],
-                            transfomer_cross_attn_features=model_configs['cross_attn_features'],
-                            transfomer_per_enc_feature_len=model_configs['per_enc_feature_len'],
+                            transformer_cross_attn_features=model_configs['cross_attn_features'],
+                            transformer_per_enc_feature_len=model_configs['per_enc_feature_len'],
+                            transformer_dec_out_start_idx=model_configs['dec_out_start_idx'],
+                            transformer_dec_out_end_idx=model_configs['dec_out_end_idx'],
                             transfomer_emb_dim=16,
                             # input to transformers will be embedded to this dim. Value is similar the last element of sgat_out_f_sizes if both embeddings merge together
                             transformer_n_layers=4,
@@ -135,6 +137,8 @@ if __name__ == '__main__':
         device = configs['device'] if configs['device'] else 'cpu'
         cross_attn_features = configs['cross_attn_features'] if configs['cross_attn_features'] else 3
         per_enc_feature_len = configs['per_enc_feature_len'] if configs['per_enc_feature_len'] else 12
+        dec_out_start_idx = configs['dec_out_start_idx'] if configs['dec_out_start_idx'] else 2
+        dec_out_end_idx = configs['dec_out_end_idx'] if configs['dec_out_end_idx'] else -2
 
     data_configs = {
         'num_of_vertices': num_of_vertices,
@@ -175,5 +179,7 @@ if __name__ == '__main__':
             'dec_seq_offset': dec_seq_offset,
             'merge_emb': merge_emb,
             'cross_attn_features': cross_attn_features,
-            'per_enc_feature_len': per_enc_feature_len
+            'per_enc_feature_len': per_enc_feature_len,
+            'dec_out_start_idx': dec_out_start_idx,
+            'dec_out_end_idx': dec_out_end_idx
         })

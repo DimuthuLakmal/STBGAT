@@ -292,7 +292,7 @@ class DataLoader:
         xs = xs[offset: limit, :, :, :]  # [9358, 13, 228, 1]
         ys = ys[offset: limit, :]
 
-        ys_input = np.copy(ys)  # TODO: Change this and remove hard coded value
+        ys_input = np.copy(ys)
         if _type != 'train':
             ys_input[:, self.dec_seq_offset:, :, :] = 0
 
