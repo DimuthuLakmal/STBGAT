@@ -1,8 +1,8 @@
 batch_size: 4
-epochs: 100
-model_output_path: "output/model/pems08/decoder-conv/epoch_v2_{}_model.pt"
-model_input_path: "output/model/pems08/decoder-conv/epoch_v1_15_model.pt"
-load_saved_model: False
+epochs: 55
+model_output_path: "output/model/pems08/decoder-conv/epoch_v2_r2_{}_model.pt"
+model_input_path: "output/model/pems08/decoder-conv/epoch_v2_44_model.pt"
+load_saved_model: True
 edge_dim: 1
 input_dim: 1
 enc_seq_len: 36
