@@ -43,7 +43,8 @@ def run(epochs: int, data_loader: DataLoader, device: str, model_input_path: str
     # mse_loss_fn = nn.L1Loss()
     mse_loss_fn = Masked_MAE_Loss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-    lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=2, gamma=0.75)
+    lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer=optimizer, T_0=15, T_mult=1, eta_min=0.00005)
+    # lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=2, gamma=0.75)
     optimizer.zero_grad()
 
     min_val_loss = np.inf
