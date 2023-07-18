@@ -53,7 +53,7 @@ class TransformerDecoder(nn.Module):
         self.layers = nn.ModuleList(
             [
                 DecoderBlock(embed_dim, expansion_factor=expansion_factor, n_heads=n_heads, dropout=dropout,
-                             n_cross_attn_layers=enc_features)
+                             n_cross_attn_layers=cross_attn_features)
                 for _ in range(num_layers)
             ]
         )
@@ -82,7 +82,7 @@ class TransformerDecoder(nn.Module):
         tgt_mask_conv = tgt_mask_conv.expand(x.shape[0], self.seq_len, self.emb_dim, self.seq_len).to(device)
         return tgt_mask_conv
 
-    def forward(self, x, graph_x, enc_x, tgt_mask, local_trends=True, lookup_idx=None, device='cuda'):
+    def forward(self, x, graph_x, enc_x, tgt_mask, lookup_idx=None, local_trends=True, device='cuda'):
         embed_x = None
         embed_graph_x = None
         if x is not None:
@@ -103,7 +103,7 @@ class TransformerDecoder(nn.Module):
         embed_out = embed_out.reshape(embed_shp[0], embed_shp[1] * embed_shp[2], embed_shp[3])  # (36, 4 * 170, 16)
         embed_out = embed_out.permute(1, 0, 2)
 
-        x = self.position_embedding(embed_out)  # 32x10x512
+        x = self.position_embedding(embed_out, lookup_idx)  # 32x10x512
 
         tgt_mask_conv = self.create_conv_mask(x, device)
 
