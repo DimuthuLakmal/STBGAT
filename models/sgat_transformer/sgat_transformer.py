@@ -30,7 +30,7 @@ class SGATTransformer(nn.Module):
             transformer_out_dim: int = 1,
             transformer_dropout: float = 0.2,
             transformer_lookup_index: bool = True,
-            transformer_cross_attn_features: bool = False,
+            transformer_cross_attn_features: int = 1,
             transformer_per_enc_feature_len: int = 12,
             transformer_dec_out_start_idx: int = 2,
             transformer_dec_out_end_idx: int = -2
