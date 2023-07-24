@@ -309,7 +309,7 @@ class DataLoader:
             batched_xs_graphs[idx] = [graphs1, graphs2, graphs3, graphs4]
 
             if self.enc_features > 1:
-                batched_xs[idx] = torch.Tensor([xs[idx][:, :, 0:1], xs[idx][:, :, 1:2], xs[idx][:, :, 2:3], xs[idx][:, :, 3:4]]).to(device)
+                batched_xs[idx] = torch.Tensor(np.concatenate((xs[idx][:, :, 2:3], xs[idx][:, :, 1:2], xs[idx][:, :, 0:1]), axis=-1)).to(device)
             else:
                 batched_xs[idx] = torch.Tensor(np.concatenate(np.array([xs[idx][:, :, 2:3], xs[idx][:, :, 1:2], xs[idx][:, :, 0:1]]), axis=0)).to(device)
 

@@ -110,7 +110,7 @@ class SGATTransformer(nn.Module):
         for idx, encoder in enumerate(self.encoders):
             x_i = x[:, :, :, idx: idx + 1] if x is not None else None
             graph_x_i = graph_x[idx] if graph_x is not None else None
-            lookup_idx_i = self.lookup_idx[idx] if self.enc_features > 1 else self.lookup_idx_enc
+            lookup_idx_i = self.lookup_idx_enc[idx] if self.enc_features > 1 else self.lookup_idx_enc
 
             enc_out = encoder(x_i, graph_x_i, lookup_idx_i, True)
             enc_outs[idx] = enc_out
