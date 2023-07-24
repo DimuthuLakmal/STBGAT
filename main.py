@@ -96,17 +96,17 @@ if __name__ == '__main__':
         configs = yaml.safe_load(stream)
 
         # data configs
-        dec_seq_offset = configs['dec_seq_offset'] if configs['dec_seq_offset'] else 1
+        dec_seq_offset = configs['dec_seq_offset']
         edge_attr_scaling = configs['edge_attr_scaling'] if configs['edge_attr_scaling'] else True
         num_of_vertices = configs['num_of_vertices'] if configs['num_of_vertices'] else 307
         points_per_hour = configs['points_per_hour'] if configs['points_per_hour'] else 12
         num_for_predict = configs['num_for_predict'] if configs['num_for_predict'] else 12
         len_input = configs['len_input'] if configs['len_input'] else 12
-        num_of_weeks = configs['num_of_weeks'] if configs['num_of_weeks'] else 0
-        num_of_days = configs['num_of_days'] if configs['num_of_days'] else 0
-        num_of_hours = configs['num_of_hours'] if configs['num_of_hours'] else 1
-        num_of_weeks_target = configs['num_of_weeks_target'] if configs['num_of_weeks_target'] else 1
-        num_of_days_target = configs['num_of_days_target'] if configs['num_of_days_target'] else 1
+        num_of_weeks = configs['num_of_weeks']
+        num_of_days = configs['num_of_days']
+        num_of_hours = configs['num_of_hours']
+        num_of_weeks_target = configs['num_of_weeks_target']
+        num_of_days_target = configs['num_of_days_target']
         batch_size = configs['batch_size'] if configs['batch_size'] else 32
         epochs = configs['epochs'] if configs['epochs'] else 200
         adj_filename = configs['adj_filename'] if configs['adj_filename'] else 'data/PEMS04/PEMS04.csv'
@@ -137,8 +137,8 @@ if __name__ == '__main__':
         device = configs['device'] if configs['device'] else 'cpu'
         cross_attn_features = configs['cross_attn_features'] if configs['cross_attn_features'] else 3
         per_enc_feature_len = configs['per_enc_feature_len'] if configs['per_enc_feature_len'] else 12
-        dec_out_start_idx = configs['dec_out_start_idx'] if configs['dec_out_start_idx'] else 2
-        dec_out_end_idx = configs['dec_out_end_idx'] if configs['dec_out_end_idx'] else -2
+        dec_out_start_idx = configs['dec_out_start_idx']
+        dec_out_end_idx = configs['dec_out_end_idx']
 
     data_configs = {
         'num_of_vertices': num_of_vertices,
