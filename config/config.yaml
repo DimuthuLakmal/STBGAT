@@ -1,7 +1,7 @@
 batch_size: 4
 epochs: 100
-model_output_path: "output/model/pems08/multi-cross-attn/epoch_v2_{}_model.pt"
-model_input_path: "output/model/pems08/multi-cross-attn/epoch_v1_44_model.pt"
+model_output_path: "output/model/pemsd7/multi-cross-attn/epoch_v1_{}_model.pt"
+model_input_path: "output/model/pemsd7/multi-cross-attn/epoch_v1_44_model.pt"
 load_saved_model: False
 edge_dim: 1
 input_dim: 1
