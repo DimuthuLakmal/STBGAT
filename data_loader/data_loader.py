@@ -7,7 +7,7 @@ from torch import Tensor
 from torch_geometric.transforms import ToDevice
 import torch_geometric.data as data
 
-from utils.data_utils import scale_weights, get_sample_indices
+from utils.data_utils import scale_weights, attach_lt_wk_pattern, seq_gen
 from data_loader.dataset import Dataset
 from utils.math_utils import min_max_normalize, max_min_normalization_astgnn
 
@@ -39,6 +39,13 @@ class DataLoader:
         self.non_graph_dec_input = data_configs['non_graph_dec_input']
 
         self.enc_features = data_configs['enc_features']
+
+        # PEMSD7 Specific Variables
+        self.n_train=39
+        self.n_test=5
+        self.n_val=5
+        self.day_slot=288
+        self.n_seq=self.len_input*2
 
     def _fill_missing_values(self, x, records_time_idx, records_time_tgt_idx):
         record_key = x[0, 0, -1]
@@ -121,104 +128,43 @@ class DataLoader:
             return records_time_idx, records_time_tgt_idx
 
     # generate training, validation and test data
-    def load_node_data_file(self, graph_signal_matrix_filename, save=False):
-        data_seq = np.load(graph_signal_matrix_filename)['data']  # (sequence_length, num_of_vertices, num_of_features)
+    def load_node_data_file(self, filename, save=False):
+        data_seq = pd.read_csv(filename, header=None).values
 
-        all_samples = []
-        all_targets = []
+        n_all = self.n_train + self.n_test + self.n_val
+        seq_all, wk_dy_all, hr_dy_all = seq_gen(n_all, data_seq, 0, self.n_seq, self.num_of_vertices, self.day_slot)
+        x = attach_lt_wk_pattern(seq_all, self.len_input)
+        training_x_set, validation_x_set, testing_x_set = x['train'], x['val'], x['test']
 
-        new_data_seq = np.zeros((data_seq.shape[0], data_seq.shape[1], data_seq.shape[2] + 1))
-        points_per_week = self.points_per_hour * 24 * 7
+        total_drop = 288 * 5
+        train_end_limit = self.day_slot * 34 - total_drop
+        val_end_limit = self.day_slot * 39 - total_drop
 
-        for idx in range(data_seq.shape[0]):
-            time_idx = np.array(idx % points_per_week)
-            new_arr = np.expand_dims(np.repeat(time_idx, self.num_of_vertices, axis=0), axis=1)
-            new_data_seq[idx] = np.concatenate((data_seq[idx], new_arr), axis=-1)
+        seq_all = seq_all[total_drop:]
 
-        for idx in range(new_data_seq.shape[0]):
-            sample = get_sample_indices(data_seq, self.num_of_weeks,
-                                        self.num_of_days,
-                                        self.num_of_hours,
-                                        idx,
-                                        self.num_for_predict,
-                                        self.points_per_hour,
-                                        num_of_days_target=self.num_of_days_target,
-                                        num_of_weeks_target=self.num_of_weeks_target)
-            if (sample[0] is None) and (sample[1] is None) and (sample[2] is None):
-                continue
-
-            week_sample, day_sample, hour_sample, target, wk_dys, hrs, week_sample_target, day_sample_target = sample
-
-            time_idx_sample = np.repeat(np.expand_dims(new_data_seq[idx, :, -1:], axis=0), self.len_input, axis=0)
-
-            # Make the hr_idx repeats for every vertex and then expand dimensions to match sample dim
-            hr_idx_sample = np.expand_dims(
-                np.repeat(np.expand_dims(hrs[:self.len_input], axis=0), self.num_of_vertices, axis=0).transpose((1, 0)),
-                axis=-1)
-            hr_idx_target = np.expand_dims(
-                np.repeat(np.expand_dims(hrs[self.len_input:], axis=0), self.num_of_vertices, axis=0).transpose((1, 0)),
-                axis=-1)
-
-            # Make the wk_dy_idx repeats for every vertex and then expand dimensions to match sample dim
-            wk_dy_idx_sample = np.expand_dims(
-                np.repeat(np.expand_dims(wk_dys[:self.len_input], axis=0), self.num_of_vertices, axis=0).transpose(
-                    (1, 0)), axis=-1)
-            wk_dy_idx_target = np.expand_dims(
-                np.repeat(np.expand_dims(wk_dys[self.len_input:], axis=0), self.num_of_vertices, axis=0).transpose(
-                    (1, 0)), axis=-1)
-
-            sample = None
-            # if self.num_of_days_target > 0:
-            #     sample = np.concatenate((sample, day_sample_target[:, :, 0:1]), axis=2)
-
-            if self.num_of_days > 0:
-                # sample = np.concatenate((sample, day_sample[:, :, 0:1]), axis=2)
-                sample = np.concatenate((hour_sample[:, :, 0:1], day_sample[:, :, 0:1]), axis=2)
-
-            if self.num_of_weeks > 0:
-                sample = np.concatenate((sample, week_sample[:, :, 0:1]), axis=2)
-
-            if self.num_of_weeks_target > 0:
-                sample = np.concatenate((sample, week_sample_target[:, :, 0:1]), axis=2)
-                ### hr and wk_dy indices are not used as features. So skipping attaching ###
-
-            # sample = np.concatenate((sample, hr_idx_sample, wk_dy_idx_sample, time_idx_sample), axis=2)
-            sample = np.concatenate((sample, time_idx_sample), axis=2)
-
-            # target = np.concatenate((target[:, :, 0:1], hr_idx_target, wk_dy_idx_target), axis=2)
-            all_samples.append(sample)
-            all_targets.append(target[:, :, 0:1])
-
-        split_line1 = int(len(all_samples) * 0.6)
-        split_line2 = int(len(all_samples) * 0.8)
-
-        training_x_set = np.array(all_samples[:split_line1])
-        validation_x_set = np.array(all_samples[split_line1: split_line2])
-        testing_x_set = np.array(all_samples[split_line2:])
-
-        training_y_set = np.array(all_targets[:split_line1])
-        validation_y_set = np.array(all_targets[split_line1: split_line2])
-        testing_y_set = np.array(all_targets[split_line2:])
+        training_y_set = seq_all[: train_end_limit, self.len_input:]
+        validation_y_set = seq_all[train_end_limit: val_end_limit, self.len_input:]
+        testing_y_set = seq_all[val_end_limit:, self.len_input:]
 
         # Derive global representation vector for each sensor for similar time steps
         # records_time_idx, records_time_tgt_idx = self._derive_rep_timeline(training_x_set, training_y_set, points_per_week)
 
         new_train_x_set = np.zeros(
-            (training_x_set.shape[0], training_x_set.shape[1], training_x_set.shape[2], training_x_set.shape[3] - 1))
+            (training_x_set.shape[0], training_x_set.shape[1], training_x_set.shape[2], training_x_set.shape[3]))
         for i, x in enumerate(training_x_set):
             # new_train_x_set[i] = self._fill_missing_values(x, records_time_idx, records_time_tgt_idx)
-            new_train_x_set[i] = x[:, :, :-1]
+            new_train_x_set[i] = x
 
         new_val_x_set = np.zeros(
             (validation_x_set.shape[0], validation_x_set.shape[1], validation_x_set.shape[2],
-             validation_x_set.shape[3] - 1))
+             validation_x_set.shape[3]))
         for i, x in enumerate(validation_x_set):
-            new_val_x_set[i] = x[:, :, :-1]
+            new_val_x_set[i] = x[:, :, :]
 
         new_test_x_set = np.zeros(
-            (testing_x_set.shape[0], testing_x_set.shape[1], testing_x_set.shape[2], testing_x_set.shape[3] - 1))
+            (testing_x_set.shape[0], testing_x_set.shape[1], testing_x_set.shape[2], testing_x_set.shape[3]))
         for i, x in enumerate(testing_x_set):
-            new_test_x_set[i] = x[:, :, :-1]
+            new_test_x_set[i] = x[:, :, :]
 
         # Add tailing target values form x values to facilitate local trend attention in decoder
         training_y_set = np.concatenate(
@@ -248,26 +194,20 @@ class DataLoader:
 
     def load_edge_data_file(self, filename: str, scaling: bool = True):
         try:
-            w = pd.read_csv(filename, header=None).values[1:]
+            w = pd.read_csv(filename, header=None).values
 
             dst_edges = []
             src_edges = []
             edge_attr = []
             for row in range(w.shape[0]):
-                # Drop edges with large distance between vertices. This adds incorrect attention in training time and
-                # degrade test performance (Over-fitting).
-                # if float(w[row][2]) > 300:
-                #     continue
-                dst_edges.append(int(w[row][0]))
-                src_edges.append(int(w[row][1]))
-                edge_attr.append([float(w[row][2])])
-
-                dst_edges.append(int(w[row][1]))
-                src_edges.append(int(w[row][0]))
-                edge_attr.append([float(w[row][2])])
+                for col in range(w.shape[1]):
+                    if w[row][col] != 0:
+                        dst_edges.append(col)
+                        src_edges.append(row)
+                        edge_attr.append([w[row][col]])
 
             edge_index = [src_edges, dst_edges]
-            edge_attr = scale_weights(np.array(edge_attr), scaling, min_max=True)
+            edge_attr = scale_weights(edge_attr, scaling)
 
             self.edge_index = edge_index
             self.edge_attr = edge_attr

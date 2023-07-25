@@ -5,14 +5,13 @@ model_input_path: "output/model/pems08/multi-cross-attn/epoch_v1_44_model.pt"
 load_saved_model: False
 edge_dim: 1
 input_dim: 1
-enc_seq_len: 12
+enc_seq_len: 36
 dec_seq_len: 16
 dec_seq_offset: 4 # Indicates how many timesteps in the previous hour consider as inputs in the decoder
 
-adj_filename: "data/PEMS08/PEMS08.csv"
-graph_signal_matrix_filename: "data/PEMS08/PEMS08.npz"
-graph_signal_matrix_filename_asgtnn: "data/PEMS08/PEMS08_r1_d1_w1.npz"
-num_of_vertices: 170
+adj_filename: "data/PEMSD7/PeMSD7_W_228.csv"
+graph_signal_matrix_filename: "data/PEMSD7/PeMSD7_V_228.csv"
+num_of_vertices: 228
 edge_attr_scaling: True
 points_per_hour: 12
 num_for_predict : 12
@@ -27,7 +26,7 @@ graph_enc_input: False # IMPORTANT: Set true for all encode inputs if merge_emb 
 graph_dec_input: False
 non_graph_enc_input: True
 non_graph_dec_input: True
-enc_features: 3 # To indicates multiple encoders (feature-wise). default is 1
+enc_features: 1 # To indicates multiple encoders (feature-wise). default is 1
 merge_emb: False # Indicate whether the graph embeddings merge with non-graph embedding.
 device: cuda
 cross_attn_features: 3 # Used to indicates how many feature-wise cross attentions in the decoder

@@ -3,157 +3,82 @@ import numpy as np
 from utils.math_utils import normalize
 
 
-def search_data(sequence_length, num_of_depend, label_start_idx,
-                num_for_predict, units, points_per_hour):
+def seq_gen(len_seq, data_seq, offset, n_frame, n_route, day_slot, C_0=1):
     '''
-    Parameters
-    ----------
-    sequence_length: int, length of all history data
-    num_of_depend: int,
-    label_start_idx: int, the first index of predicting target
-    num_for_predict: int, the number of points will be predicted for each sample
-    units: int, week: 7 * 24, day: 24, recent(hour): 1
-    points_per_hour: int, number of points per hour, depends on data
-    Returns
-    ----------
-    list[(start_idx, end_idx)]
+    Generate data in the form of standard sequence unit.
+    :param len_seq: int, the length of target date sequence.
+    :param data_seq: np.ndarray, source data / time-series.
+    :param offset:  int, the starting index of different dataset type.
+    :param n_frame: int, the number of frame within a standard sequence unit,
+                         which contains n_his = 12 and n_pred = 9 (3 /15 min, 6 /30 min & 9 /45 min).
+    :param n_route: int, the number of routes in the graph.
+    :param day_slot: int, the number of time slots per day, controlled by the time window (5 min as default).
+    :param C_0: int, the size of input channel.
+    :return: np.ndarray, [len_seq, n_frame, n_route, C_0].
     '''
+    # n_slot = day_slot - n_frame + 1 # Dimuthu changed this
+    n_slot = day_slot
 
-    if points_per_hour < 0:
-        raise ValueError("points_per_hour should be greater than 0!")
+    wk_dy = 0
+    hr = 0
+    slots_hr = 12  # no slots per hr
+    slots_dy = 288  # no slots per day
+    hr_arr = np.ones((len_seq * n_slot, n_frame, n_route, 1))
+    wk_dy_arr = np.ones((len_seq * n_slot, n_frame, n_route, 1))
 
-    if label_start_idx + num_for_predict > sequence_length:
-        return None
+    total_slots = 44 * 288
 
-    x_idx = []
-    for i in range(1, num_of_depend + 1):
-        start_idx = label_start_idx - points_per_hour * units * i
-        end_idx = start_idx + num_for_predict
-        if start_idx >= 0:
-            x_idx.append((start_idx, end_idx))
+    tmp_seq = np.zeros((len_seq * n_slot, n_frame, n_route, C_0))
+    for i in range(len_seq):
+        for j in range(n_slot):
+            sta = (i + offset) * day_slot + j
+            end = sta + n_frame
+            if end > total_slots: continue
+            tmp_seq[i * n_slot + j, :, :, :] = np.reshape(data_seq[sta:end, :], [n_frame, n_route, C_0])
+
+            time_slot = (i + offset) * day_slot + j
+            if time_slot % slots_dy == 0:
+                wk_dy = 1 if wk_dy == 5 else wk_dy + 1
+            if time_slot % slots_hr == 0:
+                hr = 1 if hr == 24 else hr + 1
+
+            arr_idx = i * day_slot + j
+            wk_dy_arr[arr_idx, :, :, 0] = (wk_dy - 1)/4.0
+            hr_arr[arr_idx, :, :, 0] = (hr - 1)/23.0
+
+    return tmp_seq, wk_dy_arr, hr_arr
+
+
+def attach_lt_wk_pattern(seq_all: list, n_his: int):
+    day_slots = 288
+    total_drop = day_slots * 5
+
+    train_end_limit = day_slots*34 - total_drop
+    val_end_limit = day_slots*39 - total_drop
+
+    seq_tmp = seq_all[total_drop:]
+
+    prev_idxs = [day_slots, day_slots*5]
+    seq_input_train = []
+    seq_input_val = []
+    seq_input_test = []
+
+    for k in range(len(seq_tmp)):
+        lst_dy_data = seq_all[k-prev_idxs[0]][:n_his]
+        lst_5dy_data = seq_all[k-prev_idxs[1]][:n_his]
+
+        tmp = np.concatenate(
+            (seq_tmp[k][:n_his], lst_dy_data, lst_5dy_data),
+            axis=2)
+        if k < train_end_limit:
+            seq_input_train.append(tmp)
+        elif train_end_limit <= k < val_end_limit:
+            seq_input_val.append(tmp)
         else:
-            return None
+            seq_input_test.append(tmp)
 
-    if len(x_idx) != num_of_depend:
-        return None
-
-    return x_idx[::-1]
-
-
-def get_sample_indices(data_sequence, num_of_weeks, num_of_days, num_of_hours,
-                       label_start_idx, num_for_predict, points_per_hour=12,
-                       num_of_weeks_target=1, num_of_days_target=1):
-    '''
-    Parameters
-    ----------
-    data_sequence: np.ndarray
-                   shape is (sequence_length, num_of_vertices, num_of_features)
-    num_of_weeks, num_of_days, num_of_hours: int
-    label_start_idx: int, the first index of predicting target, 预测值开始的那个点
-    num_for_predict: int,
-                     the number of points will be predicted for each sample
-    points_per_hour: int, default 12, number of points per hour
-    Returns
-    ----------
-    week_sample: np.ndarray
-                 shape is (num_of_weeks * points_per_hour,
-                           num_of_vertices, num_of_features)
-    day_sample: np.ndarray
-                 shape is (num_of_days * points_per_hour,
-                           num_of_vertices, num_of_features)
-    hour_sample: np.ndarray
-                 shape is (num_of_hours * points_per_hour,
-                           num_of_vertices, num_of_features)
-    target: np.ndarray
-            shape is (num_for_predict, num_of_vertices, num_of_features)
-    '''
-
-    points_per_day = points_per_hour * 24
-    points_per_wk = points_per_hour * 24 * 7
-    wk_dys, hrs = [], []
-
-    week_sample, day_sample, hour_sample, week_sample_target, day_sample_target = None, None, None, None, None
-
-    if label_start_idx + num_for_predict > data_sequence.shape[0]:
-        return week_sample, day_sample, hour_sample, None, None, None, None, None
-
-    if num_of_weeks > 0:
-        week_indices = search_data(data_sequence.shape[0], num_of_weeks,
-                                   label_start_idx, num_for_predict,
-                                   7 * 24, points_per_hour)
-        if not week_indices:
-            return None, None, None, None, None, None, None, None
-
-        week_sample = np.concatenate([data_sequence[i: j]
-                                      for i, j in week_indices], axis=0)
-
-    if num_of_weeks_target > 0:
-        week_indices_target = search_data(data_sequence.shape[0], num_of_weeks_target,
-                                          label_start_idx + num_for_predict, num_for_predict,
-                                          7 * 24, points_per_hour)
-        if not week_indices_target:
-            return None, None, None, None, None, None, None, None
-
-        week_sample_target = np.concatenate([data_sequence[i: j]
-                                             for i, j in week_indices_target], axis=0)
-
-    if num_of_days > 0:
-        day_indices = search_data(data_sequence.shape[0], num_of_days,
-                                  label_start_idx, num_for_predict,
-                                  24, points_per_hour)
-        if not day_indices:
-            return None, None, None, None, None, None, None, None
-
-        day_sample = np.concatenate([data_sequence[i: j]
-                                     for i, j in day_indices], axis=0)
-
-    if num_of_days_target > 0:
-        day_indices_target = search_data(data_sequence.shape[0], num_of_days_target,
-                                         label_start_idx + num_for_predict, num_for_predict,
-                                         24, points_per_hour)
-        if not day_indices_target:
-            return None, None, None, None, None, None, None, None
-
-        day_sample_target = np.concatenate([data_sequence[i: j]
-                                            for i, j in day_indices_target], axis=0)
-
-    if num_of_hours > 0:
-        hour_indices = search_data(data_sequence.shape[0], num_of_hours,
-                                   label_start_idx, num_for_predict,
-                                   1, points_per_hour)
-        if not hour_indices:
-            return None, None, None, None, None, None, None, None
-
-        hour_sample = np.concatenate([data_sequence[i: j]
-                                      for i, j in hour_indices], axis=0)
-
-        if hour_indices:
-            for idx in range(hour_indices[0][0], hour_indices[0][1]):
-                per_wk_idx = idx % points_per_wk
-                wk_dy = (per_wk_idx // points_per_day) + 1
-                wk_dys.append(wk_dy)
-
-                per_dy_idx = idx % points_per_day
-                hr = (per_dy_idx // points_per_hour) + 1
-                hrs.append(hr)
-
-    target = data_sequence[label_start_idx: label_start_idx + num_for_predict]
-
-    tgt_start_idx = label_start_idx
-    tgt_end_idx = label_start_idx + num_for_predict
-    for idx in range(tgt_start_idx, tgt_end_idx):
-        per_wk_idx = idx % points_per_wk
-        wk_dy = (per_wk_idx // points_per_day) + 1
-        wk_dys.append(wk_dy)
-
-        per_dy_idx = idx % points_per_day
-        hr = (per_dy_idx // points_per_hour) + 1
-        hrs.append(hr)
-
-    wk_dys = np.array(wk_dys)
-    hrs = np.array(hrs)
-
-    return week_sample, day_sample, hour_sample, target, wk_dys, hrs, week_sample_target, day_sample_target
+    x = {'train': np.array(seq_input_train), 'val': np.array(seq_input_val), 'test': np.array(seq_input_test)}
+    return x
 
 
 def scale_weights(w, scaling=True, min_max=False):
@@ -204,9 +129,9 @@ def search_index(max_len, num_of_depend=1, num_for_predict=12, points_per_hour=1
 
 def create_lookup_index(merge=False):
     wk_lookup_idx = search_index(max_len=0,
-                                 units=24 * 7)
+                                 units=24 * 5)
     wk_tgt_lookup_idx = search_index(max_len=0,
-                                     units=24 * 7,
+                                     units=24 * 5,
                                      offset=12)
     dy_lookup_idx = search_index(max_len=0,
                                  units=24)
