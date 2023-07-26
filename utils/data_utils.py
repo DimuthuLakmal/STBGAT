@@ -64,8 +64,8 @@ def attach_lt_wk_pattern(seq_all: list, n_his: int):
     seq_input_test = []
 
     for k in range(len(seq_tmp)):
-        lst_dy_data = seq_all[k-prev_idxs[0]][:n_his]
-        lst_5dy_data = seq_all[k-prev_idxs[1]][:n_his]
+        lst_dy_data = seq_all[k-prev_idxs[0]][n_his:]
+        lst_5dy_data = seq_all[k-prev_idxs[1]][n_his:]
 
         tmp = np.concatenate(
             (seq_tmp[k][:n_his], lst_dy_data, lst_5dy_data),
@@ -129,12 +129,14 @@ def search_index(max_len, num_of_depend=1, num_for_predict=12, points_per_hour=1
 
 def create_lookup_index(merge=False):
     wk_lookup_idx = search_index(max_len=0,
-                                 units=24 * 5)
+                                 units=24 * 5,
+                                 offset=12)
     wk_tgt_lookup_idx = search_index(max_len=0,
                                      units=24 * 5,
                                      offset=12)
     dy_lookup_idx = search_index(max_len=0,
-                                 units=24)
+                                 units=24,
+                                 offset=12)
     hr_lookup_idx = search_index(max_len=0,
                                  units=1)
     max_val = min((wk_lookup_idx, wk_tgt_lookup_idx, dy_lookup_idx, hr_lookup_idx))[0] * -1
