@@ -28,7 +28,7 @@ graph_dec_input: False
 non_graph_enc_input: True
 non_graph_dec_input: True
 enc_features: 1 # To indicates multiple encoders (feature-wise). default is 1
-merge_emb: False # Indicate whether the graph embeddings merge with non-graph embedding.
+merge_emb: True # Indicate whether the graph embeddings merge with non-graph embedding.
 device: cuda
 cross_attn_features: 3 # Used to indicates how many feature-wise cross attentions in the decoder
 per_enc_feature_len: 12  # used in decoder cross attention (feature-wise cross attention). This should be tuned along with cross_attn_features
