@@ -11,7 +11,7 @@ from utils.masked_mae_loss import Masked_MAE_Loss
 
 
 def run(epochs: int, data_loader: DataLoader, device: str, model_input_path: str, model_output_path: str,
-        load_saved_model: bool, model_configs: dict):
+        load_saved_model: bool, model_configs: dict, log_file):
     model = SGATTransformer(device=device,
                             sgat_first_in_f_size=1,
                             sgat_n_layers=2,
@@ -53,6 +53,7 @@ def run(epochs: int, data_loader: DataLoader, device: str, model_input_path: str
 
     for epoch in range(epochs):
         print(f"LR: {lr_scheduler.get_last_lr()}")
+        log_file.write(f"LR: {lr_scheduler.get_last_lr()}\n")
 
         mae_train_loss, rmse_train_loss, mape_train_loss = train(model=model,
                                                                  data_loader=data_loader,
@@ -71,15 +72,20 @@ def run(epochs: int, data_loader: DataLoader, device: str, model_input_path: str
         print(f"Epoch: {epoch} | mae_train_loss: {mae_train_loss} | rmse_train_loss: {rmse_train_loss}"
               f" | mape_train_loss: {mape_train_loss} | mae_val_loss: {mae_val_loss}"
               f" | rmse_val_loss: {rmse_val_loss} | mape_val_loss: {mape_val_loss}")
+        log_file.write("Epoch: {epoch} | mae_train_loss: {mae_train_loss} | rmse_train_loss: {rmse_train_loss}"
+              f" | mape_train_loss: {mape_train_loss} | mae_val_loss: {mae_val_loss}"
+              f" | rmse_val_loss: {rmse_val_loss} | mape_val_loss: {mape_val_loss}\n")
 
         if min_val_loss > rmse_val_loss:
             min_val_loss = rmse_val_loss
-            print('Saving Model...')
             best_model_path = model_output_path.format(str(epoch))
             torch.save(model.state_dict(), best_model_path)  # saving model
+            print('Saving Model...')
+            log_file.write("Saving Model...\n")
 
     # testing model
     print('Testing model...')
+    log_file.write("Testing model...\n")
     model.load_state_dict(torch.load(best_model_path))
     mae_test_loss, rmse_test_loss, mape_test_loss = test(_type='test',
                                                          model=model,
@@ -88,6 +94,8 @@ def run(epochs: int, data_loader: DataLoader, device: str, model_input_path: str
                                                          seq_offset=model_configs['dec_seq_offset'])
 
     print(f"mae_test_loss: {mae_test_loss} | rmse_test_loss: {rmse_test_loss} | mape_test_loss: {mape_test_loss}")
+
+    log_file.close()
 
 
 if __name__ == '__main__':
@@ -114,6 +122,7 @@ if __name__ == '__main__':
             'graph_signal_matrix_filename'] \
             else 'data/PEMS04/PEMS04.npz'
         dataset_name = configs['dataset_name'] if configs['dataset_name'] else 'PEMS04'
+        log_filename = configs['log_filename']
 
         graph_enc_input = configs['graph_enc_input'] if configs['graph_enc_input'] else False
         graph_dec_input = configs['graph_dec_input'] if configs['graph_dec_input'] else False
@@ -139,6 +148,8 @@ if __name__ == '__main__':
         per_enc_feature_len = configs['per_enc_feature_len'] if configs['per_enc_feature_len'] else 12
         dec_out_start_idx = configs['dec_out_start_idx']
         dec_out_end_idx = configs['dec_out_end_idx']
+
+    log_file = open(log_filename, '+w')
 
     data_configs = {
         'num_of_vertices': num_of_vertices,
@@ -170,6 +181,7 @@ if __name__ == '__main__':
         model_input_path=model_input_path,
         model_output_path=model_output_path,
         load_saved_model=load_saved_model,
+        log_file=log_file,
         model_configs={
             'input_dim': input_dim,
             'edge_dim': edge_dim,

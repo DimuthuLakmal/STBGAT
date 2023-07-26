@@ -1,7 +1,8 @@
 batch_size: 4
-epochs: 100
+epochs: 50
 model_output_path: "output/model/pemsd7/multi-cross-attn/epoch_v1_{}_model.pt"
 model_input_path: "output/model/pemsd7/multi-cross-attn/epoch_v1_44_model.pt"
+log_filename: "output/model/pemsd7/multi-cross-attn/log.txt"
 load_saved_model: False
 edge_dim: 1
 input_dim: 1
