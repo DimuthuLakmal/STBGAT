@@ -236,23 +236,35 @@ class DataLoader:
         if _type != 'train':
             ys_input[:, self.dec_seq_offset:, :, :] = 0
 
-        batched_xs_graphs = [[] for i in range(batch_size)]
+        feature_xs_graphs = [[] for i in range(self.enc_features)]
+        for k in range(self.enc_features):
+            batched_xs_graphs = [[] for i in range(batch_size)]
+
+            for idx, x_timesteps in enumerate(xs):
+                graph_xs = []
+
+                if self.enc_features > 1:
+                    for t, x in enumerate(x_timesteps):
+                        graph_xs.append(to(self._create_graph(x[:, k:k + 1])))
+
+                else:
+                    # TODO: This is hard coded. Please replace with a proper index selection
+                    [graph_xs.append(to(self._create_graph(x[:, 2:3]))) for x in x_timesteps]  # last week
+                    [graph_xs.append(to(self._create_graph(x[:, 1:2]))) for x in x_timesteps]  # last day
+                    [graph_xs.append(to(self._create_graph(x[:, 0:1]))) for x in x_timesteps]  # last hour
+
+                batched_xs_graphs[idx] = graph_xs
+
+            feature_xs_graphs[k] = batched_xs_graphs
+
         batched_xs = [[] for i in range(batch_size)]
         for idx, x_timesteps in enumerate(xs):
-            graphs1, graphs2, graphs3, graphs4 = [], [], [], []
-            for x in x_timesteps:
-                graphs1.append(to(self._create_graph(x[:, 0:1])))
-                graphs2.append(to(self._create_graph(x[:, 1:2])))
-                graphs3.append(to(self._create_graph(x[:, 2:3])))
-                graphs4.append(to(self._create_graph(x[:, 3:4])))
-
-            batched_xs_graphs[idx] = [graphs1, graphs2, graphs3, graphs4]
-
             if self.enc_features > 1:
-                batched_xs[idx] = torch.Tensor(np.concatenate((xs[idx][:, :, 2:3], xs[idx][:, :, 1:2], xs[idx][:, :, 0:1]), axis=-1)).to(device)
+                batched_xs[idx] = torch.Tensor(
+                    [xs[idx][:, :, 0:1], xs[idx][:, :, 1:2], xs[idx][:, :, 2:3], xs[idx][:, :, 3:4]]).to(device)
             else:
-                batched_xs[idx] = torch.Tensor(np.concatenate(np.array([xs[idx][:, :, 2:3], xs[idx][:, :, 1:2], xs[idx][:, :, 0:1]]), axis=0)).to(device)
-
+                seq_x = np.concatenate(np.array([xs[idx][:, :, 2:3], xs[idx][:, :, 1:2], xs[idx][:, :, 0:1]]), axis=0)
+                batched_xs[idx] = torch.Tensor(seq_x).to(device)
         batched_xs = torch.stack(batched_xs)
 
         batched_ys = [[] for i in range(batch_size)]  # decoder input
@@ -279,4 +291,4 @@ class DataLoader:
         if not self.non_graph_dec_input:
             batched_ys = None
 
-        return batched_xs, batched_xs_graphs, batched_ys, batched_ys_graphs, batch_ys_target
+        return batched_xs, feature_xs_graphs, batched_ys, batched_ys_graphs, batch_ys_target
