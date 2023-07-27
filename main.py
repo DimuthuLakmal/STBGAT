@@ -14,9 +14,9 @@ def run(epochs: int, data_loader: DataLoader, device: str, model_input_path: str
         load_saved_model: bool, model_configs: dict, log_file):
     model = SGATTransformer(device=device,
                             sgat_first_in_f_size=1,
-                            sgat_n_layers=2,
-                            sgat_out_f_sizes=[16, 16],
-                            sgat_n_heads=[8, 1],
+                            sgat_n_layers=1,
+                            sgat_out_f_sizes=[16],
+                            sgat_n_heads=[4],
                             sgat_alpha=0.2,
                             sgat_dropout=0.5,
                             sgat_edge_dim=model_configs['edge_dim'],
@@ -76,8 +76,8 @@ def run(epochs: int, data_loader: DataLoader, device: str, model_input_path: str
               f" | mape_train_loss: {mape_train_loss} | mae_val_loss: {mae_val_loss}"
               f" | rmse_val_loss: {rmse_val_loss} | mape_val_loss: {mape_val_loss}\n")
 
-        if min_val_loss > rmse_val_loss:
-            min_val_loss = rmse_val_loss
+        if min_val_loss > mae_val_loss:
+            min_val_loss = mae_val_loss
             best_model_path = model_output_path.format(str(epoch))
             torch.save(model.state_dict(), best_model_path)  # saving model
             print('Saving Model...')
