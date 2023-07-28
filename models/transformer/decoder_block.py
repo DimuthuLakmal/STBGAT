@@ -9,7 +9,7 @@ class DecoderBlock(nn.Module):
     def __init__(self, embed_dim, expansion_factor=4, n_heads=8, dropout=0.2, n_cross_attn_layers=5):
         super(DecoderBlock, self).__init__()
 
-        self.self_attention = MultiheadAttention(embed_dim=embed_dim, num_heads=n_heads, batch_first=True, bias=False)
+        self.self_attention = MultiheadAttention(embed_dim=embed_dim, num_heads=n_heads, batch_first=True, bias=True)
         self.norm1 = nn.LayerNorm(embed_dim)
         self.dropout1 = nn.Dropout(dropout)
 
