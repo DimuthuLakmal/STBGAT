@@ -1,6 +1,7 @@
 import torch
 
 from data_loader.data_loader import DataLoader
+from utils.logger import logger
 from utils.math_utils import calculate_loss
 
 
@@ -43,7 +44,7 @@ def test(_type: str,
             mape_loss += mape_loss_val
 
             if batch % 100 == 0:
-                print(f"MAE {mae_loss/(batch + 1)}")
+                logger.info(f"MAE {mae_loss/(batch + 1)}")
 
             offset += data_loader.batch_size
 
