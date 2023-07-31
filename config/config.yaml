@@ -1,4 +1,4 @@
-batch_size: 16
+batch_size: 4
 epochs: 50
 model_output_path: "output/model/pemsd7/multi-cross-attn/epoch_v1_{}_model.pt"
 model_input_path: "output/model/pemsd7/multi-cross-attn/epoch_v1_13_model.pt"
@@ -23,7 +23,7 @@ num_of_hours: 1
 num_of_days_target: 1
 num_of_weeks_target: 1
 graph_enc_input: True # IMPORTANT: Set true for all encode inputs if merge_emb is True
-graph_dec_input: True
+graph_dec_input: False
 non_graph_enc_input: True
 non_graph_dec_input: True
 enc_features: 1 # To indicates multiple encoders (feature-wise). default is 1
