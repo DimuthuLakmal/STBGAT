@@ -9,7 +9,7 @@ class SGATEmbedding(nn.Module):
     def __init__(self, n_layers, first_in_f_size, out_f_sizes, n_heads, alpha, dropout, edge_dim, seq_len):
         super(SGATEmbedding, self).__init__()
         self.gats = nn.ModuleList([
-            GATV2(n_layers=n_layers,
+            GAT(n_layers=n_layers,
                   first_in_f_size=first_in_f_size,
                   out_f_sizes=out_f_sizes,
                   n_heads=n_heads,
