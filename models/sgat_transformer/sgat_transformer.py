@@ -128,8 +128,9 @@ class SGATTransformer(nn.Module):
                                        lookup_idx=self.lookup_idx_dec, device=self.device)
 
                 y[:, i + self.dec_seq_offset] = dec_out[:, i + self.dec_out_start_idx]
-                for batch in range(y.shape[0]):
-                    graph_y[batch][i + self.dec_seq_offset].x = dec_out[batch, i + self.dec_out_start_idx]
+                if graph_y is not None:
+                    for batch in range(y.shape[0]):
+                        graph_y[batch][i + self.dec_seq_offset].x = dec_out[batch, i + self.dec_out_start_idx]
 
                 final_out[:, i + self.dec_seq_offset] = dec_out[:, i + self.dec_out_start_idx]
 
