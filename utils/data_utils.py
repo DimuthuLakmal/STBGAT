@@ -48,6 +48,29 @@ def seq_gen(len_seq, data_seq, offset, n_frame, n_route, day_slot, C_0=1):
 
     return tmp_seq, wk_dy_arr, hr_arr
 
+def seq_gen_v2(len_seq, data_seq, offset, n_frame, n_route, day_slot, C_0=1):
+    '''
+    Generate data in the form of standard sequence unit.
+    :param len_seq: int, the length of target date sequence.
+    :param data_seq: np.ndarray, source data / time-series.
+    :param offset:  int, the starting index of different dataset type.
+    :param n_frame: int, the number of frame within a standard sequence unit,
+                         which contains n_his = 12 and n_pred = 9 (3 /15 min, 6 /30 min & 9 /45 min).
+    :param n_route: int, the number of routes in the graph.
+    :param day_slot: int, the number of time slots per day, controlled by the time window (5 min as default).
+    :param C_0: int, the size of input channel.
+    :return: np.ndarray, [len_seq, n_frame, n_route, C_0].
+    '''
+    n_slot = day_slot - n_frame + 1
+
+    tmp_seq = np.zeros((len_seq * n_slot, n_frame, n_route, C_0))
+    for i in range(len_seq):
+        for j in range(n_slot):
+            sta = (i + offset) * day_slot + j
+            end = sta + n_frame
+            tmp_seq[i * n_slot + j, :, :, :] = np.reshape(data_seq[sta:end, :], [n_frame, n_route, C_0])
+    return tmp_seq
+
 
 def attach_lt_wk_pattern(seq_all: list, n_his: int):
     day_slots = 288
@@ -64,8 +87,8 @@ def attach_lt_wk_pattern(seq_all: list, n_his: int):
     seq_input_test = []
 
     for k in range(len(seq_tmp)):
-        lst_dy_data = seq_all[k-prev_idxs[0]][n_his:]
-        lst_5dy_data = seq_all[k-prev_idxs[1]][n_his:]
+        lst_dy_data = seq_all[total_drop + k-prev_idxs[0]][n_his:]
+        lst_5dy_data = seq_all[total_drop + k-prev_idxs[1]][n_his:]
 
         tmp = np.concatenate(
             (seq_tmp[k][:n_his], lst_dy_data, lst_5dy_data),

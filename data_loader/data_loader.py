@@ -7,7 +7,7 @@ from torch import Tensor
 from torch_geometric.transforms import ToDevice
 import torch_geometric.data as data
 
-from utils.data_utils import scale_weights, attach_lt_wk_pattern, seq_gen
+from utils.data_utils import scale_weights, attach_lt_wk_pattern, seq_gen, seq_gen_v2
 from data_loader.dataset import Dataset
 from utils.math_utils import z_score_normalize
 
@@ -43,7 +43,7 @@ class DataLoader:
         self.enc_features = data_configs['enc_features']
 
         # PEMSD7 Specific Variables
-        self.n_train=39
+        self.n_train=34
         self.n_test=5
         self.n_val=5
         self.day_slot=288
@@ -134,7 +134,11 @@ class DataLoader:
         data_seq = pd.read_csv(filename, header=None).values
 
         n_all = self.n_train + self.n_test + self.n_val
-        seq_all, wk_dy_all, hr_dy_all = seq_gen(n_all, data_seq, 0, self.n_seq, self.num_of_vertices, self.day_slot)
+        # seq_all, wk_dy_all, hr_dy_all = seq_gen(n_all, data_seq, 0, self.n_seq, self.num_of_vertices, self.day_slot)
+        seq_train = seq_gen_v2(self.n_train, data_seq, 0, self.n_seq, self.num_of_vertices, self.day_slot)
+        seq_val = seq_gen_v2(self.n_val, data_seq, self.n_train, self.n_seq, self.num_of_vertices, self.day_slot)
+        seq_test = seq_gen_v2(self.n_test, data_seq, self.n_train + self.n_val, self.n_seq, self.num_of_vertices, self.day_slot)
+
         # new_seq_all = np.zeros((seq_all.shape[0], seq_all.shape[1], seq_all.shape[2], seq_all.shape[3] + 1))
         # points_per_week = 12 * 24 * 5
         #
@@ -143,19 +147,27 @@ class DataLoader:
         #     new_arr = np.expand_dims(np.repeat(time_idx, self.num_of_vertices, axis=0), axis=1)
         #     new_seq_all[idx] = np.concatenate((seq_all[idx], new_arr), axis=-1)
 
-        x = attach_lt_wk_pattern(seq_all, self.len_input)
+        # x = attach_lt_wk_pattern(seq_all, self.len_input)
         # training_x_set, validation_x_set, testing_x_set = x['train'], x['val'], x['test']
 
-        train_end_limit = self.day_slot * 34
-        val_end_limit = self.day_slot * 39
+        # train_end_limit = self.day_slot * 34
+        # val_end_limit = self.day_slot * 39
 
-        training_x_set = seq_all[: train_end_limit, :self.len_input]
-        validation_x_set = seq_all[train_end_limit: val_end_limit, :self.len_input]
-        testing_x_set = seq_all[val_end_limit:, :self.len_input]
+        # training_x_set = seq_all[: train_end_limit, :self.len_input]
+        # validation_x_set = seq_all[train_end_limit: val_end_limit, :self.len_input]
+        # testing_x_set = seq_all[val_end_limit:, :self.len_input]
+        #
+        # training_y_set = seq_all[: train_end_limit, self.len_input:]
+        # validation_y_set = seq_all[train_end_limit: val_end_limit, self.len_input:]
+        # testing_y_set = seq_all[val_end_limit:, self.len_input:]
 
-        training_y_set = seq_all[: train_end_limit, self.len_input:]
-        validation_y_set = seq_all[train_end_limit: val_end_limit, self.len_input:]
-        testing_y_set = seq_all[val_end_limit:, self.len_input:]
+        training_x_set = seq_train[:, :self.len_input]
+        validation_x_set = seq_val[:, :self.len_input]
+        testing_x_set = seq_test[:, :self.len_input]
+
+        training_y_set = seq_train[:, self.len_input:]
+        validation_y_set = seq_val[:, self.len_input:]
+        testing_y_set = seq_test[:, self.len_input:]
 
         # Derive global representation vector for each sensor for similar time steps
         records_time_idx, records_time_tgt_idx = self._derive_rep_timeline(training_x_set, training_y_set, 288 * 5)
