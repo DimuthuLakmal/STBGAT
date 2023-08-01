@@ -41,7 +41,7 @@ class TransformerDecoder(nn.Module):
         self.conv_q_layer = nn.Conv1d(in_channels=embed_dim, out_channels=embed_dim, kernel_size=3, stride=1, padding=1)
 
         self.conv_q_layers = nn.ModuleList([
-            nn.Conv2d(in_channels=embed_dim, out_channels=embed_dim, kernel_size=(1, 3), stride=1, padding=(0, 1),
+            nn.Conv2d(in_channels=embed_dim, out_channels=embed_dim, kernel_size=(1, 3), stride=1, padding=(0, 2),
                       bias=False)
             for _ in range(num_layers)
         ])

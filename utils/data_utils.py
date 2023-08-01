@@ -139,13 +139,26 @@ def create_lookup_index(merge=False):
                                  offset=12)
     hr_lookup_idx = search_index(max_len=0,
                                  units=1)
-    max_val = min((wk_lookup_idx, wk_tgt_lookup_idx, dy_lookup_idx, hr_lookup_idx))[0] * -1
-    wk_lookup_idx = [x + max_val for x in wk_lookup_idx]
-    wk_tgt_lookup_idx = [x + max_val for x in wk_tgt_lookup_idx]
-    dy_lookup_idx = [x + max_val for x in dy_lookup_idx]
+    # max_val = min((wk_lookup_idx, wk_tgt_lookup_idx, dy_lookup_idx, hr_lookup_idx))[0] * -1
+    # max_val = min((dy_lookup_idx, hr_lookup_idx))[0] * -1
+    max_val = min(hr_lookup_idx) * -1
+
+    # wk_lookup_idx = [x + max_val for x in wk_lookup_idx]
+    # wk_tgt_lookup_idx = [x + max_val for x in wk_tgt_lookup_idx]
+    # dy_lookup_idx = [x + max_val for x in dy_lookup_idx]
     hr_lookup_idx = [x + max_val for x in hr_lookup_idx]
 
-    if merge:
-        return (wk_lookup_idx + dy_lookup_idx + hr_lookup_idx), max_val
+    # if merge:
+    #     return (wk_lookup_idx + dy_lookup_idx + hr_lookup_idx), max_val
+    #
+    # return (wk_lookup_idx, dy_lookup_idx, hr_lookup_idx), max_val
+    #
+    # if merge:
+    #     return (wk_lookup_idx + dy_lookup_idx + hr_lookup_idx), max_val
+    #
+    # return (wk_lookup_idx, dy_lookup_idx, hr_lookup_idx), max_val
 
-    return (wk_lookup_idx, dy_lookup_idx, hr_lookup_idx), max_val
+    if merge:
+        return (hr_lookup_idx), max_val
+
+    return (hr_lookup_idx), max_val
