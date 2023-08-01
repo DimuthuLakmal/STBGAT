@@ -16,7 +16,7 @@ def run(epochs: int, data_loader: DataLoader, device: str, model_input_path: str
     model = SGATTransformer(device=device,
                             sgat_first_in_f_size=1,
                             sgat_n_layers=2,
-                            sgat_out_f_sizes=[16, 16],
+                            sgat_out_f_sizes=[32, 16],
                             sgat_n_heads=[8, 1],
                             sgat_alpha=0.2,
                             sgat_dropout=0.5,
@@ -113,6 +113,8 @@ if __name__ == '__main__':
         batch_size = configs['batch_size'] if configs['batch_size'] else 32
         epochs = configs['epochs'] if configs['epochs'] else 200
         adj_filename = configs['adj_filename'] if configs['adj_filename'] else 'data/PEMS04/PEMS04.csv'
+        semantic_adj_filename = configs['semantic_adj_filename']
+        edge_w_filename = configs['edge_weight_filename']
         graph_signal_matrix_filename = configs['graph_signal_matrix_filename'] if configs[
             'graph_signal_matrix_filename'] \
             else 'data/PEMS04/PEMS04.npz'
@@ -166,6 +168,7 @@ if __name__ == '__main__':
     data_loader.load_node_data_file(graph_signal_matrix_filename)
     # data_loader.load_node_data_astgnn(graph_signal_matrix_filename)
     data_loader.load_edge_data_file(adj_filename, scaling=edge_attr_scaling)
+    data_loader.load_semantic_edge_data_file(semantic_adj_filename, edge_w_filename, scaling=edge_attr_scaling)
 
     run(data_loader=data_loader,
         epochs=epochs,

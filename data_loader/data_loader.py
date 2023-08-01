@@ -1,6 +1,6 @@
-import os
 import pandas as pd
 import numpy as np
+import pickle
 
 import torch
 from torch import Tensor
@@ -9,7 +9,7 @@ import torch_geometric.data as data
 
 from utils.data_utils import scale_weights, attach_lt_wk_pattern, seq_gen
 from data_loader.dataset import Dataset
-from utils.math_utils import min_max_normalize, max_min_normalization_astgnn
+from utils.math_utils import z_score_normalize
 
 
 class DataLoader:
@@ -17,6 +17,8 @@ class DataLoader:
         self.dataset = None
         self.edge_index = None
         self.edge_attr = None
+        self.edge_index_semantic = None
+        self.edge_attr_semantic = None
         self.n_batch_train = None
         self.n_batch_test = None
         self.n_batch_val = None
@@ -175,8 +177,8 @@ class DataLoader:
             (new_test_x_set[:, -1 * self.dec_seq_offset:, :, 0:1], testing_y_set[:, :, :, :]), axis=1)
 
         # max-min normalization on input and target values
-        (stats_x, x_train, x_val, x_test) = min_max_normalize(new_train_x_set, new_val_x_set, new_test_x_set)
-        (stats_y, y_train, y_val, y_test) = min_max_normalize(training_y_set, validation_y_set, testing_y_set)
+        (stats_x, x_train, x_val, x_test) = z_score_normalize(new_train_x_set, new_val_x_set, new_test_x_set)
+        (stats_y, y_train, y_val, y_test) = z_score_normalize(training_y_set, validation_y_set, testing_y_set)
 
         # shuffling training data 0th axis
         idx_samples = np.arange(0, x_train.shape[0])
@@ -215,11 +217,37 @@ class DataLoader:
         except FileNotFoundError:
             print(f'ERROR: input file was not found in {filename}.')
 
-    def _create_graph(self, x):
+    def load_semantic_edge_data_file(self, semantic_filename: str, edge_weight_file: str, scaling: bool = True):
+        try:
+            w = pd.read_csv(edge_weight_file, header=None).values
+
+            semantic_file = open(semantic_filename, 'rb')
+            sensor_details = pickle.load(semantic_file)
+
+            dst_edges = []
+            src_edges = []
+            edge_attr = []
+            for i, (sensor, neighbours) in enumerate(sensor_details.items()):
+                for src in neighbours:
+                    if w[sensor][src] != 0:
+                        dst_edges.append(sensor)
+                        src_edges.append(src)
+                        edge_attr.append([w[sensor][src]])
+
+            edge_index = [src_edges, dst_edges]
+            edge_attr = scale_weights(edge_attr, scaling)
+
+            self.edge_index_semantic = edge_index
+            self.edge_attr_semantic = edge_attr
+
+        except FileNotFoundError:
+            print(f'ERROR: input files was not found')
+
+    def _create_graph(self, x, edge_index, edge_attr):
         graph = data.Data(x=Tensor(x),
-                          edge_index=torch.LongTensor(self.edge_index),
+                          edge_index=torch.LongTensor(edge_index),
                           y=None,
-                          edge_attr=Tensor(self.edge_attr))
+                          edge_attr=Tensor(edge_attr))
         return graph
 
     def load_batch(self, _type: str, offset: int, batch_size: int = 32, device: str = 'cpu') -> (list, list):
@@ -237,11 +265,14 @@ class DataLoader:
             ys_input[:, self.dec_seq_offset:, :, :] = 0
 
         feature_xs_graphs = [[] for i in range(self.enc_features)]
+        feature_xs_graphs_semantic = [[] for i in range(self.enc_features)]
         for k in range(self.enc_features):
             batched_xs_graphs = [[] for i in range(batch_size)]
+            batched_xs_graphs_semantic = [[] for i in range(batch_size)]
 
             for idx, x_timesteps in enumerate(xs):
                 graph_xs = []
+                graph_xs_semantic = []
 
                 if self.enc_features > 1:
                     for t, x in enumerate(x_timesteps):
@@ -249,13 +280,20 @@ class DataLoader:
 
                 else:
                     # TODO: This is hard coded. Please replace with a proper index selection
-                    [graph_xs.append(to(self._create_graph(x[:, 2:3]))) for x in x_timesteps]  # last week
-                    [graph_xs.append(to(self._create_graph(x[:, 1:2]))) for x in x_timesteps]  # last day
-                    [graph_xs.append(to(self._create_graph(x[:, 0:1]))) for x in x_timesteps]  # last hour
+                    [graph_xs.append(to(self._create_graph(x[:, 2:3], self.edge_index, self.edge_attr))) for x in x_timesteps]  # last week
+                    [graph_xs_semantic.append(to(self._create_graph(x[:, 2:3], self.edge_index_semantic, self.edge_attr_semantic))) for x in x_timesteps]  # last week
+                    [graph_xs.append(to(self._create_graph(x[:, 1:2], self.edge_index, self.edge_attr))) for x in x_timesteps]  # last day
+                    [graph_xs_semantic.append(to(self._create_graph(x[:, 1:2], self.edge_index_semantic, self.edge_attr_semantic))) for x in x_timesteps]  # last day
+                    [graph_xs.append(to(self._create_graph(x[:, 0:1], self.edge_index, self.edge_attr))) for x in x_timesteps]  # last hour
+                    [graph_xs_semantic.append(to(self._create_graph(x[:, 0:1], self.edge_index_semantic, self.edge_attr_semantic))) for x in x_timesteps]  # last day
 
                 batched_xs_graphs[idx] = graph_xs
+                batched_xs_graphs_semantic[idx] = graph_xs_semantic
 
             feature_xs_graphs[k] = batched_xs_graphs
+            feature_xs_graphs_semantic[k] = batched_xs_graphs_semantic
+
+        feature_xs_graphs_all = [feature_xs_graphs, feature_xs_graphs_semantic]
 
         batched_xs = [[] for i in range(batch_size)]
         for idx, x_timesteps in enumerate(xs):
@@ -269,26 +307,33 @@ class DataLoader:
 
         batched_ys = [[] for i in range(batch_size)]  # decoder input
         batched_ys_graphs = [[] for i in range(batch_size)]  # This is for the decoder input graph
+        batched_ys_graphs_semantic = [[] for i in range(batch_size)]  # This is for the decoder input graph
         batch_ys_target = [[] for i in range(batch_size)]
         for idx, y_timesteps in enumerate(ys_input):
             graphs_ys = []
+            graphs_ys_semantic = []
             for i, y in enumerate(y_timesteps):
-                graph = self._create_graph(y)
+                graph = self._create_graph(y, self.edge_index, self.edge_attr)
+                graph_semantic = self._create_graph(y, self.edge_index_semantic, self.edge_attr_semantic)
                 graphs_ys.append(to(graph))
+                graphs_ys_semantic.append(to(graph_semantic))
 
             batched_ys[idx] = torch.Tensor(ys_input[idx]).to(device)
             batch_ys_target[idx] = torch.Tensor(ys[idx]).to(device)
             batched_ys_graphs[idx] = graphs_ys
+            batched_ys_graphs_semantic[idx] = graphs_ys_semantic
+
+        graph_ys_all = [batched_ys_graphs, batched_ys_graphs_semantic]
 
         batched_ys = torch.stack(batched_ys)
 
         if not self.graph_enc_input:
-            batched_xs_graphs = None
+            feature_xs_graphs_all = None
         if not self.non_graph_enc_input:
             batched_xs = None
         if not self.graph_dec_input:
-            batched_ys_graphs = None
+            graph_ys_all = None
         if not self.non_graph_dec_input:
             batched_ys = None
 
-        return batched_xs, feature_xs_graphs, batched_ys, batched_ys_graphs, batch_ys_target
+        return batched_xs, feature_xs_graphs_all, batched_ys, graph_ys_all, batch_ys_target

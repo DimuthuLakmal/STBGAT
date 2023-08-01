@@ -23,10 +23,19 @@ class TransformerEncoder(nn.Module):
                                              edge_dim=sgat_settings['edge_dim'],
                                              seq_len=seq_len)
 
+        self.graph_embedding_semantic = SGATEmbedding(n_layers=sgat_settings['n_layers'],
+                                                      first_in_f_size=sgat_settings['first_in_f_size'],
+                                                      out_f_sizes=sgat_settings['out_f_sizes'],
+                                                      n_heads=sgat_settings['n_heads'],
+                                                      alpha=sgat_settings['alpha'],
+                                                      dropout=sgat_settings['dropout'],
+                                                      edge_dim=sgat_settings['edge_dim'],
+                                                      seq_len=seq_len)
+
         # by merging embeddings we increase the num embeddings
         self.merge_embed = merge_embed
         # if merge_embed:
-        #     embed_dim = embed_dim * 2
+        #     embed_dim = embed_dim * 3
 
         self.positional_encoder = PositionalEmbedding(max_lookup_len, embed_dim)
 
@@ -39,22 +48,26 @@ class TransformerEncoder(nn.Module):
             [nn.Conv1d(in_channels=embed_dim, out_channels=embed_dim, kernel_size=3, stride=1, padding=1)
              for _ in range(num_layers)])
 
-        self.layers = nn.ModuleList([EncoderBlock(embed_dim, expansion_factor, n_heads, dropout) for i in range(num_layers)])
+        self.layers = nn.ModuleList(
+            [EncoderBlock(embed_dim, expansion_factor, n_heads, dropout) for i in range(num_layers)])
 
         self.temp_norm = nn.LayerNorm(embed_dim)
 
-    def forward(self, x, graph_x, lookup_idx=None, local_trends=True):
+    def forward(self, x, graph_x, graph_x_semantic, lookup_idx=None, local_trends=True):
         embed_x = None
         embed_graph_x = None
+        embed_graph_x_semantic = None
         if x is not None:
             embed_x = self.embedding(x)
         if graph_x is not None:
             embed_graph_x = self.graph_embedding(graph_x).transpose(0, 1)
+        if graph_x_semantic is not None:
+            embed_graph_x_semantic = self.graph_embedding_semantic(graph_x_semantic).transpose(0, 1)
 
         embed_out = None
-        if embed_graph_x is not None and embed_x is not None and self.merge_embed:
+        if embed_graph_x is not None and embed_graph_x_semantic is not None and embed_x is not None and self.merge_embed:
             # embed_out = torch.concat((embed_x, embed_graph_x), dim=-1)
-            embed_out = embed_x + embed_graph_x
+            embed_out = embed_x + embed_graph_x + embed_graph_x_semantic
             embed_out = self.temp_norm(embed_out)
         elif embed_graph_x is None and embed_x is not None:
             embed_out = embed_x
