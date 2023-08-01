@@ -135,21 +135,30 @@ class DataLoader:
 
         n_all = self.n_train + self.n_test + self.n_val
         seq_all, wk_dy_all, hr_dy_all = seq_gen(n_all, data_seq, 0, self.n_seq, self.num_of_vertices, self.day_slot)
+        # new_seq_all = np.zeros((seq_all.shape[0], seq_all.shape[1], seq_all.shape[2], seq_all.shape[3] + 1))
+        # points_per_week = 12 * 24 * 5
+        #
+        # for idx in range(seq_all.shape[0]):
+        #     time_idx = np.array(idx % points_per_week)
+        #     new_arr = np.expand_dims(np.repeat(time_idx, self.num_of_vertices, axis=0), axis=1)
+        #     new_seq_all[idx] = np.concatenate((seq_all[idx], new_arr), axis=-1)
+
         x = attach_lt_wk_pattern(seq_all, self.len_input)
-        training_x_set, validation_x_set, testing_x_set = x['train'], x['val'], x['test']
+        # training_x_set, validation_x_set, testing_x_set = x['train'], x['val'], x['test']
 
-        total_drop = 288 * 5
-        train_end_limit = self.day_slot * 34 - total_drop
-        val_end_limit = self.day_slot * 39 - total_drop
+        train_end_limit = self.day_slot * 34
+        val_end_limit = self.day_slot * 39
 
-        seq_all = seq_all[total_drop:]
+        training_x_set = seq_all[: train_end_limit, :self.len_input]
+        validation_x_set = seq_all[train_end_limit: val_end_limit, :self.len_input]
+        testing_x_set = seq_all[val_end_limit:, :self.len_input]
 
         training_y_set = seq_all[: train_end_limit, self.len_input:]
         validation_y_set = seq_all[train_end_limit: val_end_limit, self.len_input:]
         testing_y_set = seq_all[val_end_limit:, self.len_input:]
 
         # Derive global representation vector for each sensor for similar time steps
-        # records_time_idx, records_time_tgt_idx = self._derive_rep_timeline(training_x_set, training_y_set, points_per_week)
+        records_time_idx, records_time_tgt_idx = self._derive_rep_timeline(training_x_set, training_y_set, 288 * 5)
 
         new_train_x_set = np.zeros(
             (training_x_set.shape[0], training_x_set.shape[1], training_x_set.shape[2], training_x_set.shape[3]))

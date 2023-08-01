@@ -119,14 +119,20 @@ class SGATTransformer(nn.Module):
         tgt_mask = self.create_mask(enc_outs.shape[1], self.device)
 
         if train:
-            dec_out = self.decoder(y, graph_y[0], graph_y[1], enc_outs, tgt_mask=tgt_mask, local_trends=True,
+            graph_y_dis = graph_y[0] if graph_y is not None else None
+            graph_y_semantic = graph_y[1] if graph_y is not None else None
+
+            dec_out = self.decoder(y, graph_y_dis, graph_y_semantic, enc_outs, tgt_mask=tgt_mask, local_trends=True,
                                    lookup_idx=self.lookup_idx_dec, device=self.device)
             return dec_out[:, self.dec_out_start_idx: self.dec_out_end_idx]
         else:
             final_out = torch.zeros_like(y)
             dec_out_len = self.dec_seq_len - self.dec_seq_offset
             for i in range(dec_out_len):
-                dec_out = self.decoder(y, graph_y[0], graph_y[1], enc_outs, tgt_mask=tgt_mask, local_trends=True,
+                graph_y_dis = graph_y[0] if graph_y is not None else None
+                graph_y_semantic = graph_y[1] if graph_y is not None else None
+
+                dec_out = self.decoder(y, graph_y_dis, graph_y_semantic, enc_outs, tgt_mask=tgt_mask, local_trends=True,
                                        lookup_idx=self.lookup_idx_dec, device=self.device)
 
                 y[:, i + self.dec_seq_offset] = dec_out[:, i + self.dec_out_start_idx]
