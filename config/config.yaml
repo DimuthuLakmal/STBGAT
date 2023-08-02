@@ -28,10 +28,10 @@ graph_enc_input: False # IMPORTANT: Set true for all encode inputs if merge_emb 
 graph_dec_input: False
 non_graph_enc_input: True
 non_graph_dec_input: True
-enc_features: 1 # To indicates multiple encoders (feature-wise). default is 1
+enc_features: 2 # To indicates multiple encoders (feature-wise). default is 1
 merge_emb: True # Indicate whether the graph embeddings merge with non-graph embedding.
 device: cuda
 cross_attn_features: 2 # Used to indicates how many feature-wise cross attentions in the decoder
-per_enc_feature_len: 12  # used in decoder cross attention (feature-wise cross attention). This should be tuned along with cross_attn_features
+per_enc_feature_len: 24  # used in decoder cross attention (feature-wise cross attention). This should be tuned along with cross_attn_features
 dec_out_start_idx: 0 # When set decoder offset, this indicates the start index of the decoder output to calculate loss
 dec_out_end_idx: -1 # When set decoder offset, this indicates the end index of the decoder output to calculate loss

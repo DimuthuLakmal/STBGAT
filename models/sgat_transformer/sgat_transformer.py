@@ -61,7 +61,7 @@ class SGATTransformer(nn.Module):
         max_lookup_len_enc = None
         max_lookup_len_dec = None
         if transformer_lookup_index:
-            self.lookup_idx_enc, max_lookup_len_enc = create_lookup_index(merge=True if transformer_enc_features == 1 else False)
+            self.lookup_idx_enc, max_lookup_len_enc = create_lookup_index()
 
             start_idx_lk_dec = max_lookup_len_enc - transformer_dec_seq_offset
             self.lookup_idx_dec = [i for i in range(start_idx_lk_dec, start_idx_lk_dec + transformer_dec_seq_len)]
@@ -111,7 +111,7 @@ class SGATTransformer(nn.Module):
             x_i = x[:, :, :, idx: idx + 1] if x is not None else None
             graph_x_i = graph_x[0][idx] if graph_x is not None else None
             graph_x_i_semantic = graph_x[1][idx] if graph_x is not None else None
-            lookup_idx_i = self.lookup_idx[idx] if self.enc_features > 1 else self.lookup_idx_enc
+            lookup_idx_i = self.lookup_idx_enc[idx] if self.enc_features > 1 else self.lookup_idx_enc
 
             enc_out = encoder(x_i, graph_x_i, graph_x_i_semantic, lookup_idx_i, True)
             enc_outs[idx] = enc_out
