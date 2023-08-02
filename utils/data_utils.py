@@ -61,20 +61,24 @@ def seq_gen_v2(len_seq, data_seq, offset, n_frame, n_route, day_slot, C_0=1):
     :param C_0: int, the size of input channel.
     :return: np.ndarray, [len_seq, n_frame, n_route, C_0].
     '''
-    n_slot = day_slot - n_frame + 1
+    n_slot = day_slot
+    total_slots = 44 * 288
 
     tmp_seq = np.zeros((len_seq * n_slot, n_frame, n_route, C_0))
     for i in range(len_seq):
         for j in range(n_slot):
             sta = (i + offset) * day_slot + j
             end = sta + n_frame
+            if end > total_slots: continue
+            # time_idx = np.expand_dims(np.reshape(np.repeat(np.array(sta), n_frame * n_route, axis=0), [n_frame, n_route]), axis=2)
+            # tmp_seq[i * n_slot + j, :, :, :] = np.concatenate((np.reshape(data_seq[sta:end, :], [n_frame, n_route, C_0]), time_idx), axis=-1)
             tmp_seq[i * n_slot + j, :, :, :] = np.reshape(data_seq[sta:end, :], [n_frame, n_route, C_0])
     return tmp_seq
 
 
 def attach_lt_wk_pattern(seq_all: list, n_his: int):
     day_slots = 288
-    total_drop = day_slots * 5
+    total_drop = day_slots * 1
 
     train_end_limit = day_slots*34 - total_drop
     val_end_limit = day_slots*39 - total_drop
@@ -88,11 +92,9 @@ def attach_lt_wk_pattern(seq_all: list, n_his: int):
 
     for k in range(len(seq_tmp)):
         lst_dy_data = seq_all[total_drop + k-prev_idxs[0]][n_his:]
-        lst_5dy_data = seq_all[total_drop + k-prev_idxs[1]][n_his:]
+        # lst_5dy_data = seq_all[total_drop + k-prev_idxs[1]][n_his:]
 
-        tmp = np.concatenate(
-            (seq_tmp[k][:n_his], lst_dy_data, lst_5dy_data),
-            axis=2)
+        tmp = np.concatenate((seq_tmp[k][:n_his], lst_dy_data), axis=2)
         if k < train_end_limit:
             seq_input_train.append(tmp)
         elif train_end_limit <= k < val_end_limit:
@@ -163,12 +165,12 @@ def create_lookup_index(merge=False):
     hr_lookup_idx = search_index(max_len=0,
                                  units=1)
     # max_val = min((wk_lookup_idx, wk_tgt_lookup_idx, dy_lookup_idx, hr_lookup_idx))[0] * -1
-    # max_val = min((dy_lookup_idx, hr_lookup_idx))[0] * -1
-    max_val = min(hr_lookup_idx) * -1
+    max_val = min((dy_lookup_idx, hr_lookup_idx))[0] * -1
+    # max_val = min(hr_lookup_idx) * -1
 
     # wk_lookup_idx = [x + max_val for x in wk_lookup_idx]
     # wk_tgt_lookup_idx = [x + max_val for x in wk_tgt_lookup_idx]
-    # dy_lookup_idx = [x + max_val for x in dy_lookup_idx]
+    dy_lookup_idx = [x + max_val for x in dy_lookup_idx]
     hr_lookup_idx = [x + max_val for x in hr_lookup_idx]
 
     # if merge:
@@ -176,12 +178,12 @@ def create_lookup_index(merge=False):
     #
     # return (wk_lookup_idx, dy_lookup_idx, hr_lookup_idx), max_val
     #
-    # if merge:
-    #     return (wk_lookup_idx + dy_lookup_idx + hr_lookup_idx), max_val
-    #
-    # return (wk_lookup_idx, dy_lookup_idx, hr_lookup_idx), max_val
-
     if merge:
-        return (hr_lookup_idx), max_val
+        return (dy_lookup_idx + hr_lookup_idx), max_val
 
-    return (hr_lookup_idx), max_val
+    return (dy_lookup_idx, hr_lookup_idx), max_val
+
+    # if merge:
+    #     return (hr_lookup_idx), max_val
+    #
+    # return (hr_lookup_idx), max_val

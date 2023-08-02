@@ -133,12 +133,11 @@ class DataLoader:
     def load_node_data_file(self, filename, save=False):
         data_seq = pd.read_csv(filename, header=None).values
 
-        n_all = self.n_train + self.n_test + self.n_val
-        # seq_all, wk_dy_all, hr_dy_all = seq_gen(n_all, data_seq, 0, self.n_seq, self.num_of_vertices, self.day_slot)
         seq_train = seq_gen_v2(self.n_train, data_seq, 0, self.n_seq, self.num_of_vertices, self.day_slot)
         seq_val = seq_gen_v2(self.n_val, data_seq, self.n_train, self.n_seq, self.num_of_vertices, self.day_slot)
         seq_test = seq_gen_v2(self.n_test, data_seq, self.n_train + self.n_val, self.n_seq, self.num_of_vertices, self.day_slot)
 
+        seq_all = np.concatenate((seq_train, seq_val, seq_test), axis=0)
         # new_seq_all = np.zeros((seq_all.shape[0], seq_all.shape[1], seq_all.shape[2], seq_all.shape[3] + 1))
         # points_per_week = 12 * 24 * 5
         #
@@ -147,30 +146,20 @@ class DataLoader:
         #     new_arr = np.expand_dims(np.repeat(time_idx, self.num_of_vertices, axis=0), axis=1)
         #     new_seq_all[idx] = np.concatenate((seq_all[idx], new_arr), axis=-1)
 
-        # x = attach_lt_wk_pattern(seq_all, self.len_input)
-        # training_x_set, validation_x_set, testing_x_set = x['train'], x['val'], x['test']
+        x = attach_lt_wk_pattern(seq_all, self.len_input)
+        training_x_set, validation_x_set, testing_x_set = x['train'], x['val'], x['test']
 
-        # train_end_limit = self.day_slot * 34
-        # val_end_limit = self.day_slot * 39
+        training_x_set = training_x_set[: -1 * self.n_seq]
+        validation_x_set = validation_x_set[: -1 * self.n_seq]
+        testing_x_set = testing_x_set[: -1 * self.n_seq]
 
-        # training_x_set = seq_all[: train_end_limit, :self.len_input]
-        # validation_x_set = seq_all[train_end_limit: val_end_limit, :self.len_input]
-        # testing_x_set = seq_all[val_end_limit:, :self.len_input]
-        #
-        # training_y_set = seq_all[: train_end_limit, self.len_input:]
-        # validation_y_set = seq_all[train_end_limit: val_end_limit, self.len_input:]
-        # testing_y_set = seq_all[val_end_limit:, self.len_input:]
-
-        training_x_set = seq_train[:, :self.len_input]
-        validation_x_set = seq_val[:, :self.len_input]
-        testing_x_set = seq_test[:, :self.len_input]
-
-        training_y_set = seq_train[:, self.len_input:]
-        validation_y_set = seq_val[:, self.len_input:]
-        testing_y_set = seq_test[:, self.len_input:]
+        total_drop = self.day_slot * 1
+        training_y_set = seq_train[total_drop:-1 * self.n_seq, self.len_input:]
+        validation_y_set = seq_val[:-1 * self.n_seq, self.len_input:]
+        testing_y_set = seq_test[:-1 * self.n_seq, self.len_input:]
 
         # Derive global representation vector for each sensor for similar time steps
-        records_time_idx, records_time_tgt_idx = self._derive_rep_timeline(training_x_set, training_y_set, 288 * 5)
+        # records_time_idx, records_time_tgt_idx = self._derive_rep_timeline(training_x_set, training_y_set, 288 * 5)
 
         new_train_x_set = np.zeros(
             (training_x_set.shape[0], training_x_set.shape[1], training_x_set.shape[2], training_x_set.shape[3]))
@@ -303,8 +292,8 @@ class DataLoader:
                     # TODO: This is hard coded. Please replace with a proper index selection
                     # [graph_xs.append(to(self._create_graph(x[:, 2:3], self.edge_index, self.edge_attr))) for x in x_timesteps]  # last week
                     # [graph_xs_semantic.append(to(self._create_graph(x[:, 2:3], self.edge_index_semantic, self.edge_attr_semantic))) for x in x_timesteps]  # last week
-                    # [graph_xs.append(to(self._create_graph(x[:, 1:2], self.edge_index, self.edge_attr))) for x in x_timesteps]  # last day
-                    # [graph_xs_semantic.append(to(self._create_graph(x[:, 1:2], self.edge_index_semantic, self.edge_attr_semantic))) for x in x_timesteps]  # last day
+                    [graph_xs.append(to(self._create_graph(x[:, 1:2], self.edge_index, self.edge_attr))) for x in x_timesteps]  # last day
+                    [graph_xs_semantic.append(to(self._create_graph(x[:, 1:2], self.edge_index_semantic, self.edge_attr_semantic))) for x in x_timesteps]  # last day
                     [graph_xs.append(to(self._create_graph(x[:, 0:1], self.edge_index, self.edge_attr))) for x in x_timesteps]  # last hour
                     [graph_xs_semantic.append(to(self._create_graph(x[:, 0:1], self.edge_index_semantic, self.edge_attr_semantic))) for x in x_timesteps]  # last day
 
@@ -322,7 +311,7 @@ class DataLoader:
                 batched_xs[idx] = torch.Tensor(
                     [xs[idx][:, :, 0:1], xs[idx][:, :, 1:2], xs[idx][:, :, 2:3], xs[idx][:, :, 3:4]]).to(device)
             else:
-                seq_x = np.concatenate(np.array([xs[idx][:, :, 0:1]]), axis=0)
+                seq_x = np.concatenate(np.array([xs[idx][:, :, 1:2], xs[idx][:, :, 0:1]]), axis=0)
                 batched_xs[idx] = torch.Tensor(seq_x).to(device)
         batched_xs = torch.stack(batched_xs)
 
