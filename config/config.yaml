@@ -24,8 +24,8 @@ num_of_days: 1
 num_of_hours: 1
 num_of_days_target: 1
 num_of_weeks_target: 1
-graph_enc_input: False # IMPORTANT: Set true for all encode inputs if merge_emb is True
-graph_dec_input: False
+graph_enc_input: True # IMPORTANT: Set true for all encode inputs if merge_emb is True
+graph_dec_input: True
 non_graph_enc_input: True
 non_graph_dec_input: True
 enc_features: 2 # To indicates multiple encoders (feature-wise). default is 1

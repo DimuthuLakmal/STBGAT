@@ -275,6 +275,7 @@ class DataLoader:
 
         feature_xs_graphs = [[] for i in range(self.enc_features)]
         feature_xs_graphs_semantic = [[] for i in range(self.enc_features)]
+        num_inner_f_enc = int(xs.shape[-1] / self.enc_features)
         for k in range(self.enc_features):
             batched_xs_graphs = [[] for i in range(batch_size)]
             batched_xs_graphs_semantic = [[] for i in range(batch_size)]
@@ -283,18 +284,21 @@ class DataLoader:
                 graph_xs = []
                 graph_xs_semantic = []
 
-                if self.enc_features > 1:
-                    for t, x in enumerate(x_timesteps):
-                        graph_xs.append(to(self._create_graph(x[:, k:k + 1], self.edge_index, self.edge_attr)))
-
-                else:
-                    # TODO: This is hard coded. Please replace with a proper index selection
-                    # [graph_xs.append(to(self._create_graph(x[:, 2:3], self.edge_index, self.edge_attr))) for x in x_timesteps]  # last week
-                    # [graph_xs_semantic.append(to(self._create_graph(x[:, 2:3], self.edge_index_semantic, self.edge_attr_semantic))) for x in x_timesteps]  # last week
-                    [graph_xs.append(to(self._create_graph(x[:, 1:2], self.edge_index, self.edge_attr))) for x in x_timesteps]  # last day
-                    [graph_xs_semantic.append(to(self._create_graph(x[:, 1:2], self.edge_index_semantic, self.edge_attr_semantic))) for x in x_timesteps]  # last day
-                    [graph_xs.append(to(self._create_graph(x[:, 0:1], self.edge_index, self.edge_attr))) for x in x_timesteps]  # last hour
-                    [graph_xs_semantic.append(to(self._create_graph(x[:, 0:1], self.edge_index_semantic, self.edge_attr_semantic))) for x in x_timesteps]  # last day
+                for inner_f in range(num_inner_f_enc):
+                    start_idx = (k * num_inner_f_enc) + num_inner_f_enc - inner_f - 1
+                    end_idx = start_idx + 1
+                    [graph_xs.append(to(self._create_graph(x[:, start_idx: end_idx],
+                                                           self.edge_index, self.edge_attr))) for x in x_timesteps]
+                    [graph_xs_semantic.append(to(self._create_graph(x[:, start_idx: end_idx],
+                                                           self.edge_index_semantic, self.edge_attr_semantic))) for x in x_timesteps]
+                # else:
+                #     # TODO: This is hard coded. Please replace with a proper index selection
+                #     # [graph_xs.append(to(self._create_graph(x[:, 2:3], self.edge_index, self.edge_attr))) for x in x_timesteps]  # last week
+                #     # [graph_xs_semantic.append(to(self._create_graph(x[:, 2:3], self.edge_index_semantic, self.edge_attr_semantic))) for x in x_timesteps]  # last week
+                #     [graph_xs.append(to(self._create_graph(x[:, 1:2], self.edge_index, self.edge_attr))) for x in x_timesteps]  # last day
+                #     [graph_xs_semantic.append(to(self._create_graph(x[:, 1:2], self.edge_index_semantic, self.edge_attr_semantic))) for x in x_timesteps]  # last day
+                #     [graph_xs.append(to(self._create_graph(x[:, 0:1], self.edge_index, self.edge_attr))) for x in x_timesteps]  # last hour
+                #     [graph_xs_semantic.append(to(self._create_graph(x[:, 0:1], self.edge_index_semantic, self.edge_attr_semantic))) for x in x_timesteps]  # last day
 
                 batched_xs_graphs[idx] = graph_xs
                 batched_xs_graphs_semantic[idx] = graph_xs_semantic
