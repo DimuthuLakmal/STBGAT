@@ -75,10 +75,10 @@ class SGATTransformer(nn.Module):
                                expansion_factor=transformer_expansion_factor,
                                n_heads=transformer_n_heads,
                                sgat_settings=sgat_settings,
-                               merge_embed=transformer_merge_emb,
+                               merge_embed=transformer_merge_emb if i==0 else False,
                                dropout=transformer_dropout,
                                max_lookup_len=max_lookup_len_enc if max_lookup_len_enc else transformer_enc_seq_len)
-            for _ in range(transformer_enc_features)
+            for i in range(transformer_enc_features)
         ])
 
         self.decoder = TransformerDecoder(input_dim=transformer_input_dim,
@@ -109,8 +109,8 @@ class SGATTransformer(nn.Module):
 
         for idx, encoder in enumerate(self.encoders):
             x_i = x[:, :, :, idx: idx + 1] if x is not None else None
-            graph_x_i = graph_x[0][idx] if graph_x is not None else None
-            graph_x_i_semantic = graph_x[1][idx] if graph_x is not None else None
+            graph_x_i = graph_x[0][idx] if graph_x is not None and idx == 0 else None
+            graph_x_i_semantic = graph_x[1][idx] if graph_x is not None and idx == 0 else None
             lookup_idx_i = self.lookup_idx_enc[idx] if self.enc_features > 1 else self.lookup_idx_enc
 
             enc_out = encoder(x_i, graph_x_i, graph_x_i_semantic, lookup_idx_i, True)

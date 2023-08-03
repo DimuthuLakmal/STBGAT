@@ -7,7 +7,7 @@ from torch import Tensor
 from torch_geometric.transforms import ToDevice
 import torch_geometric.data as data
 
-from utils.data_utils import scale_weights, attach_lt_wk_pattern, seq_gen, seq_gen_v2
+from utils.data_utils import scale_weights, attach_lt_wk_pattern, seq_gen_v2
 from data_loader.dataset import Dataset
 from utils.math_utils import z_score_normalize
 
