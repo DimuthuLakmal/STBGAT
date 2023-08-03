@@ -49,30 +49,18 @@ def min_max_normalize(train, val, test):
 
 
 def z_score_normalize(train, val, test):
-    '''
-    Parameters
-    ----------
-    train, val, test: np.ndarray (B,N,F,T)
-    Returns
-    ----------
-    stats: dict, two keys: mean and std
-    train_norm, val_norm, test_norm: np.ndarray,
-                                     shape is the same as original
-    '''
-
     assert train.shape[1:] == val.shape[1:] and val.shape[1:] == test.shape[1:]  # ensure the num of nodes is the same
 
     _mean = train.mean(axis=(0, 1, 2), keepdims=True)
     _std = train.std(axis=(0, 1, 2), keepdims=True)
 
-    print('_max.shape:', _mean.shape)
-    print('_min.shape:', _std.shape)
-
     train_norm = z_score(train, _mean, _std)
     val_norm = z_score(val, _mean, _std)
     test_norm = z_score(test, _mean, _std)
 
-    return {'_mean': _mean[0, 0, 0, 0], '_std': _std[0, 0, 0, 0]}, train_norm, val_norm, test_norm
+    stats = {'_mean': _mean[0, 0, 0, 0], '_std': _std[0, 0, 0, 0]}
+
+    return stats, train_norm, val_norm, test_norm
 
 
 def z_score(x, mean, std):
