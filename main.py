@@ -112,6 +112,8 @@ if __name__ == '__main__':
         semantic_adj_filename = configs['semantic_adj_filename']
         edge_w_filename = configs['edge_weight_filename']
         graph_signal_matrix_filename = configs['graph_signal_matrix_filename']
+        preprocess = configs['preprocess']
+        preprocess_output_path = configs['preprocess_output_path']
 
         # model configs
         batch_size = configs['batch_size']
@@ -153,7 +155,7 @@ if __name__ == '__main__':
     }
     data_loader = DataLoader(data_configs)
 
-    data_loader.load_node_data_file(graph_signal_matrix_filename)
+    data_loader.load_node_data_file(graph_signal_matrix_filename, preprocess, preprocess_output_path)
     data_loader.load_edge_data_file(adj_filename, scaling=edge_attr_scaling)
     data_loader.load_semantic_edge_data_file(semantic_adj_filename, edge_w_filename, scaling=edge_attr_scaling)
 

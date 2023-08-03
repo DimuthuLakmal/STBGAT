@@ -16,13 +16,13 @@ def train(model: torch.nn.Module,
     mae_train_loss = 0.
     rmse_train_loss = 0.
     mape_train_loss = 0.
+    n_batch_train = data_loader.get_dataset().get_n_batch_train()
 
     model.train()
 
-    for batch in range(data_loader.n_batch_train):
+    for batch in range(n_batch_train):
         train_x, train_graph_x, train_y, train_graph_y, train_y_target = data_loader.load_batch(_type='train',
                                                                                                 offset=offset,
-                                                                                                batch_size=data_loader.batch_size,
                                                                                                 device=device)
         out = model(train_x, train_graph_x, train_y, train_graph_y, True)
         out = out.reshape(out.shape[0] * out.shape[1] * out.shape[2], -1)

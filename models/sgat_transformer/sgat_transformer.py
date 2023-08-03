@@ -105,10 +105,10 @@ class SGATTransformer(nn.Module):
     def forward(self, x, graph_x, y=None, graph_y=None, train=True):
         # TODO: We can't guarentee that always x presents. So have to replace the way of finding shape
         emb_dim = self.emb_dim if not self.merge_emb else self.emb_dim * 3
-        enc_outs = torch.zeros((self.enc_features, x.shape[0] * x.shape[2], x.shape[1], self.emb_dim)).to(self.device)
+        enc_outs = torch.zeros((self.enc_features, x[0].shape[0] * x[0].shape[2], x[0].shape[1], self.emb_dim)).to(self.device)
 
         for idx, encoder in enumerate(self.encoders):
-            x_i = x[:, :, :, idx: idx + 1] if x is not None else None
+            x_i = x[idx] if x is not None else None
             graph_x_i = graph_x[0][idx] if graph_x is not None and idx == 0 else None
             graph_x_i_semantic = graph_x[1][idx] if graph_x is not None and idx == 0 else None
             lookup_idx_i = self.lookup_idx_enc[idx] if self.enc_features > 1 else self.lookup_idx_enc

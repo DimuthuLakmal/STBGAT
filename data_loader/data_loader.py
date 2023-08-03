@@ -90,7 +90,12 @@ class DataLoader:
         return new_x_set
 
     # generate training, validation and test data
-    def load_node_data_file(self, filename: str, save=False):
+    def load_node_data_file(self, filename: str, preprocess: bool, preprocess_output_path: str):
+        if not preprocess:
+            preprocessed_file = open(preprocess_output_path, 'rb')
+            self.dataset = pickle.load(preprocessed_file)
+            return
+
         data_seq = pd.read_csv(filename, header=None).values
 
         total_days = self.n_train + self.n_test + self.n_val
@@ -139,7 +144,7 @@ class DataLoader:
 
         # When we consider last day or last week data, we have to drop a certain amount data in training
         # y dataset as done in training x dataset.
-        total_drop = self.day_slot * 1
+        total_drop = self.day_slot * self.num_days_per_week if self.last_week else self.day_slots * 1
         training_y_set = seq_train[total_drop:-1 * self.n_seq, self.len_input:]
         validation_y_set = seq_val[:-1 * self.n_seq, self.len_input:]
         testing_y_set = seq_test[:-1 * self.n_seq, self.len_input:]
@@ -172,56 +177,62 @@ class DataLoader:
 
         data = {'train': x_train, 'val': x_val, 'test': x_test}
         y = {'train': y_train[:, :, :, 0:1], 'val': y_val[:, :, :, 0:1], 'test': y_test[:, :, :, 0:1]}
-        self.dataset = Dataset(data=data, y=y, stats_x=stats_x, stats_y=stats_y)
+        self.dataset = Dataset(
+            data=data,
+            y=y,
+            stats_x=stats_x,
+            stats_y=stats_y,
+            n_batch_train=self.n_batch_train,
+            n_batch_test=self.n_batch_test,
+            n_batch_val=self.n_batch_val,
+        )
+
+        with open(preprocess_output_path, 'wb') as file:
+            pickle.dump(self.dataset, file)
+
+    def get_dataset(self):
+        return self.dataset
 
     def load_edge_data_file(self, filename: str, scaling: bool = True):
-        try:
-            w = pd.read_csv(filename, header=None).values
+        w = pd.read_csv(filename, header=None).values
 
-            dst_edges = []
-            src_edges = []
-            edge_attr = []
-            for row in range(w.shape[0]):
-                for col in range(w.shape[1]):
-                    if w[row][col] != 0:
-                        dst_edges.append(col)
-                        src_edges.append(row)
-                        edge_attr.append([w[row][col]])
+        dst_edges = []
+        src_edges = []
+        edge_attr = []
+        for row in range(w.shape[0]):
+            for col in range(w.shape[1]):
+                if w[row][col] != 0:
+                    dst_edges.append(col)
+                    src_edges.append(row)
+                    edge_attr.append([w[row][col]])
 
-            edge_index = [src_edges, dst_edges]
-            edge_attr = scale_weights(edge_attr, scaling)
+        edge_index = [src_edges, dst_edges]
+        edge_attr = scale_weights(edge_attr, scaling)
 
-            self.edge_index = edge_index
-            self.edge_attr = edge_attr
-
-        except FileNotFoundError:
-            print(f'ERROR: input file was not found in {filename}.')
+        self.edge_index = edge_index
+        self.edge_attr = edge_attr
 
     def load_semantic_edge_data_file(self, semantic_filename: str, edge_weight_file: str, scaling: bool = True):
-        try:
-            w = pd.read_csv(edge_weight_file, header=None).values
+        w = pd.read_csv(edge_weight_file, header=None).values
 
-            semantic_file = open(semantic_filename, 'rb')
-            sensor_details = pickle.load(semantic_file)
+        semantic_file = open(semantic_filename, 'rb')
+        sensor_details = pickle.load(semantic_file)
 
-            dst_edges = []
-            src_edges = []
-            edge_attr = []
-            for i, (sensor, neighbours) in enumerate(sensor_details.items()):
-                for src in neighbours:
-                    if w[sensor][src] != 0:
-                        dst_edges.append(sensor)
-                        src_edges.append(src)
-                        edge_attr.append([w[sensor][src]])
+        dst_edges = []
+        src_edges = []
+        edge_attr = []
+        for i, (sensor, neighbours) in enumerate(sensor_details.items()):
+            for src in neighbours:
+                if w[sensor][src] != 0:
+                    dst_edges.append(sensor)
+                    src_edges.append(src)
+                    edge_attr.append([w[sensor][src]])
 
-            edge_index = [src_edges, dst_edges]
-            edge_attr = scale_weights(edge_attr, scaling)
+        edge_index = [src_edges, dst_edges]
+        edge_attr = scale_weights(edge_attr, scaling)
 
-            self.edge_index_semantic = edge_index
-            self.edge_attr_semantic = edge_attr
-
-        except FileNotFoundError:
-            print(f'ERROR: input files was not found')
+        self.edge_index_semantic = edge_index
+        self.edge_attr_semantic = edge_attr
 
     def _create_graph(self, x, edge_index, edge_attr):
         graph = data.Data(x=Tensor(x),
@@ -230,95 +241,115 @@ class DataLoader:
                           edge_attr=Tensor(edge_attr))
         return graph
 
-    def load_batch(self, _type: str, offset: int, batch_size: int = 32, device: str = 'cpu') -> (list, list):
+    def load_batch(self, _type: str, offset: int, device: str = 'cpu'):
         to = ToDevice(device)
 
         xs = self.dataset.get_data(_type)
         ys = self.dataset.get_y(_type)
-        limit = (offset + batch_size) if (offset + batch_size) <= len(xs) else len(xs)
+        limit = (offset + self.batch_size) if (offset + self.batch_size) <= len(xs) else len(xs)
 
-        xs = xs[offset: limit, :, :, :]  # [9358, 13, 228, 1]
+        xs = xs[offset: limit, :]  # [9358, 13, 228, 1]
         ys = ys[offset: limit, :]
 
+        # ys_input will be used as decoder inputs while ys will be used as ground truth data
         ys_input = np.copy(ys)
         if _type != 'train':
             ys_input[:, self.dec_seq_offset:, :, :] = 0
 
-        feature_xs_graphs = [[] for i in range(self.enc_features)]
-        feature_xs_graphs_semantic = [[] for i in range(self.enc_features)]
+        # encoder part of the model consists of multiple encoders # of encoders defined by self.enc_features
+        # each encoder can accept distance-based graph and semantic graphs as inputs
+        # if we use rep vectors and previous time seq values, those two will be input to two separate encoders
+        # and enc_features will be 2
+        enc_xs_graphs = [[] for i in range(self.enc_features)]
+        enc_xs_graphs_semantic = [[] for i in range(self.enc_features)]
         num_inner_f_enc = int(xs.shape[-1] / self.enc_features)
         for k in range(self.enc_features):
-            batched_xs_graphs = [[] for i in range(batch_size)]
-            batched_xs_graphs_semantic = [[] for i in range(batch_size)]
+            batched_xs_graphs = [[] for _ in range(self.batch_size)]
+            batched_xs_graphs_semantic = [[] for _ in range(self.batch_size)]
 
-            for idx, x_timesteps in enumerate(xs):
-                graph_xs = []
-                graph_xs_semantic = []
+            # process batch-wise
+            for idx, x_timesteps in enumerate(xs):  # x_timesteps -> (T, N, F), xs -> (B, T, N, F)
+                graph = []
+                graph_semantic = []
 
                 for inner_f in range(num_inner_f_enc):
                     start_idx = (k * num_inner_f_enc) + num_inner_f_enc - inner_f - 1
                     end_idx = start_idx + 1
-                    [graph_xs.append(to(self._create_graph(x[:, start_idx: end_idx],
-                                                           self.edge_index, self.edge_attr))) for x in x_timesteps]
-                    [graph_xs_semantic.append(to(self._create_graph(x[:, start_idx: end_idx],
-                                                                    self.edge_index_semantic, self.edge_attr_semantic)))
+                    [graph.append(to(self._create_graph(x[:, start_idx: end_idx],
+                                                        self.edge_index,
+                                                        self.edge_attr)))
                      for x in x_timesteps]
-                # else:
-                #     # TODO: This is hard coded. Please replace with a proper index selection
-                #     # [graph_xs.append(to(self._create_graph(x[:, 2:3], self.edge_index, self.edge_attr))) for x in x_timesteps]  # last week
-                #     # [graph_xs_semantic.append(to(self._create_graph(x[:, 2:3], self.edge_index_semantic, self.edge_attr_semantic))) for x in x_timesteps]  # last week
-                #     [graph_xs.append(to(self._create_graph(x[:, 1:2], self.edge_index, self.edge_attr))) for x in x_timesteps]  # last day
-                #     [graph_xs_semantic.append(to(self._create_graph(x[:, 1:2], self.edge_index_semantic, self.edge_attr_semantic))) for x in x_timesteps]  # last day
-                #     [graph_xs.append(to(self._create_graph(x[:, 0:1], self.edge_index, self.edge_attr))) for x in x_timesteps]  # last hour
-                #     [graph_xs_semantic.append(to(self._create_graph(x[:, 0:1], self.edge_index_semantic, self.edge_attr_semantic))) for x in x_timesteps]  # last day
+                    [graph_semantic.append(to(self._create_graph(x[:, start_idx: end_idx],
+                                                                 self.edge_index_semantic,
+                                                                 self.edge_attr_semantic)))
+                     for x in x_timesteps]
 
-                batched_xs_graphs[idx] = graph_xs
-                batched_xs_graphs_semantic[idx] = graph_xs_semantic
+                batched_xs_graphs[idx] = graph
+                batched_xs_graphs_semantic[idx] = graph_semantic
 
-            feature_xs_graphs[k] = batched_xs_graphs
-            feature_xs_graphs_semantic[k] = batched_xs_graphs_semantic
+            enc_xs_graphs[k] = batched_xs_graphs
+            enc_xs_graphs_semantic[k] = batched_xs_graphs_semantic
+        enc_xs_graphs_all = [enc_xs_graphs, enc_xs_graphs_semantic]
 
-        feature_xs_graphs_all = [feature_xs_graphs, feature_xs_graphs_semantic]
+        enc_xs = []
+        for k in range(self.enc_features):
+            batched_xs = [[] for i in range(self.batch_size)]
 
-        batched_xs = [[] for i in range(batch_size)]
-        for idx, x_timesteps in enumerate(xs):
-            speed_vals = np.concatenate(np.array([xs[idx][:, :, 1:2], xs[idx][:, :, 0:1]]), axis=0)
-            rep_vals = np.concatenate(np.array([xs[idx][:, :, 3:4], xs[idx][:, :, 2:3]]), axis=0)
-            if self.enc_features > 1:
-                batched_xs[idx] = torch.Tensor(np.concatenate((speed_vals, rep_vals), axis=-1)).to(device)
-            else:
-                batched_xs[idx] = torch.Tensor(speed_vals).to(device)
-        batched_xs = torch.stack(batched_xs)
+            for idx, x_timesteps in enumerate(xs):
+                seq_len = xs.shape[1]
+                tmp_xs = np.zeros((seq_len * num_inner_f_enc, xs.shape[2], 1))
+                for inner_f in range(num_inner_f_enc):
+                    start_idx = (k * num_inner_f_enc) + num_inner_f_enc - inner_f - 1
+                    end_idx = start_idx + 1
 
-        batched_ys = [[] for i in range(batch_size)]  # decoder input
-        batched_ys_graphs = [[] for i in range(batch_size)]  # This is for the decoder input graph
-        batched_ys_graphs_semantic = [[] for i in range(batch_size)]  # This is for the decoder input graph
-        batch_ys_target = [[] for i in range(batch_size)]
+                    tmp_xs_start_idx = seq_len * inner_f
+                    tmp_xs_end_idx = seq_len * inner_f + seq_len
+                    tmp_xs[tmp_xs_start_idx: tmp_xs_end_idx] = x_timesteps[:, :, start_idx: end_idx]
+
+                batched_xs[idx] = torch.Tensor(tmp_xs)
+
+            batched_xs = torch.stack(batched_xs)
+            enc_xs.append(batched_xs)
+
+        # batched_xs = [[] for i in range(self.batch_size)]
+        # for idx, x_timesteps in enumerate(xs):
+        #     speed_vals = np.concatenate(np.array([xs[idx][:, :, 1:2], xs[idx][:, :, 0:1]]), axis=0)
+        #     rep_vals = np.concatenate(np.array([xs[idx][:, :, 3:4], xs[idx][:, :, 2:3]]), axis=0)
+        #     if self.enc_features > 1:
+        #         batched_xs[idx] = torch.Tensor(np.concatenate((speed_vals, rep_vals), axis=-1)).to(device)
+        #     else:
+        #         batched_xs[idx] = torch.Tensor(speed_vals).to(device)
+        # batched_xs = torch.stack(batched_xs)
+
+        dec_ys = [[] for i in range(self.batch_size)]  # decoder input
+        dec_ys_graphs = [[] for i in range(self.batch_size)]  # This is for the decoder input graph
+        dec_ys_graphs_semantic = [[] for i in range(self.batch_size)]  # This is for the decoder input semantic graph
+        dec_ys_target = [[] for i in range(self.batch_size)]  # This is used as the ground truth data
         for idx, y_timesteps in enumerate(ys_input):
-            graphs_ys = []
-            graphs_ys_semantic = []
+            graphs = []
+            graphs_semantic = []
             for i, y in enumerate(y_timesteps):
                 graph = self._create_graph(y, self.edge_index, self.edge_attr)
                 graph_semantic = self._create_graph(y, self.edge_index_semantic, self.edge_attr_semantic)
-                graphs_ys.append(to(graph))
-                graphs_ys_semantic.append(to(graph_semantic))
+                graphs.append(to(graph))
+                graphs_semantic.append(to(graph_semantic))
 
-            batched_ys[idx] = torch.Tensor(ys_input[idx]).to(device)
-            batch_ys_target[idx] = torch.Tensor(ys[idx]).to(device)
-            batched_ys_graphs[idx] = graphs_ys
-            batched_ys_graphs_semantic[idx] = graphs_ys_semantic
+            dec_ys_graphs[idx] = graphs
+            dec_ys_graphs_semantic[idx] = graphs_semantic
 
-        graph_ys_all = [batched_ys_graphs, batched_ys_graphs_semantic]
+            dec_ys[idx] = torch.Tensor(y_timesteps).to(device)
+            dec_ys_target[idx] = torch.Tensor(ys[idx]).to(device)
 
-        batched_ys = torch.stack(batched_ys)
+        dec_ys_graph_all = [dec_ys_graphs, dec_ys_graphs_semantic]
+        dec_ys = torch.stack(dec_ys)
 
         if not self.graph_enc_input:
-            feature_xs_graphs_all = None
+            enc_xs_graphs_all = None
         if not self.non_graph_enc_input:
-            batched_xs = None
+            enc_xs = None
         if not self.graph_dec_input:
-            graph_ys_all = None
+            dec_ys_graph_all = None
         if not self.non_graph_dec_input:
-            batched_ys = None
+            dec_ys = None
 
-        return batched_xs, feature_xs_graphs_all, batched_ys, graph_ys_all, batch_ys_target
+        return enc_xs, enc_xs_graphs_all, dec_ys, dec_ys_graph_all, dec_ys_target

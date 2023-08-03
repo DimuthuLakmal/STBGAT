@@ -34,3 +34,5 @@ last_week: True
 last_day: True
 num_days_per_week: 5
 rep_vectors: True
+preprocess: False
+preprocess_output_path: "data/PEMSD7/PeMSD7_Preprocessed.pickle"

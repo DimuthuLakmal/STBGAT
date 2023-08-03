@@ -15,13 +15,17 @@ def test(_type: str,
     mae_loss = 0.
     rmse_loss = 0.
     mape_loss = 0.
+    n_batch = 0
+    if _type == 'test':
+        n_batch = data_loader.get_dataset().get_n_batch_test()
+    elif _type == 'val':
+        n_batch = data_loader.get_dataset().get_n_batch_val()
 
     offset = 0
     with torch.inference_mode():
-        for batch in range(data_loader.n_batch_test):
+        for batch in range(n_batch):
             test_x, test_x_graph, test_y, test_y_graph, test_y_target = data_loader.load_batch(_type=_type,
                                                                                                offset=offset,
-                                                                                               batch_size=data_loader.batch_size,
                                                                                                device=device)
 
             out = model(test_x, test_x_graph, test_y, test_y_graph, False)
