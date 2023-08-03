@@ -7,7 +7,7 @@ from torch import Tensor
 from torch_geometric.transforms import ToDevice
 import torch_geometric.data as data
 
-from utils.data_utils import scale_weights, attach_lt_wk_pattern, seq_gen_v2
+from utils.data_utils import scale_weights, attach_prev_dys_seq, seq_gen_v2, derive_rep_timeline
 from data_loader.dataset import Dataset
 from utils.math_utils import z_score_normalize
 
@@ -23,140 +23,112 @@ class DataLoader:
         self.n_batch_test = None
         self.n_batch_val = None
 
-        self.dec_seq_offset = data_configs['dec_seq_offset']
         self.num_of_vertices = data_configs['num_of_vertices']
         self.points_per_hour = data_configs['points_per_hour']
-        self.num_for_predict = data_configs['num_for_predict']
         self.len_input = data_configs['len_input']
-        self.batch_size = data_configs['batch_size']
-        self.num_of_weeks = data_configs['num_of_weeks']
-        self.num_of_days = data_configs['num_of_days']
-        self.num_of_hours = data_configs['num_of_hours']
-        self.num_of_weeks_target = data_configs['num_of_weeks_target']
-        self.num_of_days_target = data_configs['num_of_days_target']
+        self.last_day = data_configs['last_day']
+        self.last_week = data_configs['last_week']
+        self.num_days_per_week = data_configs['num_days_per_week']
+        self.rep_vectors = data_configs['rep_vectors']
 
+        self.batch_size = data_configs['batch_size']
         self.graph_enc_input = data_configs['graph_enc_input']
         self.graph_dec_input = data_configs['graph_dec_input']
         self.non_graph_enc_input = data_configs['non_graph_enc_input']
         self.non_graph_dec_input = data_configs['non_graph_dec_input']
-
         self.enc_features = data_configs['enc_features']
+        self.dec_seq_offset = data_configs['dec_seq_offset']
 
         # PEMSD7 Specific Variables
-        self.n_train=34
-        self.n_test=5
-        self.n_val=5
-        self.day_slot=288
-        self.n_seq=self.len_input*2
-
-    def _fill_missing_values(self, x, records_time_idx, records_time_tgt_idx):
-        record_key = x[0, 0, -1]
-        record_key_lt_dy = np.abs(record_key - 288.0)
-        # check for noise data
-        for sensor in range(self.num_of_vertices):
-            sensor_data_hr = x[:, sensor, 0:1]
-            zero_idx = np.where(sensor_data_hr == 0)[0]
-            x[zero_idx, sensor, 0:1] = records_time_idx[record_key][zero_idx, sensor]
-
-            sensor_data_dy = x[:, sensor, 1:2]
-            zero_idx = np.where(sensor_data_dy == 0)[0]
-            x[zero_idx, sensor, 1:2] = records_time_idx[record_key_lt_dy][zero_idx, sensor]
-
-            sensor_data_wk = x[:, sensor, 2:3]
-            zero_idx = np.where(sensor_data_wk == 0)[0]
-            x[zero_idx, sensor, 2:3] = records_time_idx[record_key][zero_idx, sensor]
-
-            # sensor_data_tgt_wk = x[:, sensor, 3:4]
-            # zero_idx = np.where(sensor_data_tgt_wk == 0)[0]
-            # x[zero_idx, sensor, 3:4] = records_time_tgt_idx[record_key][zero_idx, sensor]
-
-        return x[:, :, :-1]
-
-    def _derive_rep_timeline_v2(self, x_set, points_per_week):
-        training_size = x_set.shape[0]
-        num_weeks_training = int(training_size / points_per_week)
-        seq_len = x_set.shape[1]
-
-        records_time_idx = {}
-
-        for time_idx in range(points_per_week):
-            # x and y values representation vectors
-            record = [x_set[time_idx]]
-
-            record_key = record[0][0, 0, -2]
-            for week in range(1, num_weeks_training + 1):
-                idx = time_idx + points_per_week * week
-                if idx >= training_size: continue
-
-                record.append(x_set[idx])
-
-            sensor_means = []
-            for sensor in range(self.num_of_vertices):
-                sensor_data = np.array(record)[:, :, sensor, 0]
-                n_samples = sensor_data.shape[0]
-
-                mean_ts = []
-                for t in range(seq_len):
-                    sensor_t = sensor_data[:, t]
-
-                    less_ten = (sensor_t < 10).sum()
-                    if n_samples == less_ten:
-                        mean_ts.append(np.mean(sensor_data[:, t]))
-                    else:
-                        non_zero_idx = list(np.nonzero(sensor_t)[0])
-                        mean_ts.append(np.mean(sensor_data[non_zero_idx, t]))
-
-                mean = np.expand_dims(np.array(mean_ts), axis=-1)
-                sensor_means.append(mean)
-
-            records_time_idx[record_key] = np.array(sensor_means).transpose(1, 0, 2)
-
-        return records_time_idx
+        self.n_train = 34
+        self.n_test = 5
+        self.n_val = 5
+        self.day_slot = self.points_per_hour * 24
+        self.n_seq = self.len_input * 2
 
     # generate training, validation and test data
-    def load_node_data_file(self, filename, save=False):
+    def load_node_data_file(self, filename: str, save=False):
         data_seq = pd.read_csv(filename, header=None).values
 
-        seq_train = seq_gen_v2(self.n_train, data_seq, 0, self.n_seq, self.num_of_vertices, self.day_slot)
-        seq_val = seq_gen_v2(self.n_val, data_seq, self.n_train, self.n_seq, self.num_of_vertices, self.day_slot)
-        seq_test = seq_gen_v2(self.n_test, data_seq, self.n_train + self.n_val, self.n_seq, self.num_of_vertices, self.day_slot)
+        total_days = self.n_train + self.n_test + self.n_val
+        seq_train = seq_gen_v2(self.n_train, data_seq, 0, self.n_seq, self.num_of_vertices, self.day_slot, 1,
+                               total_days)
+        seq_val = seq_gen_v2(self.n_val, data_seq, self.n_train, self.n_seq, self.num_of_vertices, self.day_slot, 1,
+                             total_days)
+        seq_test = seq_gen_v2(self.n_test, data_seq, self.n_train + self.n_val, self.n_seq, self.num_of_vertices,
+                              self.day_slot, 1, total_days)
 
+        # Take seq all to find last day, last week time seq
         seq_all = np.concatenate((seq_train, seq_val, seq_test), axis=0)
         new_seq_all = np.zeros((seq_all.shape[0], seq_all.shape[1], seq_all.shape[2], seq_all.shape[3] + 1))
-        points_per_week = 12 * 24 * 5
-
+        points_per_week = self.points_per_hour * 24 * self.num_days_per_week
         for idx in range(seq_all.shape[0]):
             time_idx = np.array(idx % points_per_week)
-            new_arr = np.expand_dims(np.reshape(np.repeat(time_idx, self.n_seq * self.num_of_vertices, axis=0), (self.n_seq, self.num_of_vertices)), axis=2)
+            new_arr = np.expand_dims(np.reshape(np.repeat(time_idx, self.n_seq * self.num_of_vertices, axis=0),
+                                                (self.n_seq, self.num_of_vertices)), axis=2)
             new_seq_all[idx] = np.concatenate((seq_all[idx], new_arr), axis=-1)
 
-        x = attach_lt_wk_pattern(new_seq_all, self.len_input)
+        # Following idx will be used to filter out the weekly time idx that we added in the prev step
+        speed_idx = 0
+        last_dy_idx = 2
+        last_wk_idx = 3
+
+        # attach last day and last week time series with last hour data
+        # Warning: we attached weekly index along with the speed value in the prev step.
+        # So, picking right index is important from now on. new_seq_all -> (8354, 12, 228, 1) -> (8354, 12, 228, 2)
+        # In the following step we attach one or two values pertaining to last day and last week speed values
+        x = attach_prev_dys_seq(new_seq_all,
+                                self.len_input,
+                                self.day_slot,
+                                self.num_days_per_week,
+                                self.n_train,
+                                self.n_val,
+                                self.last_week,
+                                self.last_day)
         training_x_set, validation_x_set, testing_x_set = x['train'], x['val'], x['test']
 
         # Derive global representation vector for each sensor for similar time steps
-        records_time_idx = self._derive_rep_timeline_v2(training_x_set, 288 * 5)
+        if self.rep_vectors:
+            records_time_idx = derive_rep_timeline(training_x_set,
+                                                   self.day_slot * self.num_days_per_week,
+                                                   self.num_of_vertices)
 
         # avoided mixing training, testing, and validation dataset at the edge.
+        # The time series during the last two hours of train, test and val datasets are ignored
         training_x_set = training_x_set[: -1 * self.n_seq]
         validation_x_set = validation_x_set[: -1 * self.n_seq]
         testing_x_set = testing_x_set[: -1 * self.n_seq]
 
+        # When we consider last day or last week data, we have to drop a certain amount data in training
+        # y dataset as done in training x dataset.
         total_drop = self.day_slot * 1
         training_y_set = seq_train[total_drop:-1 * self.n_seq, self.len_input:]
         validation_y_set = seq_val[:-1 * self.n_seq, self.len_input:]
         testing_y_set = seq_test[:-1 * self.n_seq, self.len_input:]
 
-        new_train_x_set = np.zeros(
-            (training_x_set.shape[0], training_x_set.shape[1], training_x_set.shape[2], training_x_set.shape[3]+1))
+        # Attach rep vectors for last day and last week data and drop weekly time index value
+        new_n_f = training_x_set.shape[3]-1
+        if self.last_day and self.rep_vectors:
+            new_n_f += 1
+        if self.last_week and self.rep_vectors:
+            new_n_f += 1
+
+        new_train_x_set = np.zeros((training_x_set.shape[0], training_x_set.shape[1], training_x_set.shape[2], new_n_f))
         for i, x in enumerate(training_x_set):
             record_key = x[0, 0, -2]
-            record_key_yesterday = record_key - 24 * 12
-            record_key_yesterday = record_key_yesterday if record_key_yesterday >= 0 else record_key + points_per_week - 24 * 12
-            x = np.concatenate((x[:, :, 0:1], x[:, :, 2:3], records_time_idx[record_key], records_time_idx[record_key_yesterday]), axis=-1)
+            record_key_yesterday = record_key - 24 * self.points_per_hour
+            record_key_yesterday = record_key_yesterday if record_key_yesterday >= 0 else record_key + points_per_week - 24 * self.points_per_hour
+
+            speed_data = x[:, :, speed_idx:speed_idx + 1]
+            last_dy_data = x[:, :, last_dy_idx:last_dy_idx + 1]
+            last_wk_data = x[:, :, last_wk_idx:last_wk_idx + 1]
+            x = np.concatenate(
+                (speed_data, last_dy_data, last_wk_data, records_time_idx[record_key], records_time_idx[record_key_yesterday]),
+                axis=-1)
             new_train_x_set[i] = x
 
-        new_val_x_set = np.zeros(
-            (validation_x_set.shape[0], validation_x_set.shape[1], validation_x_set.shape[2], validation_x_set.shape[3]+1))
+        new_val_x_set = np.zeros((validation_x_set.shape[0], validation_x_set.shape[1], validation_x_set.shape[2],
+                                  new_n_f))
         for i, x in enumerate(validation_x_set):
             record_key = x[0, 0, -2]
             record_key_yesterday = record_key - 24 * 12
@@ -166,8 +138,7 @@ class DataLoader:
                 axis=-1)
             new_val_x_set[i] = x
 
-        new_test_x_set = np.zeros(
-            (testing_x_set.shape[0], testing_x_set.shape[1], testing_x_set.shape[2], testing_x_set.shape[3]+1))
+        new_test_x_set = np.zeros((testing_x_set.shape[0], testing_x_set.shape[1], testing_x_set.shape[2], new_n_f))
         for i, x in enumerate(testing_x_set):
             record_key = x[0, 0, -2]
             record_key_yesterday = record_key - 24 * 12
@@ -290,7 +261,8 @@ class DataLoader:
                     [graph_xs.append(to(self._create_graph(x[:, start_idx: end_idx],
                                                            self.edge_index, self.edge_attr))) for x in x_timesteps]
                     [graph_xs_semantic.append(to(self._create_graph(x[:, start_idx: end_idx],
-                                                           self.edge_index_semantic, self.edge_attr_semantic))) for x in x_timesteps]
+                                                                    self.edge_index_semantic, self.edge_attr_semantic)))
+                     for x in x_timesteps]
                 # else:
                 #     # TODO: This is hard coded. Please replace with a proper index selection
                 #     # [graph_xs.append(to(self._create_graph(x[:, 2:3], self.edge_index, self.edge_attr))) for x in x_timesteps]  # last week

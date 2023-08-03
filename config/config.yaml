@@ -1,3 +1,4 @@
+# Model Configs
 batch_size: 4
 epochs: 75
 model_output_path: "output/model/pemsd7/multi-cross-attn/epoch_v1_{}_model.pt"
@@ -8,22 +9,6 @@ input_dim: 1
 enc_seq_len: 24
 dec_seq_len: 13
 dec_seq_offset: 1 # Indicates how many timesteps in the previous hour consider as inputs in the decoder
-
-adj_filename: "data/PEMSD7/PeMSD7_W_228.csv"
-edge_weight_filename: "data/PEMSD7/PeMSD7_W_228_original.csv"
-semantic_adj_filename: "data/PEMSD7/PeMSD7_W_228.pickle"
-graph_signal_matrix_filename: "data/PEMSD7/PeMSD7_V_228.csv"
-num_of_vertices: 228
-edge_attr_scaling: True
-points_per_hour: 12
-num_for_predict : 12
-len_input: 12
-dataset_name: "PEMS08"
-num_of_weeks: 1
-num_of_days: 1
-num_of_hours: 1
-num_of_days_target: 1
-num_of_weeks_target: 1
 graph_enc_input: True # IMPORTANT: Set true for all encode inputs if merge_emb is True
 graph_dec_input: True
 non_graph_enc_input: True
@@ -35,3 +20,17 @@ cross_attn_features: 2 # Used to indicates how many feature-wise cross attention
 per_enc_feature_len: 24  # used in decoder cross attention (feature-wise cross attention). This should be tuned along with cross_attn_features
 dec_out_start_idx: 0 # When set decoder offset, this indicates the start index of the decoder output to calculate loss
 dec_out_end_idx: -1 # When set decoder offset, this indicates the end index of the decoder output to calculate loss
+
+# Data Configs
+adj_filename: "data/PEMSD7/PeMSD7_W_228.csv"
+edge_weight_filename: "data/PEMSD7/PeMSD7_W_228_original.csv"
+semantic_adj_filename: "data/PEMSD7/PeMSD7_W_228.pickle"
+graph_signal_matrix_filename: "data/PEMSD7/PeMSD7_V_228.csv"
+num_of_vertices: 228
+edge_attr_scaling: True
+points_per_hour: 12
+len_input: 12
+last_week: True
+last_day: True
+num_days_per_week: 5
+rep_vectors: True

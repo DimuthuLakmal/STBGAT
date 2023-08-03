@@ -100,61 +100,49 @@ if __name__ == '__main__':
 
         # data configs
         dec_seq_offset = configs['dec_seq_offset']
-        edge_attr_scaling = configs['edge_attr_scaling'] if configs['edge_attr_scaling'] else True
-        num_of_vertices = configs['num_of_vertices'] if configs['num_of_vertices'] else 307
-        points_per_hour = configs['points_per_hour'] if configs['points_per_hour'] else 12
-        num_for_predict = configs['num_for_predict'] if configs['num_for_predict'] else 12
-        len_input = configs['len_input'] if configs['len_input'] else 12
-        num_of_weeks = configs['num_of_weeks']
-        num_of_days = configs['num_of_days']
-        num_of_hours = configs['num_of_hours']
-        num_of_weeks_target = configs['num_of_weeks_target']
-        num_of_days_target = configs['num_of_days_target']
-        batch_size = configs['batch_size'] if configs['batch_size'] else 32
-        epochs = configs['epochs'] if configs['epochs'] else 200
-        adj_filename = configs['adj_filename'] if configs['adj_filename'] else 'data/PEMS04/PEMS04.csv'
+        edge_attr_scaling = configs['edge_attr_scaling']
+        num_of_vertices = configs['num_of_vertices']
+        points_per_hour = configs['points_per_hour']
+        len_input = configs['len_input']
+        last_week = configs['last_week']
+        last_day = configs['last_day']
+        num_days_per_week = configs['num_days_per_week']
+        rep_vectors = configs['rep_vectors']
+        adj_filename = configs['adj_filename']
         semantic_adj_filename = configs['semantic_adj_filename']
         edge_w_filename = configs['edge_weight_filename']
-        graph_signal_matrix_filename = configs['graph_signal_matrix_filename'] if configs[
-            'graph_signal_matrix_filename'] \
-            else 'data/PEMS04/PEMS04.npz'
-        dataset_name = configs['dataset_name'] if configs['dataset_name'] else 'PEMS04'
-
-        graph_enc_input = configs['graph_enc_input'] if configs['graph_enc_input'] else False
-        graph_dec_input = configs['graph_dec_input'] if configs['graph_dec_input'] else False
-        non_graph_enc_input = configs['non_graph_enc_input'] if configs['non_graph_enc_input'] else False
-        non_graph_dec_input = configs['non_graph_dec_input'] if configs['non_graph_dec_input'] else False
+        graph_signal_matrix_filename = configs['graph_signal_matrix_filename']
 
         # model configs
-        model_output_path = configs['model_output_path'] if configs[
-            'model_output_path'] else 'output/model/epoch_{}_model.pt'
-        model_input_path = configs['model_input_path'] if configs[
-            'model_input_path'] else 'output/model/epoch_1_model.pt'
-        load_saved_model = configs['load_saved_model'] if configs['load_saved_model'] else False
-
-        input_dim = configs['input_dim'] if configs['input_dim'] else 1
-        edge_dim = configs['edge_dim'] if configs['edge_dim'] else 1
-        enc_seq_len = configs['enc_seq_len'] if configs['enc_seq_len'] else 12
-        dec_seq_len = configs['dec_seq_len'] if configs['dec_seq_len'] else 12
-        enc_features = configs['enc_features'] if configs['enc_features'] else 5
-
-        merge_emb = configs['merge_emb'] if configs['merge_emb'] else False
-        device = configs['device'] if configs['device'] else 'cpu'
-        cross_attn_features = configs['cross_attn_features'] if configs['cross_attn_features'] else 3
-        per_enc_feature_len = configs['per_enc_feature_len'] if configs['per_enc_feature_len'] else 12
+        batch_size = configs['batch_size']
+        epochs = configs['epochs']
+        model_output_path = configs['model_output_path']
+        model_input_path = configs['model_input_path']
+        load_saved_model = configs['load_saved_model']
+        input_dim = configs['input_dim']
+        edge_dim = configs['edge_dim']
+        enc_seq_len = configs['enc_seq_len']
+        dec_seq_len = configs['dec_seq_len']
+        enc_features = configs['enc_features']
+        merge_emb = configs['merge_emb']
+        device = configs['device']
+        cross_attn_features = configs['cross_attn_features']
+        per_enc_feature_len = configs['per_enc_feature_len']
         dec_out_start_idx = configs['dec_out_start_idx']
         dec_out_end_idx = configs['dec_out_end_idx']
+        graph_enc_input = configs['graph_enc_input']
+        graph_dec_input = configs['graph_dec_input']
+        non_graph_enc_input = configs['non_graph_enc_input']
+        non_graph_dec_input = configs['non_graph_dec_input']
 
     data_configs = {
         'num_of_vertices': num_of_vertices,
         'points_per_hour': points_per_hour,
-        'num_for_predict': num_for_predict,
         'len_input': len_input,
-        'num_of_weeks': num_of_weeks,
-        'num_of_days': num_of_days,
-        'num_of_hours': num_of_hours,
-        'num_of_days_target': num_of_days_target,
-        'num_of_weeks_target': num_of_weeks_target,
+        'last_week': last_week,
+        'last_day': last_day,
+        'num_days_per_week': num_days_per_week,
+        'rep_vectors': rep_vectors,
         'batch_size': batch_size,
         'dec_seq_offset': dec_seq_offset,
         'graph_enc_input': graph_enc_input,
@@ -166,7 +154,6 @@ if __name__ == '__main__':
     data_loader = DataLoader(data_configs)
 
     data_loader.load_node_data_file(graph_signal_matrix_filename)
-    # data_loader.load_node_data_astgnn(graph_signal_matrix_filename)
     data_loader.load_edge_data_file(adj_filename, scaling=edge_attr_scaling)
     data_loader.load_semantic_edge_data_file(semantic_adj_filename, edge_w_filename, scaling=edge_attr_scaling)
 
