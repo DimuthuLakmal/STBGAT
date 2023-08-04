@@ -153,7 +153,7 @@ class DataLoader:
 
         # When we consider last day or last week data, we have to drop a certain amount data in training
         # y dataset as done in training x dataset.
-        total_drop = self.day_slot * self.num_days_per_week if self.last_week else self.day_slots * 1
+        total_drop = self.day_slot * self.num_days_per_week if self.last_week else self.day_slot * 1
         training_y_set = seq_train[total_drop:-1 * self.n_seq, self.len_input:]
         validation_y_set = seq_val[:-1 * self.n_seq, self.len_input:]
         testing_y_set = seq_test[:-1 * self.n_seq, self.len_input:]
