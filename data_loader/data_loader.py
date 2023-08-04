@@ -255,8 +255,6 @@ class DataLoader:
     def load_batch(self, _type: str, offset: int, device: str = 'cpu'):
         to = ToDevice(device)
 
-        start = time.time()
-
         xs = self.dataset.get_data(_type)
         ys = self.dataset.get_y(_type)
         limit = (offset + self.batch_size) if (offset + self.batch_size) <= len(xs) else len(xs)
@@ -268,6 +266,8 @@ class DataLoader:
         ys_input = np.copy(ys)
         if _type != 'train':
             ys_input[:, self.dec_seq_offset:, :, :] = 0
+
+        start = time.time()
 
         # encoder part of the model consists of multiple encoders # of encoders defined by self.enc_features
         # each encoder can accept distance-based graph and semantic graphs as inputs
@@ -304,6 +304,9 @@ class DataLoader:
             enc_xs_graphs_semantic[k] = batched_xs_graphs_semantic
         enc_xs_graphs_all = [enc_xs_graphs, enc_xs_graphs_semantic]
 
+        end1 = time.time() - start
+        print("Time", end1)
+
         enc_xs = []
         for k in range(self.enc_features):
             batched_xs = [[] for i in range(self.batch_size)]
@@ -323,6 +326,9 @@ class DataLoader:
 
             batched_xs = torch.stack(batched_xs)
             enc_xs.append(batched_xs)
+
+        end2 = time.time() - end1
+        print("Time", end2)
 
         dec_ys = [[] for i in range(self.batch_size)]  # decoder input
         dec_ys_graphs = [[] for i in range(self.batch_size)]  # This is for the decoder input graph
@@ -354,8 +360,5 @@ class DataLoader:
             dec_ys_graph_all = None
         if not self.non_graph_dec_input:
             dec_ys = None
-
-        end = time.time()
-        print("Time", end-start)
 
         return enc_xs, enc_xs_graphs_all, dec_ys, dec_ys_graph_all, dec_ys_target
