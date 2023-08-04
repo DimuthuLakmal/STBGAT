@@ -79,9 +79,7 @@ def seq_gen_v2(len_seq, data_seq, offset, n_frame, n_route, day_slot, C_0=1, tot
 
 
 def attach_prev_dys_seq(seq_all: np.array, n_his: int, day_slots: int, num_days_per_week: int, n_train: int, n_val: int,
-                        last_week: bool, last_day: bool):
-    total_drop = day_slots * num_days_per_week if last_week else day_slots * 1
-
+                        last_week: bool, last_day: bool, total_drop: int):
     train_end_limit = day_slots * n_train - total_drop
     val_end_limit = day_slots * (n_train + n_val) - total_drop
 

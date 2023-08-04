@@ -14,6 +14,7 @@ class TransformerEncoder(nn.Module):
         emb_dim = configs['emb_dim']
         input_dim = configs['input_dim']
         self.merge_emb = configs['merge_emb']
+        emb_expansion_factor = configs['emb_expansion_factor']
         max_lookup_len = configs['max_lookup_len']
         self.lookup_idx = configs['lookup_idx']
 
@@ -30,7 +31,7 @@ class TransformerEncoder(nn.Module):
 
         # by merging embeddings we increase the num embeddings
         if self.merge_emb:
-            emb_dim = emb_dim * 3
+            emb_dim = emb_dim * emb_expansion_factor
         self.positional_encoder = PositionalEmbedding(max_lookup_len, emb_dim)
         self.emb_norm = nn.LayerNorm(emb_dim)
 

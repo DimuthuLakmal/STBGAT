@@ -15,6 +15,7 @@ class TransformerDecoder(nn.Module):
         self.emb_dim = configs['emb_dim']
         input_dim = configs['input_dim']
         self.merge_emb = configs['merge_emb']
+        emb_expansion_factor = configs['emb_expansion_factor']
         max_lookup_len = configs['max_lookup_len']
         self.lookup_idx = configs['lookup_idx']
 
@@ -34,7 +35,7 @@ class TransformerDecoder(nn.Module):
         self.graph_embedding_semantic = SGATEmbedding(configs['sgat'])
         # by merging embeddings we increase the num embeddings
         if self.merge_emb:
-            self.emb_dim = self.emb_dim * 3
+            self.emb_dim = self.emb_dim * emb_expansion_factor
         self.position_embedding = PositionalEmbedding(max_lookup_len, self.emb_dim)
 
         # convolution related

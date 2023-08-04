@@ -17,6 +17,7 @@ class SGATTransformer(nn.Module):
         self.merge_emb = tf_configs['encoder']['merge_emb']
         self.enc_features = tf_configs['encoder']['features']
         self.enc_seq_len = tf_configs['encoder']['seq_len']
+        self.enc_emb_expansion_factor = tf_configs['encoder']['emb_expansion_factor']
 
         self.dec_seq_len = tf_configs['decoder']['seq_len']
         self.dec_seq_offset = tf_configs['decoder']['seq_offset']
@@ -32,24 +33,31 @@ class SGATTransformer(nn.Module):
         decoder_configs['enc_features'] = self.enc_features
         self.decoder = TransformerDecoder(decoder_configs)
 
-    def create_mask(self, batch_size, device):
+    def _create_mask(self, batch_size, device):
         trg_mask = torch.triu(torch.ones((self.dec_seq_len, self.dec_seq_len)))\
             .fill_diagonal_(0).bool().expand(batch_size * 8, self.dec_seq_len, self.dec_seq_len)
         return trg_mask.to(device)
 
+    def _create_enc_out(self, x, graph_x):
+        emb_dim = self.emb_dim if not self.merge_emb else self.emb_dim * self.enc_emb_expansion_factor
+        if x is not None:
+            enc_outs = torch.zeros((self.enc_features, x[0].shape[0] * x[0].shape[2], x[0].shape[1], emb_dim)).to(
+                self.device)
+        else:
+            enc_outs = torch.zeros((self.enc_features, len(graph_x[0][0]) * graph_x[0][0][0][0].x.shape[0],
+                                    len(graph_x[0][0][0]), emb_dim)).to(self.device)
+        return enc_outs
+
     def forward(self, x, graph_x, y=None, graph_y=None, train=True):
-        # TODO: We can't guarentee that always x presents. So have to replace the way of finding shape
-        emb_dim = self.emb_dim if not self.merge_emb else self.emb_dim * 3
-        enc_outs = torch.zeros((self.enc_features, x[0].shape[0] * x[0].shape[2], x[0].shape[1], self.emb_dim)).to(self.device)
+        enc_outs = self._create_enc_out(x, graph_x)
+        tgt_mask = self._create_mask(enc_outs.shape[1], self.device)
 
         for idx, encoder in enumerate(self.encoders):
-            x_i = x[idx] if x is not None else None
+            x_i = x[idx] if x is not None and idx == 1 else None
             graph_x_i = graph_x[0][idx] if graph_x is not None and idx == 0 else None
             graph_x_i_semantic = graph_x[1][idx] if graph_x is not None and idx == 0 else None
             enc_out = encoder(x_i, graph_x_i, graph_x_i_semantic)
             enc_outs[idx] = enc_out
-
-        tgt_mask = self.create_mask(enc_outs.shape[1], self.device)
 
         if train:
             graph_y_dis = graph_y[0] if graph_y is not None else None

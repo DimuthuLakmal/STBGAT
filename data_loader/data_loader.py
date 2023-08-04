@@ -131,6 +131,11 @@ class DataLoader:
         # Warning: we attached weekly index along with the speed value in the prev step.
         # So, picking right index is important from now on. new_seq_all -> (8354, 12, 228, 1) -> (8354, 12, 228, 2)
         # In the following step we attach one or two values pertaining to last day and last week speed values
+        total_drop = 0
+        if self.last_day:
+            total_drop = self.day_slot * 1
+        elif self.last_week:
+            total_drop = self.day_slot * self.num_days_per_week
         x = attach_prev_dys_seq(new_seq_all,
                                 self.len_input,
                                 self.day_slot,
@@ -138,7 +143,8 @@ class DataLoader:
                                 self.n_train,
                                 self.n_val,
                                 self.last_week,
-                                self.last_day)
+                                self.last_day,
+                                total_drop)
         training_x_set, validation_x_set, testing_x_set = x['train'], x['val'], x['test']
 
         # Derive global representation vector for each sensor for similar time steps
@@ -155,7 +161,6 @@ class DataLoader:
 
         # When we consider last day or last week data, we have to drop a certain amount data in training
         # y dataset as done in training x dataset.
-        total_drop = self.day_slot * self.num_days_per_week if self.last_week else self.day_slot * 1
         training_y_set = seq_train[total_drop:-1 * self.n_seq, self.len_input:]
         validation_y_set = seq_val[:-1 * self.n_seq, self.len_input:]
         testing_y_set = seq_test[:-1 * self.n_seq, self.len_input:]
@@ -205,7 +210,7 @@ class DataLoader:
         return self.dataset
 
     def load_edge_data_file(self):
-        w = pd.read_csv(self.edge_weight_original_filename, header=None).values
+        w = pd.read_csv(self.edge_weight_filename, header=None).values
 
         dst_edges = []
         src_edges = []
@@ -285,17 +290,17 @@ class DataLoader:
                 graph = []
                 graph_semantic = []
 
-                # for inner_f in range(num_inner_f_enc):
-                #     start_idx = (k * num_inner_f_enc) + num_inner_f_enc - inner_f - 1
-                #     end_idx = start_idx + 1
-                #     [graph.append(to(self._create_graph(x[:, start_idx: end_idx],
-                #                                         self.edge_index,
-                #                                         self.edge_attr)))
-                #      for x in x_timesteps]
-                #     [graph_semantic.append(to(self._create_graph(x[:, start_idx: end_idx],
-                #                                                  self.edge_index_semantic,
-                #                                                  self.edge_attr_semantic)))
-                #      for x in x_timesteps]
+                for inner_f in range(num_inner_f_enc):
+                    start_idx = (k * num_inner_f_enc) + num_inner_f_enc - inner_f - 1
+                    end_idx = start_idx + 1
+                    [graph.append(to(self._create_graph(x[:, start_idx: end_idx],
+                                                        self.edge_index,
+                                                        self.edge_attr)))
+                     for x in x_timesteps]
+                    [graph_semantic.append(to(self._create_graph(x[:, start_idx: end_idx],
+                                                                 self.edge_index_semantic,
+                                                                 self.edge_attr_semantic)))
+                     for x in x_timesteps]
 
                 batched_xs_graphs[idx] = graph
                 batched_xs_graphs_semantic[idx] = graph_semantic
