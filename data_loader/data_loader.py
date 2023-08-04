@@ -11,6 +11,8 @@ from utils.data_utils import scale_weights, attach_prev_dys_seq, seq_gen_v2, der
 from data_loader.dataset import Dataset
 from utils.math_utils import z_score_normalize
 
+import time
+
 
 class DataLoader:
     def __init__(self, data_configs):
@@ -253,6 +255,8 @@ class DataLoader:
     def load_batch(self, _type: str, offset: int, device: str = 'cpu'):
         to = ToDevice(device)
 
+        start = time.time()
+
         xs = self.dataset.get_data(_type)
         ys = self.dataset.get_y(_type)
         limit = (offset + self.batch_size) if (offset + self.batch_size) <= len(xs) else len(xs)
@@ -350,5 +354,8 @@ class DataLoader:
             dec_ys_graph_all = None
         if not self.non_graph_dec_input:
             dec_ys = None
+
+        end = time.time()
+        print("Time", end-start)
 
         return enc_xs, enc_xs_graphs_all, dec_ys, dec_ys_graph_all, dec_ys_target

@@ -73,7 +73,7 @@ data:
   last_day: True
   num_days_per_week: 5
   rep_vectors: True
-  preprocess: True
+  preprocess: False
   preprocess_output_path: "data/PEMSD7/PeMSD7_Preprocessed.pickle"
   graph_enc_input: False # IMPORTANT: Set true for all encode inputs if merge_emb is True
   graph_dec_input: False
