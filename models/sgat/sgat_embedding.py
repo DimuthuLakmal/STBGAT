@@ -6,16 +6,11 @@ from models.sgat.gat_layer_skip import GATV2
 
 
 class SGATEmbedding(nn.Module):
-    def __init__(self, n_layers, first_in_f_size, out_f_sizes, n_heads, alpha, dropout, edge_dim, seq_len):
+    def __init__(self, sgat_configs):
         super(SGATEmbedding, self).__init__()
+
         self.gats = nn.ModuleList([
-            GAT(n_layers=n_layers,
-                  first_in_f_size=first_in_f_size,
-                  out_f_sizes=out_f_sizes,
-                  n_heads=n_heads,
-                  alpha=alpha,
-                  dropout=dropout,
-                  edge_dim=edge_dim) for _ in range(seq_len)
+            GAT(sgat_configs) for _ in range(sgat_configs['seq_len'])
         ])
 
         # self.gat = GATV2(n_layers=n_layers,

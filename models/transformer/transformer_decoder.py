@@ -8,69 +8,66 @@ from models.transformer.token_embedding import TokenEmbedding
 
 
 class TransformerDecoder(nn.Module):
-    def __init__(self, input_dim, out_dim, embed_dim, seq_len, num_layers=2, expansion_factor=4, n_heads=8, dropout=0.2,
-                 enc_features=5, sgat_settings=None, merge_embed=False, max_lookup_len=0,
-                 cross_attn_features=True, per_enc_feature_len=12, offset=1):
+    def __init__(self, configs):
 
         super(TransformerDecoder, self).__init__()
 
+        self.emb_dim = configs['emb_dim']
+        input_dim = configs['input_dim']
+        self.merge_emb = configs['merge_emb']
+        max_lookup_len = configs['max_lookup_len']
+        self.lookup_idx = configs['lookup_idx']
+
+        n_layers = configs['n_layers']
+        out_dim = configs['out_dim']
+
+        self.offset = configs['seq_offset']
+        self.seq_len = configs['seq_len']
+        self.enc_features = configs['enc_features']
+        self.per_enc_feature_len = configs['per_enc_feature_len']
+        self.cross_attn_features = configs['decoder_block']['cross_attn_features']
+
         # embedding
-        self.embedding = TokenEmbedding(input_dim=input_dim, embed_dim=embed_dim)
-        self.graph_embedding = SGATEmbedding(n_layers=sgat_settings['n_layers'],
-                                             first_in_f_size=sgat_settings['first_in_f_size'],
-                                             out_f_sizes=sgat_settings['out_f_sizes'],
-                                             n_heads=sgat_settings['n_heads'],
-                                             alpha=sgat_settings['alpha'],
-                                             dropout=sgat_settings['dropout'],
-                                             edge_dim=sgat_settings['edge_dim'],
-                                             seq_len=seq_len)
-        self.graph_embedding_semantic = SGATEmbedding(n_layers=sgat_settings['n_layers'],
-                                                      first_in_f_size=sgat_settings['first_in_f_size'],
-                                                      out_f_sizes=sgat_settings['out_f_sizes'],
-                                                      n_heads=sgat_settings['n_heads'],
-                                                      alpha=sgat_settings['alpha'],
-                                                      dropout=sgat_settings['dropout'],
-                                                      edge_dim=sgat_settings['edge_dim'],
-                                                      seq_len=seq_len)
-        self.position_embedding = PositionalEmbedding(max_lookup_len, embed_dim)
+        self.embedding = TokenEmbedding(input_dim=input_dim, embed_dim=self.emb_dim)
+        configs['sgat']['seq_len'] = configs['seq_len']
+        self.graph_embedding = SGATEmbedding(configs['sgat'])
+        self.graph_embedding_semantic = SGATEmbedding(configs['sgat'])
         # by merging embeddings we increase the num embeddings
-        self.merge_embed = merge_embed
-        # if merge_embed:
-        #     embed_dim = embed_dim * 3
+        if self.merge_emb:
+            self.emb_dim = self.emb_dim * 3
+        self.position_embedding = PositionalEmbedding(max_lookup_len, self.emb_dim)
 
-        self.conv_q_layer = nn.Conv1d(in_channels=embed_dim, out_channels=embed_dim, kernel_size=3, stride=1, padding=1)
+        # convolution related
+        self.local_trends = configs['local_trends']
 
+        self.conv_q_layer = nn.Conv1d(in_channels=self.emb_dim, out_channels=self.emb_dim, kernel_size=3, stride=1, padding=1)
+        self.emb_norm = nn.LayerNorm(self.emb_dim)
+
+        padding_size = 1
+        if self.offset == 1:
+            padding_size = 2
         self.conv_q_layers = nn.ModuleList([
-            nn.Conv2d(in_channels=embed_dim, out_channels=embed_dim, kernel_size=(1, 3), stride=1, padding=(0, 2),
-                      bias=False)
-            for _ in range(num_layers)
+            nn.Conv2d(in_channels=self.emb_dim, out_channels=self.emb_dim, kernel_size=(1, 3), stride=1,
+                      padding=(0, padding_size), bias=False)
+            for _ in range(n_layers)
         ])
-        # decoder input masking for convolution operation
-        self.offset = offset
-        self.seq_len = seq_len
-        self.emb_dim = embed_dim
 
-        self.enc_features = enc_features
-        self.per_enc_feature_len = per_enc_feature_len
-        self.cross_attn_features = cross_attn_features
         self.conv_k_layers = nn.ModuleList([
             nn.ModuleList(
-                [nn.Conv1d(in_channels=embed_dim, out_channels=embed_dim, kernel_size=3, stride=1, padding=1) for i in
-                 range(cross_attn_features)])
-            for j in range(num_layers)
+                [nn.Conv1d(in_channels=self.emb_dim, out_channels=self.emb_dim, kernel_size=3, stride=1, padding=1) for i in
+                 range(self.cross_attn_features)])
+            for j in range(n_layers)
         ])
 
+        configs['decoder_block']['emb_dim'] = self.emb_dim
         self.layers = nn.ModuleList(
             [
-                DecoderBlock(embed_dim, expansion_factor=expansion_factor, n_heads=n_heads, dropout=dropout,
-                             n_cross_attn_layers=cross_attn_features)
-                for _ in range(num_layers)
+                DecoderBlock(configs['decoder_block'])
+                for _ in range(n_layers)
             ]
         )
 
-        self.fc_out = nn.Linear(embed_dim, out_dim)
-
-        self.temp_norm = nn.LayerNorm(embed_dim)
+        self.fc_out = nn.Linear(self.emb_dim, out_dim)
 
     def calculate_masked_src(self, x, conv_q, tgt_mask, device='cuda'):
         batch_size = x.shape[0]
@@ -94,7 +91,7 @@ class TransformerDecoder(nn.Module):
         tgt_mask_conv = tgt_mask_conv.expand(x.shape[0], self.seq_len, self.emb_dim, self.seq_len).to(device)
         return tgt_mask_conv
 
-    def forward(self, x, graph_x, graph_x_semantic, enc_x, tgt_mask, lookup_idx=None, local_trends=True, device='cuda'):
+    def forward(self, x, graph_x, graph_x_semantic, enc_x, tgt_mask, device):
         embed_x = None
         embed_graph_x = None
         embed_graph_x_semantic = None
@@ -106,10 +103,12 @@ class TransformerDecoder(nn.Module):
             embed_graph_x_semantic = self.graph_embedding_semantic(graph_x_semantic).transpose(0, 1)
 
         embed_out = None
-        if embed_graph_x is not None and embed_graph_x_semantic is not None and embed_x is not None and self.merge_embed:
-            # embed_out = torch.concat((embed_x, embed_graph_x), dim=-1)
-            embed_out = embed_x + embed_graph_x + embed_graph_x_semantic
-            embed_out = self.temp_norm(embed_out)
+        if embed_graph_x is not None and embed_graph_x_semantic is not None and embed_x is not None:
+            if self.merge_emb:
+                embed_out = torch.concat((embed_x, embed_graph_x), dim=-1)
+            else:
+                embed_out = embed_x + embed_graph_x + embed_graph_x_semantic
+                embed_out = self.emb_norm(embed_out)
         elif embed_graph_x is None and embed_x is not None:
             embed_out = embed_x
         elif embed_graph_x is not None and embed_x is None:
@@ -120,12 +119,12 @@ class TransformerDecoder(nn.Module):
         embed_out = embed_out.reshape(embed_shp[0], embed_shp[1] * embed_shp[2], embed_shp[3])  # (36, 4 * 170, 16)
         embed_out = embed_out.permute(1, 0, 2)
 
-        x = self.position_embedding(embed_out, lookup_idx)  # 32x10x512
+        x = self.position_embedding(embed_out, self.lookup_idx)  # 32x10x512
 
         tgt_mask_conv = self.create_conv_mask(x, device)
 
         for idx, layer in enumerate(self.layers):
-            if local_trends:
+            if self.local_trends:
                 # x = self.conv_q_layer(x.transpose(2, 1)).transpose(2, 1)
                 x = self.calculate_masked_src(x, self.conv_q_layers[idx], tgt_mask_conv, device)
 

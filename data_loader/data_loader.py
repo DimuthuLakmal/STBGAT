@@ -39,6 +39,15 @@ class DataLoader:
         self.enc_features = data_configs['enc_features']
         self.dec_seq_offset = data_configs['dec_seq_offset']
 
+        self.preprocess = data_configs['preprocess']
+        self.preprocess_output_path = data_configs['preprocess_output_path']
+        self.node_data_filename = data_configs['node_data_filename']
+
+        self.edge_weight_filename = data_configs['edge_weight_filename']
+        self.semantic_adj_filename = data_configs['semantic_adj_filename']
+        self.edge_weight_original_filename = data_configs['edge_weight_original_filename']
+        self.edge_weight_scaling = data_configs['edge_weight_scaling']
+
         # PEMSD7 Specific Variables
         self.n_train = 34
         self.n_test = 5
@@ -90,13 +99,13 @@ class DataLoader:
         return new_x_set
 
     # generate training, validation and test data
-    def load_node_data_file(self, filename: str, preprocess: bool, preprocess_output_path: str):
-        if not preprocess:
-            preprocessed_file = open(preprocess_output_path, 'rb')
+    def load_node_data_file(self):
+        if not self.preprocess:
+            preprocessed_file = open(self.preprocess_output_path, 'rb')
             self.dataset = pickle.load(preprocessed_file)
             return
 
-        data_seq = pd.read_csv(filename, header=None).values
+        data_seq = pd.read_csv(self.node_data_filename, header=None).values
 
         total_days = self.n_train + self.n_test + self.n_val
         seq_train = seq_gen_v2(self.n_train, data_seq, 0, self.n_seq, self.num_of_vertices, self.day_slot, 1,
@@ -187,14 +196,14 @@ class DataLoader:
             n_batch_val=self.n_batch_val,
         )
 
-        with open(preprocess_output_path, 'wb') as file:
+        with open(self.preprocess_output_path, 'wb') as file:
             pickle.dump(self.dataset, file)
 
     def get_dataset(self):
         return self.dataset
 
-    def load_edge_data_file(self, filename: str, scaling: bool = True):
-        w = pd.read_csv(filename, header=None).values
+    def load_edge_data_file(self):
+        w = pd.read_csv(self.edge_weight_original_filename, header=None).values
 
         dst_edges = []
         src_edges = []
@@ -207,15 +216,15 @@ class DataLoader:
                     edge_attr.append([w[row][col]])
 
         edge_index = [src_edges, dst_edges]
-        edge_attr = scale_weights(edge_attr, scaling)
+        edge_attr = scale_weights(edge_attr, self.edge_weight_scaling)
 
         self.edge_index = edge_index
         self.edge_attr = edge_attr
 
-    def load_semantic_edge_data_file(self, semantic_filename: str, edge_weight_file: str, scaling: bool = True):
-        w = pd.read_csv(edge_weight_file, header=None).values
+    def load_semantic_edge_data_file(self):
+        w = pd.read_csv(self.edge_weight_original_filename, header=None).values
 
-        semantic_file = open(semantic_filename, 'rb')
+        semantic_file = open(self.semantic_adj_filename, 'rb')
         sensor_details = pickle.load(semantic_file)
 
         dst_edges = []
@@ -229,7 +238,7 @@ class DataLoader:
                     edge_attr.append([w[sensor][src]])
 
         edge_index = [src_edges, dst_edges]
-        edge_attr = scale_weights(edge_attr, scaling)
+        edge_attr = scale_weights(edge_attr, self.edge_weight_scaling)
 
         self.edge_index_semantic = edge_index
         self.edge_attr_semantic = edge_attr
@@ -306,20 +315,10 @@ class DataLoader:
                     tmp_xs_end_idx = seq_len * inner_f + seq_len
                     tmp_xs[tmp_xs_start_idx: tmp_xs_end_idx] = x_timesteps[:, :, start_idx: end_idx]
 
-                batched_xs[idx] = torch.Tensor(tmp_xs)
+                batched_xs[idx] = torch.Tensor(tmp_xs).to(device)
 
             batched_xs = torch.stack(batched_xs)
             enc_xs.append(batched_xs)
-
-        # batched_xs = [[] for i in range(self.batch_size)]
-        # for idx, x_timesteps in enumerate(xs):
-        #     speed_vals = np.concatenate(np.array([xs[idx][:, :, 1:2], xs[idx][:, :, 0:1]]), axis=0)
-        #     rep_vals = np.concatenate(np.array([xs[idx][:, :, 3:4], xs[idx][:, :, 2:3]]), axis=0)
-        #     if self.enc_features > 1:
-        #         batched_xs[idx] = torch.Tensor(np.concatenate((speed_vals, rep_vals), axis=-1)).to(device)
-        #     else:
-        #         batched_xs[idx] = torch.Tensor(speed_vals).to(device)
-        # batched_xs = torch.stack(batched_xs)
 
         dec_ys = [[] for i in range(self.batch_size)]  # decoder input
         dec_ys_graphs = [[] for i in range(self.batch_size)]  # This is for the decoder input graph

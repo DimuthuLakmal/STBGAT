@@ -6,21 +6,29 @@ from models.transformer.position_wise_feed_forward import PositionWiseFeedForwar
 
 
 class DecoderBlock(nn.Module):
-    def __init__(self, embed_dim, expansion_factor=4, n_heads=8, dropout=0.2, n_cross_attn_layers=5):
+    def __init__(self, configs):
         super(DecoderBlock, self).__init__()
 
-        self.self_attention = MultiheadAttention(embed_dim=embed_dim, num_heads=n_heads, batch_first=True, bias=True)
-        self.norm1 = nn.LayerNorm(embed_dim)
-        self.dropout1 = nn.Dropout(dropout)
+        emb_dim = configs['emb_dim']
+        n_heads = configs['n_heads']
+        expansion_factor = configs['expansion_factor']
+        cross_attn_dropout = configs['cross_attn_dropout']
+        cross_attn_features = configs['cross_attn_features']
+        src_dropout = configs['src_dropout']
+        ff_dropout = configs['ff_dropout']
+
+        self.self_attention = MultiheadAttention(embed_dim=emb_dim, num_heads=n_heads, batch_first=True, bias=True)
+        self.norm1 = nn.LayerNorm(emb_dim)
+        self.dropout1 = nn.Dropout(src_dropout)
 
         self.cross_attn_layers = nn.ModuleList([
-            CrossAttentionLayer(embed_dim, n_heads, dropout=0.4) for i in range(n_cross_attn_layers)
+            CrossAttentionLayer(emb_dim, n_heads, dropout=cross_attn_dropout) for i in range(cross_attn_features)
         ])
-        self.norm2 = nn.LayerNorm(embed_dim)
+        self.norm2 = nn.LayerNorm(emb_dim)
 
-        self.feed_forward = PositionWiseFeedForward(embed_dim, expansion_factor * embed_dim)
-        self.norm3 = nn.LayerNorm(embed_dim)
-        self.dropout2 = nn.Dropout(dropout)
+        self.feed_forward = PositionWiseFeedForward(emb_dim, expansion_factor * emb_dim)
+        self.norm3 = nn.LayerNorm(emb_dim)
+        self.dropout2 = nn.Dropout(ff_dropout)
 
     def forward(self, x, enc_x, tgt_mask):
         # self attention

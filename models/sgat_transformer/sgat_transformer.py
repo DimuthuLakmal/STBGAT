@@ -3,99 +3,34 @@ from torch import nn
 
 from models.transformer.transformer_decoder import TransformerDecoder
 from models.transformer.transformer_encoder import TransformerEncoder
-from utils.data_utils import create_lookup_index
 
 
 class SGATTransformer(nn.Module):
-    def __init__(
-            self,
-            device: str,
-            sgat_first_in_f_size: int,
-            sgat_n_layers: int,
-            sgat_out_f_sizes: list,
-            sgat_n_heads: list,
-            sgat_alpha: float = 0.2,
-            sgat_dropout: float = 0.2,
-            sgat_edge_dim: int = 1,
-            transformer_merge_emb=False,
-            transformer_enc_seq_len: int = 12,
-            transformer_dec_seq_len: int = 12,
-            transformer_dec_seq_offset: int = 1,
-            transformer_input_dim: int = 1,
-            transfomer_emb_dim: int = 16,  # input to transformers will be embedded to this dim
-            transformer_n_layers: int = 2,
-            transformer_expansion_factor: int = 4,
-            transformer_n_heads: int = 4,
-            transformer_enc_features: int = 5,  # number of encoders
-            transformer_out_dim: int = 1,
-            transformer_dropout: float = 0.2,
-            transformer_lookup_index: bool = True,
-            transformer_cross_attn_features: int = 1,
-            transformer_per_enc_feature_len: int = 12,
-            transformer_dec_out_start_idx: int = 2,
-            transformer_dec_out_end_idx: int = -2
-    ):
+    def __init__(self, configs: dict):
         super(SGATTransformer, self).__init__()
 
-        self.device = device
-        self.enc_features = transformer_enc_features
-        self.dec_seq_len = transformer_dec_seq_len
-        self.emb_dim = transfomer_emb_dim
-        self.merge_emb = transformer_merge_emb
-        self.dec_seq_offset = transformer_dec_seq_offset
-        self.dec_out_start_idx = transformer_dec_out_start_idx
-        self.dec_out_end_idx = transformer_dec_out_end_idx
+        tf_configs = configs['transformer']
 
-        sgat_settings = {
-            'n_layers': sgat_n_layers,
-            'first_in_f_size': sgat_first_in_f_size,
-            'out_f_sizes': sgat_out_f_sizes,
-            'n_heads': sgat_n_heads,
-            'alpha': sgat_alpha,
-            'dropout': sgat_dropout,
-            'edge_dim': sgat_edge_dim
-        }
+        self.device = configs['device']
 
-        self.lookup_idx_enc = None
-        self.lookup_idx_dec = None
-        max_lookup_len_enc = None
-        max_lookup_len_dec = None
-        if transformer_lookup_index:
-            self.lookup_idx_enc, max_lookup_len_enc = create_lookup_index()
+        self.emb_dim = tf_configs['encoder']['emb_dim']
+        self.merge_emb = tf_configs['encoder']['merge_emb']
+        self.enc_features = tf_configs['encoder']['features']
+        self.enc_seq_len = tf_configs['encoder']['seq_len']
 
-            start_idx_lk_dec = max_lookup_len_enc - transformer_dec_seq_offset
-            self.lookup_idx_dec = [i for i in range(start_idx_lk_dec, start_idx_lk_dec + transformer_dec_seq_len)]
-            max_lookup_len_dec = start_idx_lk_dec + transformer_dec_seq_len
+        self.dec_seq_len = tf_configs['decoder']['seq_len']
+        self.dec_seq_offset = tf_configs['decoder']['seq_offset']
+        self.dec_out_start_idx = tf_configs['decoder']['out_start_idx']
+        self.dec_out_end_idx = tf_configs['decoder']['out_end_idx']
 
+        encoder_configs = tf_configs['encoder']
         self.encoders = nn.ModuleList([
-            TransformerEncoder(seq_len=transformer_enc_seq_len,
-                               input_dim=transformer_input_dim,
-                               embed_dim=transfomer_emb_dim,
-                               num_layers=transformer_n_layers,
-                               expansion_factor=transformer_expansion_factor,
-                               n_heads=transformer_n_heads,
-                               sgat_settings=sgat_settings,
-                               merge_embed=transformer_merge_emb if i==0 else False,
-                               dropout=transformer_dropout,
-                               max_lookup_len=max_lookup_len_enc if max_lookup_len_enc else transformer_enc_seq_len)
-            for i in range(transformer_enc_features)
+            TransformerEncoder(encoder_configs) for _ in range(self.enc_features)
         ])
 
-        self.decoder = TransformerDecoder(input_dim=transformer_input_dim,
-                                          out_dim=transformer_out_dim,
-                                          embed_dim=transfomer_emb_dim,
-                                          seq_len=transformer_dec_seq_len,
-                                          offset=transformer_dec_seq_offset,
-                                          num_layers=transformer_n_layers,
-                                          expansion_factor=transformer_expansion_factor,
-                                          n_heads=transformer_n_heads,
-                                          dropout=transformer_dropout,
-                                          enc_features=transformer_enc_features,
-                                          sgat_settings=sgat_settings,
-                                          merge_embed=transformer_merge_emb,
-                                          cross_attn_features=transformer_cross_attn_features,
-                                          per_enc_feature_len=transformer_per_enc_feature_len,
-                                          max_lookup_len=max_lookup_len_dec if max_lookup_len_dec else transformer_dec_seq_len)
+        decoder_configs = tf_configs['decoder']
+        decoder_configs['enc_features'] = self.enc_features
+        self.decoder = TransformerDecoder(decoder_configs)
 
     def create_mask(self, batch_size, device):
         trg_mask = torch.triu(torch.ones((self.dec_seq_len, self.dec_seq_len)))\
@@ -111,9 +46,7 @@ class SGATTransformer(nn.Module):
             x_i = x[idx] if x is not None else None
             graph_x_i = graph_x[0][idx] if graph_x is not None and idx == 0 else None
             graph_x_i_semantic = graph_x[1][idx] if graph_x is not None and idx == 0 else None
-            lookup_idx_i = self.lookup_idx_enc[idx] if self.enc_features > 1 else self.lookup_idx_enc
-
-            enc_out = encoder(x_i, graph_x_i, graph_x_i_semantic, lookup_idx_i, True)
+            enc_out = encoder(x_i, graph_x_i, graph_x_i_semantic)
             enc_outs[idx] = enc_out
 
         tgt_mask = self.create_mask(enc_outs.shape[1], self.device)
@@ -122,8 +55,7 @@ class SGATTransformer(nn.Module):
             graph_y_dis = graph_y[0] if graph_y is not None else None
             graph_y_semantic = graph_y[1] if graph_y is not None else None
 
-            dec_out = self.decoder(y, graph_y_dis, graph_y_semantic, enc_outs, tgt_mask=tgt_mask, local_trends=True,
-                                   lookup_idx=self.lookup_idx_dec, device=self.device)
+            dec_out = self.decoder(y, graph_y_dis, graph_y_semantic, enc_outs, tgt_mask=tgt_mask, device=self.device)
             return dec_out[:, self.dec_out_start_idx: self.dec_out_end_idx]
         else:
             final_out = torch.zeros_like(y)
@@ -132,8 +64,7 @@ class SGATTransformer(nn.Module):
                 graph_y_dis = graph_y[0] if graph_y is not None else None
                 graph_y_semantic = graph_y[1] if graph_y is not None else None
 
-                dec_out = self.decoder(y, graph_y_dis, graph_y_semantic, enc_outs, tgt_mask=tgt_mask, local_trends=True,
-                                       lookup_idx=self.lookup_idx_dec, device=self.device)
+                dec_out = self.decoder(y, graph_y_dis, graph_y_semantic, enc_outs, tgt_mask=tgt_mask, device=self.device)
 
                 y[:, i + self.dec_seq_offset] = dec_out[:, i + self.dec_out_start_idx]
                 if graph_y is not None:

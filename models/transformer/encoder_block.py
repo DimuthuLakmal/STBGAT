@@ -5,18 +5,24 @@ from models.transformer.position_wise_feed_forward import PositionWiseFeedForwar
 
 
 class EncoderBlock(nn.Module):
-    def __init__(self, embed_dim, expansion_factor=4, n_heads=8, dropout=0.2):
+    def __init__(self, configs):
         super(EncoderBlock, self).__init__()
 
-        self.attention = MultiheadAttention(embed_dim=embed_dim, num_heads=n_heads, batch_first=True)
+        emb_dim = configs['emb_dim']
+        n_heads = configs['n_heads']
+        expansion_factor = configs['expansion_factor']
+        src_dropout = configs['src_dropout']
+        ff_dropout = configs['ff_dropout']
 
-        self.norm1 = nn.LayerNorm(embed_dim)
-        self.norm2 = nn.LayerNorm(embed_dim)
+        self.attention = MultiheadAttention(embed_dim=emb_dim, num_heads=n_heads, batch_first=True)
 
-        self.feed_forward = PositionWiseFeedForward(embed_dim, expansion_factor * embed_dim)
+        self.norm1 = nn.LayerNorm(emb_dim)
+        self.norm2 = nn.LayerNorm(emb_dim)
 
-        self.dropout1 = nn.Dropout(dropout)
-        self.dropout2 = nn.Dropout(dropout)
+        self.feed_forward = PositionWiseFeedForward(emb_dim, expansion_factor * emb_dim)
+
+        self.dropout1 = nn.Dropout(src_dropout)
+        self.dropout2 = nn.Dropout(ff_dropout)
 
     def forward(self, query, key, value):
         # self attention

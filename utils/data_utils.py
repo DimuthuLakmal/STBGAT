@@ -221,38 +221,36 @@ def search_index(max_len, num_of_depend=1, num_for_predict=12, points_per_hour=1
     return x_idx
 
 
-def create_lookup_index(merge=True):
+def create_lookup_index(last_week=True, last_dy=True, dec_seq_offset=0, dec_seq_len=12):
     wk_lookup_idx = search_index(max_len=0,
                                  units=24 * 5,
-                                 offset=12)
-    wk_tgt_lookup_idx = search_index(max_len=0,
-                                     units=24 * 5,
-                                     offset=12)
+                                 offset=0)
     dy_lookup_idx = search_index(max_len=0,
                                  units=24,
-                                 offset=12)
+                                 offset=0)
     hr_lookup_idx = search_index(max_len=0,
                                  units=1)
-    # max_val = min((wk_lookup_idx, wk_tgt_lookup_idx, dy_lookup_idx, hr_lookup_idx))[0] * -1
-    max_val = min((dy_lookup_idx, hr_lookup_idx))[0] * -1
-    # max_val = min(hr_lookup_idx) * -1
 
-    # wk_lookup_idx = [x + max_val for x in wk_lookup_idx]
-    # wk_tgt_lookup_idx = [x + max_val for x in wk_tgt_lookup_idx]
-    dy_lookup_idx = [x + max_val for x in dy_lookup_idx]
-    hr_lookup_idx = [x + max_val for x in hr_lookup_idx]
+    max_lookup_len_enc = min(hr_lookup_idx) * -1
+    if last_dy:
+        max_lookup_len_enc = min((dy_lookup_idx, hr_lookup_idx))[0] * -1
+    if last_week:
+        max_lookup_len_enc = min((wk_lookup_idx, dy_lookup_idx, hr_lookup_idx))[0] * -1
 
-    # if merge:
-    #     return (wk_lookup_idx + dy_lookup_idx + hr_lookup_idx), max_val
-    #
-    # return (wk_lookup_idx, dy_lookup_idx, hr_lookup_idx), max_val
-    #
-    if merge:
-        return (dy_lookup_idx + hr_lookup_idx), max_val
+    wk_lookup_idx = [x + max_lookup_len_enc for x in wk_lookup_idx]
+    dy_lookup_idx = [x + max_lookup_len_enc for x in dy_lookup_idx]
+    hr_lookup_idx = [x + max_lookup_len_enc for x in hr_lookup_idx]
 
-    return (dy_lookup_idx, hr_lookup_idx), max_val
+    lookup_idx_enc = hr_lookup_idx
+    if last_week and last_dy:
+        lookup_idx_enc = (wk_lookup_idx + dy_lookup_idx + hr_lookup_idx)
+    if not last_week and last_dy:
+        lookup_idx_enc = (dy_lookup_idx + hr_lookup_idx)
+    if last_week and not last_dy:
+        lookup_idx_enc = (wk_lookup_idx + hr_lookup_idx)
 
-    # if merge:
-    #     return (hr_lookup_idx), max_val
-    #
-    # return (hr_lookup_idx), max_val
+    start_idx_lk_dec = max_lookup_len_enc - dec_seq_offset
+    lookup_idx_dec = [i for i in range(start_idx_lk_dec, start_idx_lk_dec + dec_seq_len)]
+    max_lookup_len_dec = start_idx_lk_dec + dec_seq_len
+
+    return max_lookup_len_enc, lookup_idx_enc, max_lookup_len_dec, lookup_idx_dec
