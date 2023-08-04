@@ -285,17 +285,17 @@ class DataLoader:
                 graph = []
                 graph_semantic = []
 
-                for inner_f in range(num_inner_f_enc):
-                    start_idx = (k * num_inner_f_enc) + num_inner_f_enc - inner_f - 1
-                    end_idx = start_idx + 1
-                    [graph.append(to(self._create_graph(x[:, start_idx: end_idx],
-                                                        self.edge_index,
-                                                        self.edge_attr)))
-                     for x in x_timesteps]
-                    [graph_semantic.append(to(self._create_graph(x[:, start_idx: end_idx],
-                                                                 self.edge_index_semantic,
-                                                                 self.edge_attr_semantic)))
-                     for x in x_timesteps]
+                # for inner_f in range(num_inner_f_enc):
+                #     start_idx = (k * num_inner_f_enc) + num_inner_f_enc - inner_f - 1
+                #     end_idx = start_idx + 1
+                #     [graph.append(to(self._create_graph(x[:, start_idx: end_idx],
+                #                                         self.edge_index,
+                #                                         self.edge_attr)))
+                #      for x in x_timesteps]
+                #     [graph_semantic.append(to(self._create_graph(x[:, start_idx: end_idx],
+                #                                                  self.edge_index_semantic,
+                #                                                  self.edge_attr_semantic)))
+                #      for x in x_timesteps]
 
                 batched_xs_graphs[idx] = graph
                 batched_xs_graphs_semantic[idx] = graph_semantic
@@ -305,7 +305,7 @@ class DataLoader:
         enc_xs_graphs_all = [enc_xs_graphs, enc_xs_graphs_semantic]
 
         end1 = time.time() - start
-        print("Time", end1)
+        # print("Time", end1)
 
         enc_xs = []
         for k in range(self.enc_features):
@@ -328,7 +328,7 @@ class DataLoader:
             enc_xs.append(batched_xs)
 
         end2 = time.time() - end1
-        print("Time", end2)
+        # print("Time", end2)
 
         dec_ys = [[] for i in range(self.batch_size)]  # decoder input
         dec_ys_graphs = [[] for i in range(self.batch_size)]  # This is for the decoder input graph
