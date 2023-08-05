@@ -9,9 +9,14 @@ from models.sgat.gat_conv.gat_conv_v7.gat_conv_v7 import GATConvV7
 
 
 class GATV2(nn.Module):
-    def __init__(self, n_layers: int, first_in_f_size: int, out_f_sizes: list, n_heads: list, alpha=0.2, dropout=0.5,
-                 edge_dim=384, dropout_skip=0.5):
+    def __init__(self, configs):
         super(GATV2, self).__init__()
+
+        n_layers = configs['n_layers']
+        dropout = configs['dropout']
+        first_in_f_size = configs['first_in_f_size']
+        edge_dim = configs['edge_dim']
+
         self.n_layers = n_layers
         self.dropout = dropout
 

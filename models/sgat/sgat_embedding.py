@@ -9,8 +9,12 @@ class SGATEmbedding(nn.Module):
     def __init__(self, sgat_configs):
         super(SGATEmbedding, self).__init__()
 
+        # self.gats = nn.ModuleList([
+        #     GAT(sgat_configs) for _ in range(sgat_configs['seq_len'])
+        # ])
+
         self.gats = nn.ModuleList([
-            GAT(sgat_configs) for _ in range(sgat_configs['seq_len'])
+            GATV2(sgat_configs) for _ in range(sgat_configs['seq_len'])
         ])
 
         # self.gat = GATV2(n_layers=n_layers,
