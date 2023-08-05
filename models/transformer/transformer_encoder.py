@@ -48,7 +48,7 @@ class TransformerEncoder(nn.Module):
         self.layers = nn.ModuleList(
             [EncoderBlock(configs['encoder_block']) for i in range(n_layers)])
 
-    def forward(self, x, graph_x, graph_x_semantic):
+    def _derive_emb_out(self, x, graph_x, graph_x_semantic):
         embed_x = None
         embed_graph_x = None
         embed_graph_x_semantic = None
@@ -62,14 +62,23 @@ class TransformerEncoder(nn.Module):
         embed_out = None
         if embed_graph_x is not None and embed_graph_x_semantic is not None and embed_x is not None:
             if self.merge_emb:
-                embed_out = torch.concat((embed_x, embed_graph_x), dim=-1)
+                embed_out = torch.concat((embed_x, embed_graph_x, embed_graph_x_semantic), dim=-1)
             else:
                 embed_out = embed_x + embed_graph_x + embed_graph_x_semantic
                 embed_out = self.emb_norm(embed_out)
-        elif embed_graph_x is None and embed_x is not None:
+        elif embed_graph_x is None and embed_graph_x_semantic is None and embed_x is not None:
             embed_out = embed_x
-        elif embed_graph_x is not None and embed_x is None:
-            embed_out = embed_graph_x
+        elif embed_graph_x is not None and embed_graph_x_semantic is not None and embed_x is None:
+            if self.merge_emb:
+                embed_out = torch.concat((embed_graph_x, embed_graph_x_semantic), dim=-1)
+            else:
+                embed_out = embed_graph_x + embed_graph_x_semantic
+                embed_out = self.emb_norm(embed_out)
+
+        return embed_out
+
+    def forward(self, x, graph_x, graph_x_semantic):
+        embed_out = self._derive_emb_out(x, graph_x, graph_x_semantic)
 
         embed_out = embed_out.permute(1, 0, 2, 3)  # B, T, N, F -> T, B, N , F (4, 36, 170, 16) -> (36, 4, 170, 16)
         embed_shp = embed_out.shape

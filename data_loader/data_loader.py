@@ -148,6 +148,7 @@ class DataLoader:
         training_x_set, validation_x_set, testing_x_set = x['train'], x['val'], x['test']
 
         # Derive global representation vector for each sensor for similar time steps
+        records_time_idx = None
         if self.rep_vectors:
             records_time_idx = derive_rep_timeline(training_x_set,
                                                    self.day_slot * self.num_days_per_week,
