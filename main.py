@@ -51,7 +51,7 @@ def train_validate(model, configs: dict, data_loader: DataLoader):
 
         if min_val_loss > mae_val_loss:
             min_val_loss = mae_val_loss
-            print('Saving Model...')
+            logger.info('Saving Model...')
             best_model_path = configs['model_output_path'].format(str(epoch))
             torch.save(model.state_dict(), best_model_path)  # saving model
 

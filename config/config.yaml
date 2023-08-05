@@ -8,7 +8,7 @@ model:
   device: cuda
   transformer:
     encoder:
-      features: 2 # To indicates multiple encoders (feature-wise). default is 1
+      features: 1 # To indicates multiple encoders (feature-wise). default is 1
       emb_dim: 16
       seq_len: 24
       input_dim: 1
@@ -47,7 +47,7 @@ model:
       decoder_block:
         n_heads: 8
         expansion_factor: 4
-        cross_attn_features: 2 # Used to indicates how many feature-wise cross attentions in the decoder
+        cross_attn_features: 1 # Used to indicates how many feature-wise cross attentions in the decoder
         src_dropout: 0.2
         cross_attn_dropout: 0.4
         ff_dropout: 0.2
@@ -74,10 +74,10 @@ data:
   last_week: False
   last_day: True
   num_days_per_week: 5
-  rep_vectors: True
+  rep_vectors: False
   preprocess: True
   preprocess_output_path: "data/PEMSD7/PeMSD7_Preprocessed.pickle"
   graph_enc_input: True # IMPORTANT: Set true for all encode inputs if merge_emb is True
   graph_dec_input: False
-  non_graph_enc_input: True
+  non_graph_enc_input: False
   non_graph_dec_input: True
