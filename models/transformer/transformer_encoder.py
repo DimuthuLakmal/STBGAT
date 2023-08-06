@@ -72,7 +72,7 @@ class TransformerEncoder(nn.Module):
             if self.merge_emb:
                 embed_out = torch.concat((embed_graph_x, embed_graph_x_semantic), dim=-1)
             else:
-                embed_out = embed_graph_x + embed_graph_x_semantic
+                embed_out = embed_graph_x_semantic
                 embed_out = self.emb_norm(embed_out)
 
         return embed_out
