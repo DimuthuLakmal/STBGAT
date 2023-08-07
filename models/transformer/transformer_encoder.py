@@ -60,20 +60,31 @@ class TransformerEncoder(nn.Module):
             embed_graph_x_semantic = self.graph_embedding_semantic(graph_x_semantic).transpose(0, 1)
 
         embed_out = None
-        if embed_graph_x is not None and embed_graph_x_semantic is not None and embed_x is not None:
-            if self.merge_emb:
-                embed_out = torch.concat((embed_x, embed_graph_x, embed_graph_x_semantic), dim=-1)
-            else:
-                embed_out = embed_x + embed_graph_x + embed_graph_x_semantic
-                embed_out = self.emb_norm(embed_out)
-        elif embed_graph_x is None and embed_graph_x_semantic is None and embed_x is not None:
+
+        normalize = False
+        if embed_x is not None:
             embed_out = embed_x
-        elif embed_graph_x is not None and embed_graph_x_semantic is not None and embed_x is None:
-            if self.merge_emb:
-                embed_out = torch.concat((embed_graph_x, embed_graph_x_semantic), dim=-1)
+        if embed_graph_x is not None:
+            if embed_out is not None:
+                if self.merge_emb:
+                    embed_out = torch.concat((embed_out, embed_graph_x), dim=-1)
+                else:
+                    embed_out += embed_graph_x
+                    normalize = True
+            else:
+                embed_out = embed_graph_x
+        if embed_graph_x_semantic is not None:
+            if embed_out is not None:
+                if self.merge_emb:
+                    embed_out = torch.concat((embed_out, embed_graph_x_semantic), dim=-1)
+                else:
+                    embed_out += embed_graph_x_semantic
+                    normalize = True
             else:
                 embed_out = embed_graph_x_semantic
-                embed_out = self.emb_norm(embed_out)
+
+        if normalize:
+            embed_out = self.emb_norm(embed_out)
 
         return embed_out
 

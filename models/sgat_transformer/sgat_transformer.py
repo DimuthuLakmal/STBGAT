@@ -54,14 +54,15 @@ class SGATTransformer(nn.Module):
 
         for idx, encoder in enumerate(self.encoders):
             x_i = x[idx] if x is not None and idx == 1 else None
-            graph_x_i = graph_x[0][idx] if graph_x is not None and idx == 0 else None
-            graph_x_i_semantic = graph_x[1][idx] if graph_x is not None and idx == 0 else None
+            graph_x_i = graph_x[0][idx] if graph_x[0] is not None and idx == 0 else None
+            graph_x_i_semantic = graph_x[1][idx] if graph_x[1] is not None and idx == 0 else None
+
             enc_out = encoder(x_i, graph_x_i, graph_x_i_semantic)
             enc_outs[idx] = enc_out
 
         if train:
-            graph_y_dis = graph_y[0] if graph_y is not None else None
-            graph_y_semantic = graph_y[1] if graph_y is not None else None
+            graph_y_dis = graph_y[0]
+            graph_y_semantic = graph_y[1]
 
             dec_out = self.decoder(y, graph_y_dis, graph_y_semantic, enc_outs, tgt_mask=tgt_mask, device=self.device)
             return dec_out[:, self.dec_out_start_idx: self.dec_out_end_idx]
@@ -69,15 +70,16 @@ class SGATTransformer(nn.Module):
             final_out = torch.zeros_like(y)
             dec_out_len = self.dec_seq_len - self.dec_seq_offset
             for i in range(dec_out_len):
-                graph_y_dis = graph_y[0] if graph_y is not None else None
-                graph_y_semantic = graph_y[1] if graph_y is not None else None
+                graph_y_dis = graph_y[0]
+                graph_y_semantic = graph_y[1]
 
                 dec_out = self.decoder(y, graph_y_dis, graph_y_semantic, enc_outs, tgt_mask=tgt_mask, device=self.device)
 
                 y[:, i + self.dec_seq_offset] = dec_out[:, i + self.dec_out_start_idx]
-                if graph_y is not None:
-                    for batch in range(y.shape[0]):
+                for batch in range(y.shape[0]):
+                    if graph_y[0] is not None:
                         graph_y[0][batch][i + self.dec_seq_offset].x = dec_out[batch, i + self.dec_out_start_idx]
+                    if graph_y[1] is not None:
                         graph_y[1][batch][i + self.dec_seq_offset].x = dec_out[batch, i + self.dec_out_start_idx]
 
                 final_out[:, i + self.dec_seq_offset] = dec_out[:, i + self.dec_out_start_idx]

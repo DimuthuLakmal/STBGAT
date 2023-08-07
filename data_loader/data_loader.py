@@ -11,8 +11,6 @@ from utils.data_utils import scale_weights, attach_prev_dys_seq, seq_gen_v2, der
 from data_loader.dataset import Dataset
 from utils.math_utils import z_score_normalize
 
-import time
-
 
 class DataLoader:
     def __init__(self, data_configs):
@@ -34,7 +32,9 @@ class DataLoader:
         self.rep_vectors = data_configs['rep_vectors']
 
         self.batch_size = data_configs['batch_size']
+        self.graph_enc_semantic_input = data_configs['graph_enc_semantic_input']
         self.graph_enc_input = data_configs['graph_enc_input']
+        self.graph_dec_semantic_input = data_configs['graph_dec_semantic_input']
         self.graph_dec_input = data_configs['graph_dec_input']
         self.non_graph_enc_input = data_configs['non_graph_enc_input']
         self.non_graph_dec_input = data_configs['non_graph_dec_input']
@@ -273,8 +273,6 @@ class DataLoader:
         if _type != 'train':
             ys_input[:, self.dec_seq_offset:, :, :] = 0
 
-        start = time.time()
-
         # encoder part of the model consists of multiple encoders # of encoders defined by self.enc_features
         # each encoder can accept distance-based graph and semantic graphs as inputs
         # if we use rep vectors and previous time seq values, those two will be input to two separate encoders
@@ -294,24 +292,28 @@ class DataLoader:
                 for inner_f in range(num_inner_f_enc):
                     start_idx = (k * num_inner_f_enc) + num_inner_f_enc - inner_f - 1
                     end_idx = start_idx + 1
-                    [graph.append(to(self._create_graph(x[:, start_idx: end_idx],
-                                                        self.edge_index,
-                                                        self.edge_attr)))
-                     for x in x_timesteps]
-                    [graph_semantic.append(to(self._create_graph(x[:, start_idx: end_idx],
-                                                                 self.edge_index_semantic,
-                                                                 self.edge_attr_semantic)))
-                     for x in x_timesteps]
+                    if self.graph_enc_input:
+                        [graph.append(to(self._create_graph(x[:, start_idx: end_idx],
+                                                            self.edge_index,
+                                                            self.edge_attr)))
+                         for x in x_timesteps]
+                    if self.graph_enc_semantic_input:
+                        [graph_semantic.append(to(self._create_graph(x[:, start_idx: end_idx],
+                                                                     self.edge_index_semantic,
+                                                                     self.edge_attr_semantic)))
+                         for x in x_timesteps]
 
                 batched_xs_graphs[idx] = graph
                 batched_xs_graphs_semantic[idx] = graph_semantic
 
             enc_xs_graphs[k] = batched_xs_graphs
             enc_xs_graphs_semantic[k] = batched_xs_graphs_semantic
-        enc_xs_graphs_all = [enc_xs_graphs, enc_xs_graphs_semantic]
 
-        end1 = time.time() - start
-        # print("Time", end1)
+        if not self.graph_enc_input:
+            enc_xs_graphs = None
+        if not self.graph_enc_semantic_input:
+            enc_xs_graphs_semantic = None
+        enc_xs_graphs_all = [enc_xs_graphs, enc_xs_graphs_semantic]
 
         enc_xs = []
         for k in range(self.enc_features):
@@ -333,9 +335,6 @@ class DataLoader:
             batched_xs = torch.stack(batched_xs)
             enc_xs.append(batched_xs)
 
-        end2 = time.time() - end1
-        # print("Time", end2)
-
         dec_ys = [[] for i in range(self.batch_size)]  # decoder input
         dec_ys_graphs = [[] for i in range(self.batch_size)]  # This is for the decoder input graph
         dec_ys_graphs_semantic = [[] for i in range(self.batch_size)]  # This is for the decoder input semantic graph
@@ -344,10 +343,12 @@ class DataLoader:
             graphs = []
             graphs_semantic = []
             for i, y in enumerate(y_timesteps):
-                graph = self._create_graph(y, self.edge_index, self.edge_attr)
-                graph_semantic = self._create_graph(y, self.edge_index_semantic, self.edge_attr_semantic)
-                graphs.append(to(graph))
-                graphs_semantic.append(to(graph_semantic))
+                if self.graph_dec_input:
+                    graph = self._create_graph(y, self.edge_index, self.edge_attr)
+                    graphs.append(to(graph))
+                if self.graph_dec_semantic_input:
+                    graph_semantic = self._create_graph(y, self.edge_index_semantic, self.edge_attr_semantic)
+                    graphs_semantic.append(to(graph_semantic))
 
             dec_ys_graphs[idx] = graphs
             dec_ys_graphs_semantic[idx] = graphs_semantic
@@ -355,15 +356,16 @@ class DataLoader:
             dec_ys[idx] = torch.Tensor(y_timesteps).to(device)
             dec_ys_target[idx] = torch.Tensor(ys[idx]).to(device)
 
+        if not self.graph_dec_input:
+            dec_ys_graphs = None
+        if not self.graph_dec_semantic_input:
+            dec_ys_graphs_semantic = None
         dec_ys_graph_all = [dec_ys_graphs, dec_ys_graphs_semantic]
+
         dec_ys = torch.stack(dec_ys)
 
-        if not self.graph_enc_input:
-            enc_xs_graphs_all = None
         if not self.non_graph_enc_input:
             enc_xs = None
-        if not self.graph_dec_input:
-            dec_ys_graph_all = None
         if not self.non_graph_dec_input:
             dec_ys = None
 
