@@ -25,12 +25,14 @@ class SGATTransformer(nn.Module):
         self.dec_out_end_idx = tf_configs['decoder']['out_end_idx']
 
         encoder_configs = tf_configs['encoder']
+        encoder_configs['device'] = self.device
         self.encoders = nn.ModuleList([
             TransformerEncoder(encoder_configs) for _ in range(self.enc_features)
         ])
 
         decoder_configs = tf_configs['decoder']
         decoder_configs['enc_features'] = self.enc_features
+        decoder_configs['device'] = self.device
         self.decoder = TransformerDecoder(decoder_configs)
 
     def _create_mask(self, batch_size, device):
@@ -38,50 +40,32 @@ class SGATTransformer(nn.Module):
             .fill_diagonal_(0).bool().expand(batch_size * 8, self.dec_seq_len, self.dec_seq_len)
         return trg_mask.to(device)
 
-    def _create_enc_out(self, x, graph_x):
+    def _create_enc_out(self, x):
         emb_dim = self.emb_dim if not self.merge_emb else self.emb_dim * self.enc_emb_expansion_factor
-        if x is not None:
-            enc_outs = torch.zeros((self.enc_features, x[0].shape[0] * x[0].shape[2], x[0].shape[1], emb_dim)).to(
-                self.device)
-        else:
-            enc_outs = torch.zeros((self.enc_features, len(graph_x[0][0]) * graph_x[0][0][0][0].x.shape[0],
-                                    len(graph_x[0][0][0]), emb_dim)).to(self.device)
+        enc_outs = torch.zeros((self.enc_features, x[0].shape[0] * x[0].shape[2], x[0].shape[1], emb_dim))\
+            .to(self.device)
         return enc_outs
 
-    def forward(self, x, graph_x, y=None, graph_y=None, train=True):
-        enc_outs = self._create_enc_out(x, graph_x)
+    def forward(self, x, y=None, train=True):
+        enc_outs = self._create_enc_out(x)
         tgt_mask = self._create_mask(enc_outs.shape[1], self.device)
 
         for idx, encoder in enumerate(self.encoders):
-            x_i = x[idx] if x is not None and idx == 1 else None
-            graph_x_i = graph_x[0][idx] if graph_x[0] is not None and idx == 0 else None
-            graph_x_i_semantic = graph_x[1][idx] if graph_x[1] is not None and idx == 0 else None
+            x_i = x[idx]
 
-            enc_out = encoder(x_i, graph_x_i, graph_x_i_semantic)
+            enc_out = encoder(x_i, idx)
             enc_outs[idx] = enc_out
 
         if train:
-            graph_y_dis = graph_y[0]
-            graph_y_semantic = graph_y[1]
-
-            dec_out = self.decoder(y, graph_y_dis, graph_y_semantic, enc_outs, tgt_mask=tgt_mask, device=self.device)
+            dec_out = self.decoder(y, enc_outs, tgt_mask=tgt_mask, device=self.device)
             return dec_out[:, self.dec_out_start_idx: self.dec_out_end_idx]
         else:
             final_out = torch.zeros_like(y)
             dec_out_len = self.dec_seq_len - self.dec_seq_offset
             for i in range(dec_out_len):
-                graph_y_dis = graph_y[0]
-                graph_y_semantic = graph_y[1]
 
-                dec_out = self.decoder(y, graph_y_dis, graph_y_semantic, enc_outs, tgt_mask=tgt_mask, device=self.device)
-
+                dec_out = self.decoder(y, enc_outs, tgt_mask=tgt_mask, device=self.device)
                 y[:, i + self.dec_seq_offset] = dec_out[:, i + self.dec_out_start_idx]
-                for batch in range(y.shape[0]):
-                    if graph_y[0] is not None:
-                        graph_y[0][batch][i + self.dec_seq_offset].x = dec_out[batch, i + self.dec_out_start_idx]
-                    if graph_y[1] is not None:
-                        graph_y[1][batch][i + self.dec_seq_offset].x = dec_out[batch, i + self.dec_out_start_idx]
-
                 final_out[:, i + self.dec_seq_offset] = dec_out[:, i + self.dec_out_start_idx]
 
             return final_out[:, self.dec_seq_offset:]

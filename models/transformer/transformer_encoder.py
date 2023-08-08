@@ -1,10 +1,13 @@
 import torch
-from torch import nn
+from torch import nn, Tensor
 
 from models.sgat.sgat_embedding import SGATEmbedding
 from models.transformer.positional_embedding import PositionalEmbedding
 from models.transformer.encoder_block import EncoderBlock
 from models.transformer.token_embedding import TokenEmbedding
+
+from torch_geometric.transforms import ToDevice
+import torch_geometric.data as data
 
 
 class TransformerEncoder(nn.Module):
@@ -17,6 +20,15 @@ class TransformerEncoder(nn.Module):
         emb_expansion_factor = configs['emb_expansion_factor']
         max_lookup_len = configs['max_lookup_len']
         self.lookup_idx = configs['lookup_idx']
+
+        # graph related
+        self.device = configs['device']
+        self.edge_index = configs['edge_index']
+        self.edge_attr = configs['edge_attr']
+        self.edge_index_semantic = configs['edge_index_semantic']
+        self.edge_attr_semantic = configs['edge_attr_semantic']
+        self.graph_input = configs['graph_input']
+        self.graph_semantic_input = configs['graph_semantic_input']
 
         n_layers = configs['n_layers']
 
@@ -48,53 +60,40 @@ class TransformerEncoder(nn.Module):
         self.layers = nn.ModuleList(
             [EncoderBlock(configs['encoder_block']) for i in range(n_layers)])
 
-    def _derive_emb_out(self, x, graph_x, graph_x_semantic):
-        embed_x = None
-        embed_graph_x = None
-        embed_graph_x_semantic = None
-        if x is not None:
-            embed_x = self.embedding(x)
-        if graph_x is not None:
-            embed_graph_x = self.graph_embedding(graph_x).transpose(0, 1)
-        if graph_x_semantic is not None:
-            embed_graph_x_semantic = self.graph_embedding_semantic(graph_x_semantic).transpose(0, 1)
+    def _create_graph(self, x, edge_index, edge_attr):
+        graph = data.Data(x=Tensor(x),
+                          edge_index=torch.LongTensor(edge_index),
+                          y=None,
+                          edge_attr=Tensor(edge_attr))
+        return graph
 
-        embed_out = None
+    def _derive_graphs(self, x_batch):
+        to = ToDevice(self.device)
 
-        normalize = False
-        if embed_x is not None:
-            embed_out = embed_x
-        if embed_graph_x is not None:
-            if embed_out is not None:
-                if self.merge_emb:
-                    embed_out = torch.concat((embed_out, embed_graph_x), dim=-1)
-                else:
-                    embed_out += embed_graph_x
-                    normalize = True
-            else:
-                embed_out = embed_graph_x
-        if embed_graph_x_semantic is not None:
-            if embed_out is not None:
-                if self.merge_emb:
-                    embed_out = torch.concat((embed_out, embed_graph_x_semantic), dim=-1)
-                else:
-                    embed_out += embed_graph_x_semantic
-                    normalize = True
-            else:
-                embed_out = embed_graph_x_semantic
+        x_batch_graphs = []
+        x_batch_graphs_semantic = []
+        for idx, x_all_t in enumerate(x_batch):
+            graphs = []
+            graphs_semantic = []
+            for i, x in enumerate(x_all_t):
+                if self.graph_input:
+                    graph = self._create_graph(x, self.edge_index, self.edge_attr)
+                    graphs.append(to(graph))
+                if self.graph_semantic_input:
+                    graph_semantic = self._create_graph(x, self.edge_index_semantic, self.edge_attr_semantic)
+                    graphs_semantic.append(to(graph_semantic))
 
-        if normalize:
-            embed_out = self.emb_norm(embed_out)
+            x_batch_graphs.append(graphs)
+            x_batch_graphs_semantic.append(graphs_semantic)
 
-        return embed_out
+        return x_batch_graphs, x_batch_graphs_semantic
 
-    def forward(self, x, graph_x, graph_x_semantic):
-        embed_out = self._derive_emb_out(x, graph_x, graph_x_semantic)
-
+    def forward(self, x, enc_idx):
+        embed_out = self.embedding(x)
         embed_out = embed_out.permute(1, 0, 2, 3)  # B, T, N, F -> T, B, N , F (4, 36, 170, 16) -> (36, 4, 170, 16)
         embed_shp = embed_out.shape
         embed_out = embed_out.reshape(embed_shp[0], embed_shp[1] * embed_shp[2], embed_shp[3])  # (36, 4 * 170, 16)
-        embed_out = embed_out.permute(1, 0, 2)
+        embed_out = embed_out.permute(1, 0, 2)  # (4 * 170, 36, 16)
 
         out = self.positional_encoder(embed_out, self.lookup_idx)
         for (layer, conv_q, conv_k) in zip(self.layers, self.conv_q_layers, self.conv_k_layers):
@@ -107,5 +106,16 @@ class TransformerEncoder(nn.Module):
                 q, k, v = out, out, out
 
             out = layer(q, k, v)
+
+        if enc_idx == 0:
+            out = out.reshape(x.shape[0], x.shape[2], x.shape[1], out.shape[-1])
+            out = out.permute(0, 2, 1, 3)
+            out_graph, out_graph_semantic = self._derive_graphs(out)
+            out = self.graph_embedding(out_graph).transpose(0, 1)
+
+            out = out.permute(1, 0, 2, 3)  # B, T, N, F -> T, B, N , F (4, 36, 170, 16) -> (36, 4, 170, 16)
+            out_shp = out.shape
+            out = out.reshape(out_shp[0], out_shp[1] * out_shp[2], out_shp[3])  # (36, 4 * 170, 16)
+            out = out.permute(1, 0, 2)  # (4 * 170, 36, 16)
 
         return out  # 32x10x512

@@ -11,7 +11,6 @@ def train(model: torch.nn.Module,
           loss_fn: torch.nn.Module,
           device: str,
           seq_offset: int = 0) -> tuple:
-
     offset = 0
     mae_train_loss = 0.
     rmse_train_loss = 0.
@@ -21,10 +20,9 @@ def train(model: torch.nn.Module,
     model.train()
 
     for batch in range(n_batch_train):
-        train_x, train_graph_x, train_y, train_graph_y, train_y_target = data_loader.load_batch(_type='train',
-                                                                                                offset=offset,
-                                                                                                device=device)
-        out = model(train_x, train_graph_x, train_y, train_graph_y, True)
+        train_x, train_y, train_y_target = data_loader.load_batch(_type='train', offset=offset, device=device)
+
+        out = model(train_x, train_y, True)
         out = out.reshape(out.shape[0] * out.shape[1] * out.shape[2], -1)
 
         train_y_tensor = ()

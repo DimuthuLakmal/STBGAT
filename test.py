@@ -6,10 +6,10 @@ from utils.math_utils import calculate_loss
 
 
 def test(_type: str,
-             model: torch.nn.Module,
-             data_loader: DataLoader,
-             device: str,
-             seq_offset: int = 0) -> tuple:
+         model: torch.nn.Module,
+         data_loader: DataLoader,
+         device: str,
+         seq_offset: int = 0) -> tuple:
     model.eval()
 
     mae_loss = 0.
@@ -24,11 +24,9 @@ def test(_type: str,
     offset = 0
     with torch.inference_mode():
         for batch in range(n_batch):
-            test_x, test_x_graph, test_y, test_y_graph, test_y_target = data_loader.load_batch(_type=_type,
-                                                                                               offset=offset,
-                                                                                               device=device)
+            test_x, test_y, test_y_target = data_loader.load_batch(_type=_type, offset=offset, device=device)
 
-            out = model(test_x, test_x_graph, test_y, test_y_graph, False)
+            out = model(test_x, test_y, False)
             out = out.reshape(out.shape[0] * out.shape[1] * out.shape[2], -1)
 
             test_y_tensor = ()
@@ -48,7 +46,7 @@ def test(_type: str,
             mape_loss += mape_loss_val
 
             if batch % 100 == 0:
-                logger.info(f"MAE {mae_loss/(batch + 1)}")
+                logger.info(f"MAE {mae_loss / (batch + 1)}")
 
             offset += data_loader.batch_size
 

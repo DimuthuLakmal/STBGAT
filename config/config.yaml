@@ -16,20 +16,22 @@ model:
       emb_expansion_factor: 3 # If embeddings are merged, it will expand the dimension. the factor depends on whether we use graph, semantinc graph and raw sensor data.
       n_layers: 4
       local_trends: True
+      graph_semantic_input: False
+      graph_input: True
       encoder_block:
         n_heads: 8
         expansion_factor: 4
         src_dropout: 0.2
         ff_dropout: 0.2
       sgat:
-        first_in_f_size: 1
+        first_in_f_size: 16
         n_layers: 2
         out_f_sizes: [ 16, 16 ]
-        n_heads: [ 4, 1 ]
+        n_heads: [ 8, 1 ]
         alpha: 0.2
         dropout: 0.7
         edge_dim: 1
-        skip_conn: False
+        skip_conn: True
     decoder:
       emb_dim: 16
       seq_len: 13
@@ -43,6 +45,8 @@ model:
       out_end_idx: -1 # When set decoder offset, this indicates the end index of the decoder output to calculate loss
       per_enc_feature_len: 24 # used in decoder cross attention (feature-wise cross attention). This should be tuned along with cross_attn_features
       local_trends: True
+      graph_semantic_input: False
+      graph_input: False
       decoder_block:
         n_heads: 8
         expansion_factor: 4
@@ -51,7 +55,7 @@ model:
         cross_attn_dropout: 0.3
         ff_dropout: 0.2
       sgat:
-        first_in_f_size: 1
+        first_in_f_size: 16
         n_layers: 2
         out_f_sizes: [ 16, 16 ]
         n_heads: [ 8, 1 ]
@@ -77,9 +81,3 @@ data:
   rep_vectors: True
   preprocess: True
   preprocess_output_path: "data/PEMSD7/PeMSD7_Preprocessed.pickle"
-  graph_enc_semantic_input: True # IMPORTANT: Set true for all encode inputs if merge_emb is True
-  graph_enc_input: True # IMPORTANT: Set true for all encode inputs if merge_emb is True
-  graph_dec_semantic_input: False
-  graph_dec_input: False
-  non_graph_enc_input: True
-  non_graph_dec_input: True

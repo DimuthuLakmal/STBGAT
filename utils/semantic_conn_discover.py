@@ -21,12 +21,12 @@ if __name__ == '__main__':
     data_seq = load_data_seq(graph_signal_matrix_filename)
 
     semantic_rels = {}
-    for sensor in range(n_sensors):
+    for sensor in range(1):
         sensor_seq = data_seq[:, sensor]
         alignment_details = []
         distances = []
 
-        for sensor_2 in range(n_sensors):
+        for sensor_2 in range(30):
             if sensor_2 == sensor: continue
             sensor_seq_2 = data_seq[:, sensor_2]
             try:
@@ -37,7 +37,11 @@ if __name__ == '__main__':
                 print(ex)
 
         min_indices = np.argpartition(distances, 5)[:5]
-        semantic_rels[sensor] = min_indices
+        sorted_distances = np.array(distances)[min_indices]
+        min_data = {}
+        for min_idx in min_indices:
+            min_data[min_idx] = sorted_distances[min_idx]
+        semantic_rels[sensor] = min_data
         # for idx in min_indices:
         #     alignment = alignment_details[idx]
         #     plt.plot(data_seq[:, idx])

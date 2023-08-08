@@ -18,6 +18,7 @@ class TransformerDecoder(nn.Module):
         emb_expansion_factor = configs['emb_expansion_factor']
         max_lookup_len = configs['max_lookup_len']
         self.lookup_idx = configs['lookup_idx']
+        self.device = configs['device']
 
         n_layers = configs['n_layers']
         out_dim = configs['out_dim']
@@ -92,49 +93,8 @@ class TransformerDecoder(nn.Module):
         tgt_mask_conv = tgt_mask_conv.expand(x.shape[0], self.seq_len, self.emb_dim, self.seq_len).to(device)
         return tgt_mask_conv
 
-    def _derive_emb_out(self, x, graph_x, graph_x_semantic):
-        embed_x = None
-        embed_graph_x = None
-        embed_graph_x_semantic = None
-        if x is not None:
-            embed_x = self.embedding(x)
-        if graph_x is not None:
-            embed_graph_x = self.graph_embedding(graph_x).transpose(0, 1)
-        if graph_x_semantic is not None:
-            embed_graph_x_semantic = self.graph_embedding_semantic(graph_x_semantic).transpose(0, 1)
-
-        embed_out = None
-
-        normalize = False
-        if embed_x is not None:
-            embed_out = embed_x
-        if embed_graph_x is not None:
-            if embed_out is not None:
-                if self.merge_emb:
-                    embed_out = torch.concat((embed_out, embed_graph_x), dim=-1)
-                else:
-                    embed_out += embed_graph_x
-                    normalize = True
-            else:
-                embed_out = embed_graph_x
-        if embed_graph_x_semantic is not None:
-            if embed_out is not None:
-                if self.merge_emb:
-                    embed_out = torch.concat((embed_out, embed_graph_x_semantic), dim=-1)
-                else:
-                    embed_out += embed_graph_x_semantic
-                    normalize = True
-            else:
-                embed_out = embed_graph_x_semantic
-
-        if normalize:
-            embed_out = self.emb_norm(embed_out)
-
-        return embed_out
-
-    def forward(self, x, graph_x, graph_x_semantic, enc_x, tgt_mask, device):
-        embed_out = self._derive_emb_out(x, graph_x, graph_x_semantic)
-
+    def forward(self, x, enc_x, tgt_mask, device):
+        embed_out = self.embedding(x)
         embed_out = embed_out.permute(1, 0, 2, 3)  # B, T, N, F -> T, B, N , F (4, 36, 170, 16) -> (36, 4, 170, 16)
         embed_shp = embed_out.shape
         embed_out = embed_out.reshape(embed_shp[0], embed_shp[1] * embed_shp[2], embed_shp[3])  # (36, 4 * 170, 16)
