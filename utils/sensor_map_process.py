@@ -19,7 +19,7 @@ def drop_edges(filename: str, filename_out: str, stations: list, avg: float):
             st = stations[row]
             selected = []
             for dis in st.distances:
-                if dis <= 5:
+                if dis <= 10:
                     selected.append(True)
                 else:
                     selected.append(False)
