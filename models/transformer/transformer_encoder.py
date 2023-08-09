@@ -41,11 +41,7 @@ class TransformerEncoder(nn.Module):
         # convolution related
         self.local_trends = configs['local_trends']
 
-        # by merging embeddings we increase the num embeddings
-        if self.merge_emb:
-            emb_dim = emb_dim * emb_expansion_factor
         self.positional_encoder = PositionalEmbedding(max_lookup_len, emb_dim)
-        self.emb_norm = nn.LayerNorm(emb_dim)
 
         # to do local trend analysis
         self.conv_q_layers = nn.ModuleList(
@@ -59,6 +55,11 @@ class TransformerEncoder(nn.Module):
         configs['encoder_block']['emb_dim'] = emb_dim
         self.layers = nn.ModuleList(
             [EncoderBlock(configs['encoder_block']) for i in range(n_layers)])
+
+        # by merging embeddings we increase the output dimension
+        if self.merge_emb:
+            emb_dim = emb_dim * emb_expansion_factor
+        self.out_norm = nn.LayerNorm(emb_dim)
 
     def _create_graph(self, x, edge_index, edge_attr):
         graph = data.Data(x=Tensor(x),
@@ -88,12 +89,16 @@ class TransformerEncoder(nn.Module):
 
         return x_batch_graphs, x_batch_graphs_semantic
 
+    def _organize_matrix(self, mat):
+        mat = mat.permute(1, 0, 2, 3)  # B, T, N, F -> T, B, N , F (4, 36, 170, 16) -> (36, 4, 170, 16)
+        mat_shp = mat.shape
+        mat = mat.reshape(mat_shp[0], mat_shp[1] * mat_shp[2], mat_shp[3])  # (36, 4 * 170, 16)
+        mat = mat.permute(1, 0, 2)  # (4 * 170, 36, 16)
+        return mat
+
     def forward(self, x, enc_idx):
         embed_out = self.embedding(x)
-        embed_out = embed_out.permute(1, 0, 2, 3)  # B, T, N, F -> T, B, N , F (4, 36, 170, 16) -> (36, 4, 170, 16)
-        embed_shp = embed_out.shape
-        embed_out = embed_out.reshape(embed_shp[0], embed_shp[1] * embed_shp[2], embed_shp[3])  # (36, 4 * 170, 16)
-        embed_out = embed_out.permute(1, 0, 2)  # (4 * 170, 36, 16)
+        embed_out = self._organize_matrix(embed_out)
 
         out = self.positional_encoder(embed_out, self.lookup_idx)
         for (layer, conv_q, conv_k) in zip(self.layers, self.conv_q_layers, self.conv_k_layers):
@@ -111,11 +116,19 @@ class TransformerEncoder(nn.Module):
             out = out.reshape(x.shape[0], x.shape[2], x.shape[1], out.shape[-1])
             out = out.permute(0, 2, 1, 3)
             out_graph, out_graph_semantic = self._derive_graphs(out)
-            out = self.graph_embedding(out_graph).transpose(0, 1)
 
-            out = out.permute(1, 0, 2, 3)  # B, T, N, F -> T, B, N , F (4, 36, 170, 16) -> (36, 4, 170, 16)
-            out_shp = out.shape
-            out = out.reshape(out_shp[0], out_shp[1] * out_shp[2], out_shp[3])  # (36, 4 * 170, 16)
-            out = out.permute(1, 0, 2)  # (4 * 170, 36, 16)
+            if self.graph_input:
+                out_graph = self.graph_embedding(out_graph).transpose(0, 1)
+            if self.graph_semantic_input:
+                out_graph_semantic = self.graph_embedding_semantic(out_graph_semantic).transpose(0, 1)
+
+            if self.graph_input and self.graph_semantic_input:
+                out = self.out_norm(out_graph + out_graph_semantic)
+            elif self.graph_input and not self.graph_semantic_input:
+                out = out_graph
+            elif not self.graph_input and self.graph_semantic_input:
+                out = out_graph_semantic
+
+            out = self._organize_matrix(out)
 
         return out  # 32x10x512

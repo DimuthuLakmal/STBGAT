@@ -189,6 +189,7 @@ def scale_weights(w, scaling=True, min_max=False):
     if scaling and not min_max:
         return np.log10(w)
     elif scaling and min_max:
+        w = np.array(w)
         _min = w.min(axis=(0), keepdims=True)
         _max = w.max(axis=(0), keepdims=True)
         return normalize(w, _max, _min)

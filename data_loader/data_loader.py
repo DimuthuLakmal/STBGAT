@@ -211,13 +211,11 @@ class DataLoader:
                     edge_attr.append([w[row][col]])
 
         edge_index = [src_edges, dst_edges]
-        edge_attr = scale_weights(edge_attr, self.edge_weight_scaling)
+        edge_attr = scale_weights(edge_attr, self.edge_weight_scaling, min_max=True)
 
         return edge_index, edge_attr
 
     def load_semantic_edge_data_file(self):
-        w = pd.read_csv(self.edge_weight_original_filename, header=None).values
-
         semantic_file = open(self.semantic_adj_filename, 'rb')
         sensor_details = pickle.load(semantic_file)
 
@@ -225,14 +223,13 @@ class DataLoader:
         src_edges = []
         edge_attr = []
         for i, (sensor, neighbours) in enumerate(sensor_details.items()):
-            for src in neighbours:
-                if w[sensor][src] != 0:
-                    dst_edges.append(sensor)
-                    src_edges.append(src)
-                    edge_attr.append([w[sensor][src]])
+            for j, (neighbour, distance) in enumerate(neighbours.items()):
+                dst_edges.append(sensor)
+                src_edges.append(neighbour)
+                edge_attr.append([distance])
 
         edge_index = [src_edges, dst_edges]
-        edge_attr = scale_weights(edge_attr, self.edge_weight_scaling)
+        edge_attr = scale_weights(edge_attr, self.edge_weight_scaling, min_max=True)
 
         return edge_index, edge_attr
 
