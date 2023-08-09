@@ -224,6 +224,8 @@ class DataLoader:
         edge_attr = []
         for i, (sensor, neighbours) in enumerate(sensor_details.items()):
             for j, (neighbour, distance) in enumerate(neighbours.items()):
+                if j > 2:
+                    break
                 dst_edges.append(sensor)
                 src_edges.append(neighbour)
                 edge_attr.append([distance])
