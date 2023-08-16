@@ -16,7 +16,7 @@ model:
       emb_expansion_factor: 3 # If embeddings are merged, it will expand the dimension. the factor depends on whether we use graph, semantinc graph and raw sensor data.
       n_layers: 4
       local_trends: True
-      graph_semantic_input: True
+      graph_semantic_input: False
       graph_input: True
       encoder_block:
         n_heads: 8
@@ -24,14 +24,14 @@ model:
         src_dropout: 0.2
         ff_dropout: 0.2
       sgat:
-        first_in_f_size: 16
-        n_layers: 2
-        out_f_sizes: [ 16, 16 ]
+        first_in_f_size: 48
+        n_layers: 1
+        out_f_sizes: [ 48, 48 ]
         n_heads: [ 8, 1 ]
         alpha: 0.2
         dropout: 0.7
         edge_dim: 1
-        skip_conn: True
+        skip_conn: False
     decoder:
       emb_dim: 16
       seq_len: 13
