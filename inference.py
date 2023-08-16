@@ -29,19 +29,19 @@ if __name__ == '__main__':
     data_loader, model_configs = prepare_data(model_configs, data_configs)
 
     device = 'cpu'
-    graph_out_dir_ours = './output/graphs/ours'
+    graph_out_dir_ours = './output/graphs/pemsd7'
 
     offset = 0
     for batch in range(0, 10):
-        test_x, test_x_graph, test_y, test_y_graph, test_y_target = data_loader.load_batch(_type='train',
-                                                                                           offset=offset,
-                                                                                           device=device)
+        test_x, test_y, test_y_target = data_loader.load_batch(_type='train',
+                                                               offset=offset,
+                                                               device=device)
 
         test_x = torch.stack(test_x)[0]
         test_y_target = torch.stack(test_y_target)
 
         shape = test_x.shape
-        test_x = test_x.transpose(1, 2)[:, :, 24:, 0:1].detach().cpu().numpy().reshape(
+        test_x = test_x.transpose(1, 2)[:, :, 12:, 0:1].detach().cpu().numpy().reshape(
             (shape[0] * 12 * (shape[2]), 1))
         test_x = z_inverse(test_x, mean=data_loader.dataset.stats_x['_mean'], std=data_loader.dataset.stats_x['_std'])
         test_x = test_x.reshape((shape[0], 12, shape[2], 1))
