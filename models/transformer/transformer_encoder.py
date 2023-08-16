@@ -59,7 +59,7 @@ class TransformerEncoder(nn.Module):
         # by merging embeddings we increase the output dimension
         if self.merge_emb:
             self.emb_dim = self.emb_dim * emb_expansion_factor
-        self.out_norm = nn.LayerNorm(self.emb_dim)
+        self.out_norm = nn.LayerNorm(self.emb_dim * 3)
 
     def _create_graph(self, x, edge_index, edge_attr):
         graph = data.Data(x=Tensor(x),

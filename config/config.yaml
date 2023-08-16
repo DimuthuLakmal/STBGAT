@@ -16,7 +16,7 @@ model:
       emb_expansion_factor: 3 # If embeddings are merged, it will expand the dimension. the factor depends on whether we use graph, semantinc graph and raw sensor data.
       n_layers: 4
       local_trends: True
-      graph_semantic_input: False
+      graph_semantic_input: True
       graph_input: True
       encoder_block:
         n_heads: 8
@@ -79,5 +79,5 @@ data:
   last_day: True
   num_days_per_week: 5
   rep_vectors: True
-  preprocess: False
+  preprocess: True
   preprocess_output_path: "data/PEMSD7/PeMSD7_Preprocessed.pickle"
