@@ -5,7 +5,7 @@ model:
   model_output_path: "output/model/pemsd7/multi-cross-attn/epoch_v1_{}_model.pt"
   model_input_path: "output/model/pemsd7/multi-cross-attn/epoch_v1_40_model.pt"
   load_saved_model: False
-  device: cuda
+  device: cpu
   transformer:
     encoder:
       features: 2 # To indicates multiple encoders (feature-wise). default is 1

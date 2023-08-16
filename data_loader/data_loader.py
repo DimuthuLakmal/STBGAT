@@ -189,6 +189,7 @@ class DataLoader:
             n_batch_train=self.n_batch_train,
             n_batch_test=self.n_batch_test,
             n_batch_val=self.n_batch_val,
+            batch_size=self.batch_size
         )
 
         with open(self.preprocess_output_path, 'wb') as file:
