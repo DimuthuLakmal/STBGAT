@@ -110,30 +110,30 @@ class TransformerEncoder(nn.Module):
             else:
                 q, k, v = out, out, out
 
-        if enc_idx == 0:
-            graph_x = torch.concat((q, k, v), dim=-1)
+            if enc_idx == 0:
+                graph_x = torch.concat((q, k, v), dim=-1)
 
-            graph_x = graph_x.reshape(x.shape[0], x.shape[2], x.shape[1], graph_x.shape[-1])
-            graph_x = graph_x.permute(0, 2, 1, 3)
-            out_graph, out_graph_semantic = self._derive_graphs(graph_x)
+                graph_x = graph_x.reshape(x.shape[0], x.shape[2], x.shape[1], graph_x.shape[-1])
+                graph_x = graph_x.permute(0, 2, 1, 3)
+                out_graph, out_graph_semantic = self._derive_graphs(graph_x)
 
-            if self.graph_input:
-                out_graph = self.graph_embedding(out_graph).transpose(0, 1)
-            if self.graph_semantic_input:
-                out_graph_semantic = self.graph_embedding_semantic(out_graph_semantic).transpose(0, 1)
+                if self.graph_input:
+                    out_graph = self.graph_embedding(out_graph).transpose(0, 1)
+                if self.graph_semantic_input:
+                    out_graph_semantic = self.graph_embedding_semantic(out_graph_semantic).transpose(0, 1)
 
-            if self.graph_input and self.graph_semantic_input:
-                out = self.out_norm(out_graph + out_graph_semantic)
-            elif self.graph_input and not self.graph_semantic_input:
-                out = out_graph
-            elif not self.graph_input and self.graph_semantic_input:
-                out = out_graph_semantic
+                if self.graph_input and self.graph_semantic_input:
+                    out = self.out_norm(out_graph + out_graph_semantic)
+                elif self.graph_input and not self.graph_semantic_input:
+                    out = out_graph
+                elif not self.graph_input and self.graph_semantic_input:
+                    out = out_graph_semantic
 
-            out = self._organize_matrix(out)
-            q = out[:, :, :self.emb_dim]
-            k = out[:, :, self.emb_dim:2*self.emb_dim]
-            v = out[:, :, 2*self.emb_dim:]
+                out = self._organize_matrix(out)
+                q = out[:, :, :self.emb_dim]
+                k = out[:, :, self.emb_dim:2*self.emb_dim]
+                v = out[:, :, 2*self.emb_dim:]
 
-        out = layer(q, k, v)
+            out = layer(q, k, v)
 
         return out  # 32x10x512
