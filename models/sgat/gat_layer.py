@@ -13,9 +13,9 @@ class GATLayer(nn.Module):
         self.n_heads = n_heads
 
         if edge_dim == -1:
-            self.conv = GATv2Conv(in_features, out_features, heads=n_heads, dropout=dropout, concat=concat, aggr='mean')
+            self.conv = GATv2Conv(in_features, out_features, heads=n_heads, dropout=dropout, concat=concat)
         else:
-            self.conv = GATv2Conv(in_features, out_features, heads=n_heads, dropout=dropout, concat=concat, edge_dim=edge_dim, aggr='mean')
+            self.conv = GATv2Conv(in_features, out_features, heads=n_heads, dropout=dropout, concat=concat, edge_dim=edge_dim)
 
     def forward(self, x, edge_index, edge_attr=None):
         x = self.conv(x, edge_index, edge_attr)

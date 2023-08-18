@@ -19,7 +19,7 @@ def drop_edges(filename: str, filename_out: str, stations: list, avg: float):
             st = stations[row]
             selected = []
             for dis in st.distances:
-                if dis <= 10:
+                if dis <= 1.5:
                     selected.append(True)
                 else:
                     selected.append(False)
@@ -53,7 +53,7 @@ def load_data_file(file: str):
 
 
 if __name__ == '__main__':
-    df = load_data_file('../data/PeMSD7_M_Station_Info.csv')
+    df = load_data_file('../data/PEMSD7/PeMSD7_M_Station_Info.csv')
 
     stations = []
     for index, row in df.iterrows():
@@ -75,7 +75,7 @@ if __name__ == '__main__':
 
     all_mean = all_mean / (len(stations) * 1.0)
 
-    drop_edges(filename='../data/PeMSD7_W_228_original.csv',
-               filename_out='../data/PeMSD7_W_228.csv',
+    drop_edges(filename='../data/PEMSD7/PeMSD7_W_228_original.csv',
+               filename_out='../data/PEMSD7/PeMSD7_W_228.csv',
                stations=stations,
                avg=all_mean)

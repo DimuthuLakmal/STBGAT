@@ -214,6 +214,16 @@ class DataLoader:
         edge_index = [src_edges, dst_edges]
         edge_attr = scale_weights(edge_attr, self.edge_weight_scaling, min_max=True)
 
+        # for i in range(len(edge_attr)):
+        #     edge_attr[i] = 1 - edge_attr[i]
+        #
+        # for row in range(w.shape[0]):
+        #     edge_index[0].append(row)
+        #     edge_index[1].append(row)
+        #     edge_attr = np.append(edge_attr, [1.])
+        #
+        # edge_attr = edge_attr.reshape((edge_attr.shape[0], 1))
+
         return edge_index, edge_attr
 
     def load_semantic_edge_data_file(self):
