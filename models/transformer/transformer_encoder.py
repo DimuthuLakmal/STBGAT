@@ -29,14 +29,16 @@ class TransformerEncoder(nn.Module):
         self.edge_attr_semantic = configs['edge_attr_semantic']
         self.graph_input = configs['graph_input']
         self.graph_semantic_input = configs['graph_semantic_input']
+        self.seq_len = configs['seq_len']
 
         n_layers = configs['n_layers']
 
         # embedding
         self.embedding = TokenEmbedding(input_dim=input_dim, embed_dim=self.emb_dim)
-        configs['sgat']['seq_len'] = configs['seq_len']
+        configs['sgat']['seq_len'] = self.seq_len
         self.graph_embedding = SGATEmbedding(configs['sgat'])
         self.graph_embedding_semantic = SGATEmbedding(configs['sgat'])
+        self.bipart_lin = nn.Linear(self.emb_dim, self.seq_len * self.emb_dim)
 
         # convolution related
         self.local_trends = configs['local_trends']
@@ -62,7 +64,7 @@ class TransformerEncoder(nn.Module):
         self.out_norm = nn.LayerNorm(self.emb_dim * 3)
 
     def _create_graph(self, x, edge_index, edge_attr):
-        graph = data.Data(x=Tensor(x),
+        graph = data.Data(x=(Tensor(x[0]), Tensor(x[1])),
                           edge_index=torch.LongTensor(edge_index),
                           y=None,
                           edge_attr=Tensor(edge_attr))
@@ -76,18 +78,38 @@ class TransformerEncoder(nn.Module):
         for idx, x_all_t in enumerate(x_batch):
             graphs = []
             graphs_semantic = []
+            x_src = x_all_t.permute(1, 0, 2)  # N, T, F
+            x_src = x_src.reshape(x_src.shape[0], -1)  # N, T*F
             for i, x in enumerate(x_all_t):
+                x = self.bipart_lin(x)
                 if self.graph_input:
-                    graph = self._create_graph(x, self.edge_index, self.edge_attr)
+                    graph = self._create_graph((x_src, x), self.edge_index, self.edge_attr)
                     graphs.append(to(graph))
                 if self.graph_semantic_input:
-                    graph_semantic = self._create_graph(x, self.edge_index_semantic, self.edge_attr_semantic)
+                    graph_semantic = self._create_graph((x_src, x), self.edge_index_semantic, self.edge_attr_semantic)
                     graphs_semantic.append(to(graph_semantic))
 
             x_batch_graphs.append(graphs)
             x_batch_graphs_semantic.append(graphs_semantic)
 
         return x_batch_graphs, x_batch_graphs_semantic
+
+    # for idx, x_all_t in enumerate(x_batch):  # x_all_t -> T, N, F
+    #     graphs = []
+    #     graphs_semantic = []
+    #
+    #     x = x_all_t.permute(1, 0, 2)  # N, T, F
+    #     if self.graph_input:
+    #         graph = self._create_graph(x, self.edge_index, self.edge_attr)
+    #         graphs.append(to(graph))
+    #     if self.graph_semantic_input:
+    #         graph_semantic = self._create_graph(x, self.edge_index_semantic, self.edge_attr_semantic)
+    #         graphs_semantic.append(to(graph_semantic))
+    #
+    #     x_batch_graphs.append(graphs)
+    #     x_batch_graphs_semantic.append(graphs_semantic)
+    #
+    # return x_batch_graphs, x_batch_graphs_semantic
 
     def _organize_matrix(self, mat):
         mat = mat.permute(1, 0, 2, 3)  # B, T, N, F -> T, B, N , F (4, 36, 170, 16) -> (36, 4, 170, 16)
@@ -110,30 +132,27 @@ class TransformerEncoder(nn.Module):
             else:
                 q, k, v = out, out, out
 
-            if enc_idx == 0:
-                graph_x = torch.concat((q, k, v), dim=-1)
+            out_transformer = layer(q, k, v)
 
-                graph_x = graph_x.reshape(x.shape[0], x.shape[2], x.shape[1], graph_x.shape[-1])
-                graph_x = graph_x.permute(0, 2, 1, 3)
-                out_graph, out_graph_semantic = self._derive_graphs(graph_x)
+        if enc_idx == 0:
+            graph_x = out_transformer
 
-                if self.graph_input:
-                    out_graph = self.graph_embedding(out_graph).transpose(0, 1)
-                if self.graph_semantic_input:
-                    out_graph_semantic = self.graph_embedding_semantic(out_graph_semantic).transpose(0, 1)
+            graph_x = graph_x.reshape(x.shape[0], x.shape[2], x.shape[1], graph_x.shape[-1])
+            graph_x = graph_x.permute(0, 2, 1, 3)
+            out_graph, out_graph_semantic = self._derive_graphs(graph_x)
 
-                if self.graph_input and self.graph_semantic_input:
-                    out = self.out_norm(out_graph + out_graph_semantic)
-                elif self.graph_input and not self.graph_semantic_input:
-                    out = out_graph
-                elif not self.graph_input and self.graph_semantic_input:
-                    out = out_graph_semantic
+            if self.graph_input:
+                out_graph = self.graph_embedding(out_graph).transpose(0, 1)
+            if self.graph_semantic_input:
+                out_graph_semantic = self.graph_embedding_semantic(out_graph_semantic).transpose(0, 1)
 
-                out = self._organize_matrix(out)
-                q = out[:, :, :self.emb_dim]
-                k = out[:, :, self.emb_dim:2*self.emb_dim]
-                v = out[:, :, 2*self.emb_dim:]
+            if self.graph_input and self.graph_semantic_input:
+                out = self.out_norm(out_graph + out_graph_semantic)
+            elif self.graph_input and not self.graph_semantic_input:
+                out = out_graph
+            elif not self.graph_input and self.graph_semantic_input:
+                out = out_graph_semantic
 
-            out = layer(q, k, v)
+            out = out_transformer + self._organize_matrix(out)
 
         return out  # 32x10x512

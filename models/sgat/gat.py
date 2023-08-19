@@ -34,7 +34,9 @@ class GAT(nn.Module):
             x, edge_index, edge_attr = data.x, data.edge_index, data.edge_attr
 
             for l, gat_layer in enumerate(self.layer_stack):
-                x = F.dropout(x, p=self.dropout, training=self.training)
+                x1 = F.dropout(x[0], p=self.dropout, training=self.training)
+                x2 = F.dropout(x[1], p=self.dropout, training=self.training)
+                x = [x1, x2]
                 x = gat_layer(x, edge_attr=edge_attr, edge_index=edge_index)
                 if l < (self.n_layers - 1):
                     x = F.elu(x)

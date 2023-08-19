@@ -5,7 +5,7 @@ model:
   model_output_path: "output/model/pemsd7/multi-cross-attn/epoch_v1_{}_model.pt"
   model_input_path: "output/model/pemsd7/multi-cross-attn/epoch_v1_40_model.pt"
   load_saved_model: False
-  device: cuda
+  device: cpu
   transformer:
     encoder:
       features: 2 # To indicates multiple encoders (feature-wise). default is 1
@@ -14,7 +14,7 @@ model:
       input_dim: 1
       merge_emb: False # Indicate whether the graph embeddings merge with non-graph embedding.
       emb_expansion_factor: 3 # If embeddings are merged, it will expand the dimension. the factor depends on whether we use graph, semantinc graph and raw sensor data.
-      n_layers: 2
+      n_layers: 4
       local_trends: True
       graph_semantic_input: False
       graph_input: True
@@ -24,9 +24,9 @@ model:
         src_dropout: 0.2
         ff_dropout: 0.2
       sgat:
-        first_in_f_size: 48
+        first_in_f_size: 384
         n_layers: 1
-        out_f_sizes: [ 48, 48 ]
+        out_f_sizes: [ 16, 16 ]
         n_heads: [ 4, 1 ]
         alpha: 0.2
         dropout: 0.7
@@ -51,8 +51,8 @@ model:
         n_heads: 8
         expansion_factor: 4
         cross_attn_features: 2 # Used to indicates how many feature-wise cross attentions in the decoder
-        src_dropout: 0.3
-        cross_attn_dropout: 0.3
+        src_dropout: 0.2
+        cross_attn_dropout: 0.2
         ff_dropout: 0.2
       sgat:
         first_in_f_size: 16
@@ -79,5 +79,5 @@ data:
   last_day: True
   num_days_per_week: 5
   rep_vectors: True
-  preprocess: True
+  preprocess: False
   preprocess_output_path: "data/PEMSD7/PeMSD7_Preprocessed.pickle"
