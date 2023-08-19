@@ -94,23 +94,6 @@ class TransformerEncoder(nn.Module):
 
         return x_batch_graphs, x_batch_graphs_semantic
 
-    # for idx, x_all_t in enumerate(x_batch):  # x_all_t -> T, N, F
-    #     graphs = []
-    #     graphs_semantic = []
-    #
-    #     x = x_all_t.permute(1, 0, 2)  # N, T, F
-    #     if self.graph_input:
-    #         graph = self._create_graph(x, self.edge_index, self.edge_attr)
-    #         graphs.append(to(graph))
-    #     if self.graph_semantic_input:
-    #         graph_semantic = self._create_graph(x, self.edge_index_semantic, self.edge_attr_semantic)
-    #         graphs_semantic.append(to(graph_semantic))
-    #
-    #     x_batch_graphs.append(graphs)
-    #     x_batch_graphs_semantic.append(graphs_semantic)
-    #
-    # return x_batch_graphs, x_batch_graphs_semantic
-
     def _organize_matrix(self, mat):
         mat = mat.permute(1, 0, 2, 3)  # B, T, N, F -> T, B, N , F (4, 36, 170, 16) -> (36, 4, 170, 16)
         mat_shp = mat.shape
