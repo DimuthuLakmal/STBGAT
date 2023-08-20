@@ -46,7 +46,7 @@ model:
       per_enc_feature_len: 24 # used in decoder cross attention (feature-wise cross attention). This should be tuned along with cross_attn_features
       local_trends: True
       graph_semantic_input: False
-      graph_input: False
+      graph_input: True
       decoder_block:
         n_heads: 8
         expansion_factor: 4
@@ -55,14 +55,14 @@ model:
         cross_attn_dropout: 0.2
         ff_dropout: 0.2
       sgat:
-        first_in_f_size: 16
-        n_layers: 2
+        first_in_f_size: 208
+        n_layers: 1
         out_f_sizes: [ 16, 16 ]
-        n_heads: [ 8, 1 ]
+        n_heads: [ 4, 1 ]
         alpha: 0.2
-        dropout: 0.5
+        dropout: 0.7
         edge_dim: 1
-        skip_conn: True
+        skip_conn: False
     lookup_index: True
 
 # Data Configs
@@ -79,5 +79,5 @@ data:
   last_day: True
   num_days_per_week: 5
   rep_vectors: True
-  preprocess: True
+  preprocess: False
   preprocess_output_path: "data/PEMSD7/PeMSD7_Preprocessed.pickle"

@@ -498,3 +498,663 @@ all_batch: 2370 | batch: 374 | mae_tmp_loss: 1.3017892476717632 | rmse_tmp_loss:
 all_batch: 2370 | batch: 499 | mae_tmp_loss: 1.301766214966774 | rmse_tmp_loss: 2.2404659805297853 | mape_tmp_loss: 0.02894152769446373
 all_batch: 2370 | batch: 624 | mae_tmp_loss: 1.3065676393508912 | rmse_tmp_loss: 2.2488337144851687 | mape_tmp_loss: 0.029162130504846572
 all_batch: 2370 | batch: 749 | mae_tmp_loss: 1.3077853271961213 | rmse_tmp_loss: 2.2523707350095115 | mape_tmp_loss: 0.029288854570438463
+all_batch: 2370 | batch: 874 | mae_tmp_loss: 1.3081907706941878 | rmse_tmp_loss: 2.250054959160941 | mape_tmp_loss: 0.029311426013708116
+all_batch: 2370 | batch: 999 | mae_tmp_loss: 1.306563992202282 | rmse_tmp_loss: 2.2450906574726104 | mape_tmp_loss: 0.029242278035730124
+all_batch: 2370 | batch: 1124 | mae_tmp_loss: 1.3051827994982401 | rmse_tmp_loss: 2.2432760287390816 | mape_tmp_loss: 0.029183035761117936
+all_batch: 2370 | batch: 1249 | mae_tmp_loss: 1.3050918573856354 | rmse_tmp_loss: 2.243047201538086 | mape_tmp_loss: 0.029178398011624813
+all_batch: 2370 | batch: 1374 | mae_tmp_loss: 1.304668044350364 | rmse_tmp_loss: 2.242782762960954 | mape_tmp_loss: 0.029149907786060462
+all_batch: 2370 | batch: 1499 | mae_tmp_loss: 1.307415829181671 | rmse_tmp_loss: 2.2458106053670246 | mape_tmp_loss: 0.029254639462257426
+all_batch: 2370 | batch: 1624 | mae_tmp_loss: 1.3052624908593984 | rmse_tmp_loss: 2.2434940562615027 | mape_tmp_loss: 0.02916823082531874
+all_batch: 2370 | batch: 1749 | mae_tmp_loss: 1.3060295327050346 | rmse_tmp_loss: 2.2439887835638865 | mape_tmp_loss: 0.02922836735099554
+all_batch: 2370 | batch: 1874 | mae_tmp_loss: 1.3084736739794414 | rmse_tmp_loss: 2.246895491282145 | mape_tmp_loss: 0.02935148850729068
+all_batch: 2370 | batch: 1999 | mae_tmp_loss: 1.307611656576395 | rmse_tmp_loss: 2.2448118169903757 | mape_tmp_loss: 0.02929774821549654
+all_batch: 2370 | batch: 2124 | mae_tmp_loss: 1.3077956864693585 | rmse_tmp_loss: 2.244438286556917 | mape_tmp_loss: 0.029291318076498367
+all_batch: 2370 | batch: 2249 | mae_tmp_loss: 1.3058036420610215 | rmse_tmp_loss: 2.241745122909546 | mape_tmp_loss: 0.02922524044290185
+MAE 1.0443576574325562
+MAE 2.696290668874684
+MAE 2.8891794183360995
+MAE 2.7851062308118193
+Epoch: 5 | mae_train_loss: 1.3029405051897347 | rmse_train_loss: 2.2382967624483228 | mape_train_loss: 0.029113852368659862 | mae_val_loss: 2.8903541581778875 | rmse_val_loss: 5.309243783775696 | mape_val_loss: 0.068057407146204
+LR: [0.0003445288237343632]
+all_batch: 2370 | batch: 124 | mae_tmp_loss: 1.3574196739196778 | rmse_tmp_loss: 2.2910657386779785 | mape_tmp_loss: 0.03076222616434097
+all_batch: 2370 | batch: 249 | mae_tmp_loss: 1.3226927258968353 | rmse_tmp_loss: 2.2541921520233155 | mape_tmp_loss: 0.029611653823405505
+all_batch: 2370 | batch: 374 | mae_tmp_loss: 1.3119874575932822 | rmse_tmp_loss: 2.2476432530085244 | mape_tmp_loss: 0.029154937277237575
+all_batch: 2370 | batch: 499 | mae_tmp_loss: 1.3075387953519821 | rmse_tmp_loss: 2.246071259498596 | mape_tmp_loss: 0.02906044975668192
+all_batch: 2370 | batch: 624 | mae_tmp_loss: 1.3117582292556762 | rmse_tmp_loss: 2.2533274253845215 | mape_tmp_loss: 0.02926229318678379
+all_batch: 2370 | batch: 749 | mae_tmp_loss: 1.3110088982582093 | rmse_tmp_loss: 2.254657892068227 | mape_tmp_loss: 0.029309233155101536
+all_batch: 2370 | batch: 874 | mae_tmp_loss: 1.3111561480930873 | rmse_tmp_loss: 2.252537965229579 | mape_tmp_loss: 0.029337508889181272
+all_batch: 2370 | batch: 999 | mae_tmp_loss: 1.3073337350487708 | rmse_tmp_loss: 2.2454045870304107 | mape_tmp_loss: 0.029195274324156344
+all_batch: 2370 | batch: 1124 | mae_tmp_loss: 1.3049233400026956 | rmse_tmp_loss: 2.2420057369867963 | mape_tmp_loss: 0.029080757824911013
+all_batch: 2370 | batch: 1249 | mae_tmp_loss: 1.3039839423179627 | rmse_tmp_loss: 2.241166921234131 | mape_tmp_loss: 0.02905436524450779
+all_batch: 2370 | batch: 1374 | mae_tmp_loss: 1.303348906733773 | rmse_tmp_loss: 2.240818334752863 | mape_tmp_loss: 0.029021537393331527
+all_batch: 2370 | batch: 1499 | mae_tmp_loss: 1.3055664199590682 | rmse_tmp_loss: 2.24346577723821 | mape_tmp_loss: 0.029114641347900032
+all_batch: 2370 | batch: 1624 | mae_tmp_loss: 1.303317246730511 | rmse_tmp_loss: 2.2410451616874107 | mape_tmp_loss: 0.02902753076243859
+all_batch: 2370 | batch: 1749 | mae_tmp_loss: 1.3047200226783753 | rmse_tmp_loss: 2.241477821486337 | mape_tmp_loss: 0.029088001286877052
+all_batch: 2370 | batch: 1874 | mae_tmp_loss: 1.305255119641622 | rmse_tmp_loss: 2.242286207262675 | mape_tmp_loss: 0.02913906343181928
+all_batch: 2370 | batch: 1999 | mae_tmp_loss: 1.3042140466570855 | rmse_tmp_loss: 2.2402683120369913 | mape_tmp_loss: 0.029092128482181578
+all_batch: 2370 | batch: 2124 | mae_tmp_loss: 1.3040148319637075 | rmse_tmp_loss: 2.2397795259251314 | mape_tmp_loss: 0.029081548156983713
+all_batch: 2370 | batch: 2249 | mae_tmp_loss: 1.3017871885299683 | rmse_tmp_loss: 2.2369553017616273 | mape_tmp_loss: 0.029009604005350006
+MAE 1.0318844318389893
+MAE 2.6678012320310764
+MAE 2.846699744611237
+MAE 2.740746646030401
+Epoch: 6 | mae_train_loss: 1.298886832280501 | rmse_train_loss: 2.233481103257288 | mape_train_loss: 0.02889888874188317 | mae_val_loss: 2.8449539624701785 | rmse_val_loss: 5.262500843422561 | mape_val_loss: 0.06722159844712686
+Saving Model...
+LR: [0.0002985189042352221]
+all_batch: 2370 | batch: 124 | mae_tmp_loss: 1.3334883275032043 | rmse_tmp_loss: 2.261619966506958 | mape_tmp_loss: 0.02992967041581869
+all_batch: 2370 | batch: 249 | mae_tmp_loss: 1.3101227266788482 | rmse_tmp_loss: 2.2378533272743226 | mape_tmp_loss: 0.029074422359466553
+all_batch: 2370 | batch: 374 | mae_tmp_loss: 1.3008197210629782 | rmse_tmp_loss: 2.2342041200002036 | mape_tmp_loss: 0.028706183664500715
+all_batch: 2370 | batch: 499 | mae_tmp_loss: 1.297431912302971 | rmse_tmp_loss: 2.234655709028244 | mape_tmp_loss: 0.02866562501899898
+all_batch: 2370 | batch: 624 | mae_tmp_loss: 1.301263057422638 | rmse_tmp_loss: 2.242078367614746 | mape_tmp_loss: 0.028846093225479125
+all_batch: 2370 | batch: 749 | mae_tmp_loss: 1.3021284614404043 | rmse_tmp_loss: 2.2448937810262044 | mape_tmp_loss: 0.028948305486390987
+all_batch: 2370 | batch: 874 | mae_tmp_loss: 1.3016311090333121 | rmse_tmp_loss: 2.242117659296308 | mape_tmp_loss: 0.028956320369882244
+all_batch: 2370 | batch: 999 | mae_tmp_loss: 1.298266642689705 | rmse_tmp_loss: 2.235617003083229 | mape_tmp_loss: 0.02882656747382134
+all_batch: 2370 | batch: 1124 | mae_tmp_loss: 1.2958667501343621 | rmse_tmp_loss: 2.2324351959228514 | mape_tmp_loss: 0.02872052882446183
+all_batch: 2370 | batch: 1249 | mae_tmp_loss: 1.2951246738433837 | rmse_tmp_loss: 2.23180086479187 | mape_tmp_loss: 0.028702746625989674
+all_batch: 2370 | batch: 1374 | mae_tmp_loss: 1.2949700430089777 | rmse_tmp_loss: 2.2318707335212014 | mape_tmp_loss: 0.028686030639843506
+all_batch: 2370 | batch: 1499 | mae_tmp_loss: 1.297105197985967 | rmse_tmp_loss: 2.2347332807381948 | mape_tmp_loss: 0.028781770441060266
+all_batch: 2370 | batch: 1624 | mae_tmp_loss: 1.2949626436600319 | rmse_tmp_loss: 2.2323934791271505 | mape_tmp_loss: 0.028697759374403036
+all_batch: 2370 | batch: 1749 | mae_tmp_loss: 1.2960005027907235 | rmse_tmp_loss: 2.2325182783944264 | mape_tmp_loss: 0.028744312566838095
+all_batch: 2370 | batch: 1874 | mae_tmp_loss: 1.2974327405293782 | rmse_tmp_loss: 2.234343903986613 | mape_tmp_loss: 0.02882404203514258
+all_batch: 2370 | batch: 1999 | mae_tmp_loss: 1.2962489722371102 | rmse_tmp_loss: 2.2322091705203055 | mape_tmp_loss: 0.028774198604747652
+all_batch: 2370 | batch: 2124 | mae_tmp_loss: 1.2962100101078258 | rmse_tmp_loss: 2.2319017465815825 | mape_tmp_loss: 0.02876854683502632
+all_batch: 2370 | batch: 2249 | mae_tmp_loss: 1.2941140882439084 | rmse_tmp_loss: 2.2291904924180774 | mape_tmp_loss: 0.028700324735707706
+MAE 1.0226126909255981
+MAE 2.6394023311020125
+MAE 2.8157533771956147
+MAE 2.7115285192613188
+Epoch: 7 | mae_train_loss: 1.2915660122527353 | rmse_train_loss: 2.226007451085602 | mape_train_loss: 0.028600968009859073 | mae_val_loss: 2.8127000919506373 | rmse_val_loss: 5.264884136154153 | mape_val_loss: 0.06743538365988745
+Saving Model...
+LR: [0.000251481095764778]
+all_batch: 2370 | batch: 124 | mae_tmp_loss: 1.3086583638191223 | rmse_tmp_loss: 2.2361442966461182 | mape_tmp_loss: 0.029060925029218195
+all_batch: 2370 | batch: 249 | mae_tmp_loss: 1.292758399963379 | rmse_tmp_loss: 2.2204270763397216 | mape_tmp_loss: 0.028449554324150087
+all_batch: 2370 | batch: 374 | mae_tmp_loss: 1.28806565062205 | rmse_tmp_loss: 2.221378105481466 | mape_tmp_loss: 0.0282316280156374
+all_batch: 2370 | batch: 499 | mae_tmp_loss: 1.286956863284111 | rmse_tmp_loss: 2.2244068655967713 | mape_tmp_loss: 0.028277338579297064
+all_batch: 2370 | batch: 624 | mae_tmp_loss: 1.2919507878303529 | rmse_tmp_loss: 2.2331399570465087 | mape_tmp_loss: 0.028502230678498747
+all_batch: 2370 | batch: 749 | mae_tmp_loss: 1.2939687582651773 | rmse_tmp_loss: 2.2368915044466653 | mape_tmp_loss: 0.028637167482326427
+all_batch: 2370 | batch: 874 | mae_tmp_loss: 1.293248955317906 | rmse_tmp_loss: 2.233877389907837 | mape_tmp_loss: 0.028634078932659967
+all_batch: 2370 | batch: 999 | mae_tmp_loss: 1.2907407112717628 | rmse_tmp_loss: 2.2280233204364777 | mape_tmp_loss: 0.02852379591856152
+all_batch: 2370 | batch: 1124 | mae_tmp_loss: 1.2889463426801893 | rmse_tmp_loss: 2.2254773695203993 | mape_tmp_loss: 0.028442632836600146
+all_batch: 2370 | batch: 1249 | mae_tmp_loss: 1.2885224377155304 | rmse_tmp_loss: 2.225284834957123 | mape_tmp_loss: 0.02843798385858536
+all_batch: 2370 | batch: 1374 | mae_tmp_loss: 1.2890083551406861 | rmse_tmp_loss: 2.225882995778864 | mape_tmp_loss: 0.02843862958726558
+all_batch: 2370 | batch: 1499 | mae_tmp_loss: 1.2911476304928462 | rmse_tmp_loss: 2.2285313251813252 | mape_tmp_loss: 0.02852409105747938
+all_batch: 2370 | batch: 1624 | mae_tmp_loss: 1.2890921568136948 | rmse_tmp_loss: 2.2263264145484336 | mape_tmp_loss: 0.028448160608227437
+all_batch: 2370 | batch: 1749 | mae_tmp_loss: 1.2891209823744638 | rmse_tmp_loss: 2.2257643865857806 | mape_tmp_loss: 0.02846887918668134
+all_batch: 2370 | batch: 1874 | mae_tmp_loss: 1.291287077776591 | rmse_tmp_loss: 2.228261144447327 | mape_tmp_loss: 0.028589956020812192
+all_batch: 2370 | batch: 1999 | mae_tmp_loss: 1.2899752523601056 | rmse_tmp_loss: 2.225858309328556 | mape_tmp_loss: 0.028523886270821093
+all_batch: 2370 | batch: 2124 | mae_tmp_loss: 1.2898037797983954 | rmse_tmp_loss: 2.225569458512699 | mape_tmp_loss: 0.028518907084184534
+all_batch: 2370 | batch: 2249 | mae_tmp_loss: 1.2878435513708326 | rmse_tmp_loss: 2.2229974021381804 | mape_tmp_loss: 0.02845463135631548
+MAE 1.1596119403839111
+MAE 2.7382789944658184
+MAE 2.9168030604794253
+MAE 2.802999054870732
+Epoch: 8 | mae_train_loss: 1.2858150910979083 | rmse_train_loss: 2.220402932820944 | mape_train_loss: 0.028376940611105426 | mae_val_loss: 2.900082228884185 | rmse_val_loss: 5.261126969156965 | mape_val_loss: 0.07371283174192501
+LR: [0.00020547117626563684]
+all_batch: 2370 | batch: 124 | mae_tmp_loss: 1.3034773287773131 | rmse_tmp_loss: 2.2309810371398924 | mape_tmp_loss: 0.028892475105822088
+all_batch: 2370 | batch: 249 | mae_tmp_loss: 1.2824613101482392 | rmse_tmp_loss: 2.2107055149078367 | mape_tmp_loss: 0.02808457086607814
+all_batch: 2370 | batch: 374 | mae_tmp_loss: 1.280609054883321 | rmse_tmp_loss: 2.2138675565719605 | mape_tmp_loss: 0.027949065742393336
+all_batch: 2370 | batch: 499 | mae_tmp_loss: 1.2805419906377793 | rmse_tmp_loss: 2.2178343954086306 | mape_tmp_loss: 0.02802070390805602
+all_batch: 2370 | batch: 624 | mae_tmp_loss: 1.2855975076675414 | rmse_tmp_loss: 2.2267197797775267 | mape_tmp_loss: 0.028249217341840268
+all_batch: 2370 | batch: 749 | mae_tmp_loss: 1.2877239219347636 | rmse_tmp_loss: 2.230999454657237 | mape_tmp_loss: 0.02840239338328441
+all_batch: 2370 | batch: 874 | mae_tmp_loss: 1.2882530345916747 | rmse_tmp_loss: 2.2292199568067277 | mape_tmp_loss: 0.02846033069810697
+all_batch: 2370 | batch: 999 | mae_tmp_loss: 1.2852735812067986 | rmse_tmp_loss: 2.2230997685194014 | mape_tmp_loss: 0.028347966848872603
+all_batch: 2370 | batch: 1124 | mae_tmp_loss: 1.2834521739747788 | rmse_tmp_loss: 2.220538028187222 | mape_tmp_loss: 0.028260085420476064
+all_batch: 2370 | batch: 1249 | mae_tmp_loss: 1.2832298606395722 | rmse_tmp_loss: 2.2205731753349305 | mape_tmp_loss: 0.028261494276672603
+all_batch: 2370 | batch: 1374 | mae_tmp_loss: 1.283855606772683 | rmse_tmp_loss: 2.221273197520863 | mape_tmp_loss: 0.028269357453693043
+all_batch: 2370 | batch: 1499 | mae_tmp_loss: 1.2858736751476925 | rmse_tmp_loss: 2.2238584865729014 | mape_tmp_loss: 0.0283520021935304
+all_batch: 2370 | batch: 1624 | mae_tmp_loss: 1.2840420056123 | rmse_tmp_loss: 2.2217542004952064 | mape_tmp_loss: 0.028279431611872637
+all_batch: 2370 | batch: 1749 | mae_tmp_loss: 1.2840305688040596 | rmse_tmp_loss: 2.2211810150146483 | mape_tmp_loss: 0.028295773274132182
+all_batch: 2370 | batch: 1874 | mae_tmp_loss: 1.2848975840886434 | rmse_tmp_loss: 2.2220607774734495 | mape_tmp_loss: 0.028356100829442343
+all_batch: 2370 | batch: 1999 | mae_tmp_loss: 1.2835484022200108 | rmse_tmp_loss: 2.219625787615776 | mape_tmp_loss: 0.028290191965177656
+all_batch: 2370 | batch: 2124 | mae_tmp_loss: 1.2835212140644299 | rmse_tmp_loss: 2.2194766110812916 | mape_tmp_loss: 0.028291195808088077
+all_batch: 2370 | batch: 2249 | mae_tmp_loss: 1.2817589415709179 | rmse_tmp_loss: 2.217094329939948 | mape_tmp_loss: 0.028233960137599046
+MAE 1.146555781364441
+MAE 2.729211403591798
+MAE 2.9071976664054455
+MAE 2.795119819451012
+Epoch: 9 | mae_train_loss: 1.2797786539616967 | rmse_train_loss: 2.2145016324168014 | mape_train_loss: 0.028157623854116045 | mae_val_loss: 2.893390448753443 | rmse_val_loss: 5.259798711639339 | mape_val_loss: 0.0731907879965285
+LR: [0.00016250000000000005]
+all_batch: 2370 | batch: 124 | mae_tmp_loss: 1.2933347334861756 | rmse_tmp_loss: 2.2232013368606567 | mape_tmp_loss: 0.028630042292177676
+all_batch: 2370 | batch: 249 | mae_tmp_loss: 1.275895675420761 | rmse_tmp_loss: 2.2057764019966126 | mape_tmp_loss: 0.027910313483327627
+all_batch: 2370 | batch: 374 | mae_tmp_loss: 1.2752994699478148 | rmse_tmp_loss: 2.2095113293329876 | mape_tmp_loss: 0.027795191233356793
+all_batch: 2370 | batch: 499 | mae_tmp_loss: 1.27547163939476 | rmse_tmp_loss: 2.21366490983963 | mape_tmp_loss: 0.02787616821937263
+all_batch: 2370 | batch: 624 | mae_tmp_loss: 1.2811738595962525 | rmse_tmp_loss: 2.222928860282898 | mape_tmp_loss: 0.028114954662323
+all_batch: 2370 | batch: 749 | mae_tmp_loss: 1.2845510891278584 | rmse_tmp_loss: 2.2282405511538186 | mape_tmp_loss: 0.028307505268603563
+all_batch: 2370 | batch: 874 | mae_tmp_loss: 1.284479405607496 | rmse_tmp_loss: 2.2256951766695297 | mape_tmp_loss: 0.028330624798578875
+all_batch: 2370 | batch: 999 | mae_tmp_loss: 1.2816763622760772 | rmse_tmp_loss: 2.21949638068676 | mape_tmp_loss: 0.028216780986636877
+all_batch: 2370 | batch: 1124 | mae_tmp_loss: 1.2798041960398356 | rmse_tmp_loss: 2.2169659088982474 | mape_tmp_loss: 0.028130935402380097
+all_batch: 2370 | batch: 1249 | mae_tmp_loss: 1.2799076142311097 | rmse_tmp_loss: 2.2171081382751465 | mape_tmp_loss: 0.028140869548916817
+all_batch: 2370 | batch: 1374 | mae_tmp_loss: 1.280331437370994 | rmse_tmp_loss: 2.217837364023382 | mape_tmp_loss: 0.02814413702284748
+all_batch: 2370 | batch: 1499 | mae_tmp_loss: 1.2822189300060272 | rmse_tmp_loss: 2.2203531459172567 | mape_tmp_loss: 0.028224838469798365
+all_batch: 2370 | batch: 1624 | mae_tmp_loss: 1.2805484328269958 | rmse_tmp_loss: 2.218399346278264 | mape_tmp_loss: 0.02815921444273912
+all_batch: 2370 | batch: 1749 | mae_tmp_loss: 1.2806038026809692 | rmse_tmp_loss: 2.2178871700423106 | mape_tmp_loss: 0.028177851230438266
+all_batch: 2370 | batch: 1874 | mae_tmp_loss: 1.2804530390739441 | rmse_tmp_loss: 2.2175676120122274 | mape_tmp_loss: 0.028194655637443066
+all_batch: 2370 | batch: 1999 | mae_tmp_loss: 1.2790725700855254 | rmse_tmp_loss: 2.2150594646334647 | mape_tmp_loss: 0.028124649779871107
+all_batch: 2370 | batch: 2124 | mae_tmp_loss: 1.279164545171401 | rmse_tmp_loss: 2.2149724955839267 | mape_tmp_loss: 0.02812988496790914
+all_batch: 2370 | batch: 2249 | mae_tmp_loss: 1.2776587411827511 | rmse_tmp_loss: 2.2127553270657856 | mape_tmp_loss: 0.028079077118386826
+MAE 1.0897587537765503
+MAE 2.671088160854755
+MAE 2.8360911091761802
+MAE 2.731179576379516
+Epoch: 10 | mae_train_loss: 1.2756033900920851 | rmse_train_loss: 2.210053950321825 | mape_train_loss: 0.027999153097832127 | mae_val_loss: 2.827837991849177 | rmse_val_loss: 5.273732082655201 | mape_val_loss: 0.06901488975637544
+LR: [0.00012444561356925697]
+all_batch: 2370 | batch: 124 | mae_tmp_loss: 1.2816123099327088 | rmse_tmp_loss: 2.213934637069702 | mape_tmp_loss: 0.02832673804461956
+all_batch: 2370 | batch: 249 | mae_tmp_loss: 1.2687789549827575 | rmse_tmp_loss: 2.1995367360115052 | mape_tmp_loss: 0.02771203762292862
+all_batch: 2370 | batch: 374 | mae_tmp_loss: 1.2696558847427368 | rmse_tmp_loss: 2.204494792620341 | mape_tmp_loss: 0.027638748412330945
+all_batch: 2370 | batch: 499 | mae_tmp_loss: 1.2712240262031556 | rmse_tmp_loss: 2.2100552842617036 | mape_tmp_loss: 0.027764099391177296
+all_batch: 2370 | batch: 624 | mae_tmp_loss: 1.2774929210662842 | rmse_tmp_loss: 2.2196925647735597 | mape_tmp_loss: 0.028017303922772407
+all_batch: 2370 | batch: 749 | mae_tmp_loss: 1.2806112937132517 | rmse_tmp_loss: 2.224578502813975 | mape_tmp_loss: 0.02819176288942496
+all_batch: 2370 | batch: 874 | mae_tmp_loss: 1.280293823855264 | rmse_tmp_loss: 2.221651425770351 | mape_tmp_loss: 0.02819344141547169
+all_batch: 2370 | batch: 999 | mae_tmp_loss: 1.277363777220249 | rmse_tmp_loss: 2.215538902759552 | mape_tmp_loss: 0.02807907074689865
+all_batch: 2370 | batch: 1124 | mae_tmp_loss: 1.2756572043630812 | rmse_tmp_loss: 2.2130241115358142 | mape_tmp_loss: 0.028000047469304668
+all_batch: 2370 | batch: 1249 | mae_tmp_loss: 1.2758208834648133 | rmse_tmp_loss: 2.213329854106903 | mape_tmp_loss: 0.028012600538879634
+all_batch: 2370 | batch: 1374 | mae_tmp_loss: 1.2764725336595015 | rmse_tmp_loss: 2.2142599408409813 | mape_tmp_loss: 0.028024717662822118
+all_batch: 2370 | batch: 1499 | mae_tmp_loss: 1.2784671419461568 | rmse_tmp_loss: 2.2169002232551573 | mape_tmp_loss: 0.028112340881799657
+all_batch: 2370 | batch: 1624 | mae_tmp_loss: 1.2769894782213065 | rmse_tmp_loss: 2.2151059108147253 | mape_tmp_loss: 0.02805352542262811
+all_batch: 2370 | batch: 1749 | mae_tmp_loss: 1.2769779618808201 | rmse_tmp_loss: 2.2145740253584725 | mape_tmp_loss: 0.02807083305397204
+all_batch: 2370 | batch: 1874 | mae_tmp_loss: 1.2760442101796468 | rmse_tmp_loss: 2.2133464907328286 | mape_tmp_loss: 0.028048988752563793
+all_batch: 2370 | batch: 1999 | mae_tmp_loss: 1.2749555603861809 | rmse_tmp_loss: 2.2109872593283653 | mape_tmp_loss: 0.027984600490890445
+all_batch: 2370 | batch: 2124 | mae_tmp_loss: 1.2752001046573413 | rmse_tmp_loss: 2.2110825655881094 | mape_tmp_loss: 0.0279923880849691
+all_batch: 2370 | batch: 2249 | mae_tmp_loss: 1.2737843017843034 | rmse_tmp_loss: 2.2090338428815204 | mape_tmp_loss: 0.027945622875458664
+MAE 1.0628119707107544
+MAE 2.6618428242088545
+MAE 2.8299658345938914
+MAE 2.7281958237042856
+Epoch: 11 | mae_train_loss: 1.2718955500719415 | rmse_train_loss: 2.2064577822443807 | mape_train_loss: 0.02787012125440099 | mae_val_loss: 2.8272372302362476 | rmse_val_loss: 5.320735385188948 | mape_val_loss: 0.06773918417235048
+LR: [9.297117626563684e-05]
+all_batch: 2370 | batch: 124 | mae_tmp_loss: 1.2784929943084717 | rmse_tmp_loss: 2.212135652542114 | mape_tmp_loss: 0.028206535041332245
+all_batch: 2370 | batch: 249 | mae_tmp_loss: 1.26607173538208 | rmse_tmp_loss: 2.197645661354065 | mape_tmp_loss: 0.027614486511796713
+all_batch: 2370 | batch: 374 | mae_tmp_loss: 1.2675574137369792 | rmse_tmp_loss: 2.2027317225138345 | mape_tmp_loss: 0.027566146982212863
+all_batch: 2370 | batch: 499 | mae_tmp_loss: 1.269183518886566 | rmse_tmp_loss: 2.2078690235614777 | mape_tmp_loss: 0.02768616130389273
+all_batch: 2370 | batch: 624 | mae_tmp_loss: 1.27592656583786 | rmse_tmp_loss: 2.2178664682388307 | mape_tmp_loss: 0.027954033954441546
+all_batch: 2370 | batch: 749 | mae_tmp_loss: 1.2788389851252238 | rmse_tmp_loss: 2.222592556317647 | mape_tmp_loss: 0.02811625980461637
+all_batch: 2370 | batch: 874 | mae_tmp_loss: 1.2786373523984638 | rmse_tmp_loss: 2.219678438050406 | mape_tmp_loss: 0.028120670364371367
+all_batch: 2370 | batch: 999 | mae_tmp_loss: 1.2754495211839676 | rmse_tmp_loss: 2.213534330844879 | mape_tmp_loss: 0.02800540347583592
+all_batch: 2370 | batch: 1124 | mae_tmp_loss: 1.2737683554225498 | rmse_tmp_loss: 2.2111619715160793 | mape_tmp_loss: 0.02792747185130914
+all_batch: 2370 | batch: 1249 | mae_tmp_loss: 1.2739023663043976 | rmse_tmp_loss: 2.211463214683533 | mape_tmp_loss: 0.027941194622963666
+all_batch: 2370 | batch: 1374 | mae_tmp_loss: 1.274456444870342 | rmse_tmp_loss: 2.212225411761891 | mape_tmp_loss: 0.027950045038353313
+all_batch: 2370 | batch: 1499 | mae_tmp_loss: 1.2764284340143204 | rmse_tmp_loss: 2.2148640322685242 | mape_tmp_loss: 0.02803618536827465
+all_batch: 2370 | batch: 1624 | mae_tmp_loss: 1.2750590768594008 | rmse_tmp_loss: 2.213243979894198 | mape_tmp_loss: 0.027983199894428254
+all_batch: 2370 | batch: 1749 | mae_tmp_loss: 1.2751218684400831 | rmse_tmp_loss: 2.2127506781986783 | mape_tmp_loss: 0.028005514358303375
+all_batch: 2370 | batch: 1874 | mae_tmp_loss: 1.274270944881439 | rmse_tmp_loss: 2.2116156474431357 | mape_tmp_loss: 0.02798798786699772
+all_batch: 2370 | batch: 1999 | mae_tmp_loss: 1.2729739618599414 | rmse_tmp_loss: 2.209126831591129 | mape_tmp_loss: 0.02791865809634328
+all_batch: 2370 | batch: 2124 | mae_tmp_loss: 1.2731959576326257 | rmse_tmp_loss: 2.2092124075609094 | mape_tmp_loss: 0.02792742184505743
+all_batch: 2370 | batch: 2249 | mae_tmp_loss: 1.271782725625568 | rmse_tmp_loss: 2.2071543652746413 | mape_tmp_loss: 0.02788174238676826
+MAE 1.032395362854004
+MAE 2.6380829114725093
+MAE 2.8110881705782305
+MAE 2.7080356207400857
+Epoch: 12 | mae_train_loss: 1.2698385303030537 | rmse_train_loss: 2.2045150069747796 | mape_train_loss: 0.02780460807718808 | mae_val_loss: 2.806878896756361 | rmse_val_loss: 5.276503000218989 | mape_val_loss: 0.06741722462446255
+Saving Model...
+LR: [6.945227203041478e-05]
+all_batch: 2370 | batch: 124 | mae_tmp_loss: 1.2760941138267516 | rmse_tmp_loss: 2.2109351224899294 | mape_tmp_loss: 0.02816456039994955
+all_batch: 2370 | batch: 249 | mae_tmp_loss: 1.264017296075821 | rmse_tmp_loss: 2.1960912799835204 | mape_tmp_loss: 0.027574854735285044
+all_batch: 2370 | batch: 374 | mae_tmp_loss: 1.2655413893063863 | rmse_tmp_loss: 2.2010571002960204 | mape_tmp_loss: 0.027520401837925115
+all_batch: 2370 | batch: 499 | mae_tmp_loss: 1.2672190536260606 | rmse_tmp_loss: 2.205947579860687 | mape_tmp_loss: 0.027626177014783024
+all_batch: 2370 | batch: 624 | mae_tmp_loss: 1.2739109731674194 | rmse_tmp_loss: 2.215802710342407 | mape_tmp_loss: 0.027884332232177258
+all_batch: 2370 | batch: 749 | mae_tmp_loss: 1.2766402130921681 | rmse_tmp_loss: 2.220374985218048 | mape_tmp_loss: 0.028036834561576445
+all_batch: 2370 | batch: 874 | mae_tmp_loss: 1.2766714683941431 | rmse_tmp_loss: 2.2175503020967757 | mape_tmp_loss: 0.028046408701155868
+all_batch: 2370 | batch: 999 | mae_tmp_loss: 1.2735045537948608 | rmse_tmp_loss: 2.2114032760858535 | mape_tmp_loss: 0.027931776533834635
+all_batch: 2370 | batch: 1124 | mae_tmp_loss: 1.2718600435256957 | rmse_tmp_loss: 2.209127305030823 | mape_tmp_loss: 0.02785718816767136
+all_batch: 2370 | batch: 1249 | mae_tmp_loss: 1.272045478105545 | rmse_tmp_loss: 2.209464455032349 | mape_tmp_loss: 0.0278737598516047
+all_batch: 2370 | batch: 1374 | mae_tmp_loss: 1.27271436140754 | rmse_tmp_loss: 2.2103687980825253 | mape_tmp_loss: 0.027885076092048124
+all_batch: 2370 | batch: 1499 | mae_tmp_loss: 1.2748071945110957 | rmse_tmp_loss: 2.213055298169454 | mape_tmp_loss: 0.02797335010766983
+all_batch: 2370 | batch: 1624 | mae_tmp_loss: 1.2733817494465756 | rmse_tmp_loss: 2.2114018538548397 | mape_tmp_loss: 0.027918077731361755
+all_batch: 2370 | batch: 1749 | mae_tmp_loss: 1.2735050818920135 | rmse_tmp_loss: 2.2109122588975088 | mape_tmp_loss: 0.02793890517205
+all_batch: 2370 | batch: 1874 | mae_tmp_loss: 1.2725901704788207 | rmse_tmp_loss: 2.209665770339966 | mape_tmp_loss: 0.02792057787925005
+all_batch: 2370 | batch: 1999 | mae_tmp_loss: 1.2711769886910915 | rmse_tmp_loss: 2.2070933985710144 | mape_tmp_loss: 0.02785086518339813
+all_batch: 2370 | batch: 2124 | mae_tmp_loss: 1.271492740911596 | rmse_tmp_loss: 2.2072912107355456 | mape_tmp_loss: 0.027862464906976504
+all_batch: 2370 | batch: 2249 | mae_tmp_loss: 1.2700962569448684 | rmse_tmp_loss: 2.2052510232395597 | mape_tmp_loss: 0.027818523975296154
+MAE 1.0107686519622803
+MAE 2.61656525524536
+MAE 2.7912413904915994
+MAE 2.6898490354864304
+Epoch: 13 | mae_train_loss: 1.2682601670424143 | rmse_train_loss: 2.2027445308266813 | mape_train_loss: 0.02774506859945031 | mae_val_loss: 2.7901022334893546 | rmse_val_loss: 5.259252861394721 | mape_val_loss: 0.06705870676396342
+Saving Model...
+LR: [5.4916789834893724e-05]
+all_batch: 2370 | batch: 124 | mae_tmp_loss: 1.2747832193374633 | rmse_tmp_loss: 2.210145181655884 | mape_tmp_loss: 0.028141982801258562
+all_batch: 2370 | batch: 249 | mae_tmp_loss: 1.2628667678833008 | rmse_tmp_loss: 2.195879564285278 | mape_tmp_loss: 0.027543891977518796
+all_batch: 2370 | batch: 374 | mae_tmp_loss: 1.2644628090858459 | rmse_tmp_loss: 2.2005848207473755 | mape_tmp_loss: 0.027487566692133744
+all_batch: 2370 | batch: 499 | mae_tmp_loss: 1.2659744081497193 | rmse_tmp_loss: 2.2053726649284364 | mape_tmp_loss: 0.0275929164737463
+all_batch: 2370 | batch: 624 | mae_tmp_loss: 1.2726249633789062 | rmse_tmp_loss: 2.2152219581604005 | mape_tmp_loss: 0.027852228796482085
+all_batch: 2370 | batch: 749 | mae_tmp_loss: 1.2752444123427074 | rmse_tmp_loss: 2.2197344465255737 | mape_tmp_loss: 0.02799780514712135
+all_batch: 2370 | batch: 874 | mae_tmp_loss: 1.2750903340748379 | rmse_tmp_loss: 2.2167661472048077 | mape_tmp_loss: 0.02800273515496935
+all_batch: 2370 | batch: 999 | mae_tmp_loss: 1.2720361439585686 | rmse_tmp_loss: 2.2107452006340025 | mape_tmp_loss: 0.027889563976787032
+all_batch: 2370 | batch: 1124 | mae_tmp_loss: 1.270388236893548 | rmse_tmp_loss: 2.2083990902370876 | mape_tmp_loss: 0.02781355331506994
+all_batch: 2370 | batch: 1249 | mae_tmp_loss: 1.2705464976787566 | rmse_tmp_loss: 2.208619180011749 | mape_tmp_loss: 0.027827763874828815
+all_batch: 2370 | batch: 1374 | mae_tmp_loss: 1.2712018890380858 | rmse_tmp_loss: 2.20949647175182 | mape_tmp_loss: 0.027839027917520565
+all_batch: 2370 | batch: 1499 | mae_tmp_loss: 1.2733318808873495 | rmse_tmp_loss: 2.2122040269374845 | mape_tmp_loss: 0.027930199888224403
+all_batch: 2370 | batch: 1624 | mae_tmp_loss: 1.271897792999561 | rmse_tmp_loss: 2.210477827805739 | mape_tmp_loss: 0.027873426966942273
+all_batch: 2370 | batch: 1749 | mae_tmp_loss: 1.2721196009772164 | rmse_tmp_loss: 2.209968556880951 | mape_tmp_loss: 0.027896154360047408
+all_batch: 2370 | batch: 1874 | mae_tmp_loss: 1.27120353530248 | rmse_tmp_loss: 2.2087607683817545 | mape_tmp_loss: 0.027875753221909206
+all_batch: 2370 | batch: 1999 | mae_tmp_loss: 1.2698596800267696 | rmse_tmp_loss: 2.2062948414683343 | mape_tmp_loss: 0.027808009682688862
+all_batch: 2370 | batch: 2124 | mae_tmp_loss: 1.2701939645374523 | rmse_tmp_loss: 2.2064326055190144 | mape_tmp_loss: 0.02782024321792757
+all_batch: 2370 | batch: 2249 | mae_tmp_loss: 1.268806346072091 | rmse_tmp_loss: 2.2043505732748243 | mape_tmp_loss: 0.027775984395709302
+MAE 1.0198415517807007
+MAE 2.6205613076096714
+MAE 2.799880242169793
+MAE 2.6988505954758275
+Epoch: 14 | mae_train_loss: 1.2669498000215378 | rmse_train_loss: 2.201798867273934 | mape_train_loss: 0.027702019048485325 | mae_val_loss: 2.800048798659427 | rmse_val_loss: 5.262505685542263 | mape_val_loss: 0.06679406443263515
+LR: [0.0005]
+all_batch: 2370 | batch: 124 | mae_tmp_loss: 1.4817219800949097 | rmse_tmp_loss: 2.421468062400818 | mape_tmp_loss: 0.03547318094968796
+all_batch: 2370 | batch: 249 | mae_tmp_loss: 1.3936028299331664 | rmse_tmp_loss: 2.321447608470917 | mape_tmp_loss: 0.03202390891313553
+all_batch: 2370 | batch: 374 | mae_tmp_loss: 1.3642230993906657 | rmse_tmp_loss: 2.297550849278768 | mape_tmp_loss: 0.030960581103960674
+all_batch: 2370 | batch: 499 | mae_tmp_loss: 1.347192214012146 | rmse_tmp_loss: 2.2831860258579253 | mape_tmp_loss: 0.030443897960707546
+all_batch: 2370 | batch: 624 | mae_tmp_loss: 1.341470577812195 | rmse_tmp_loss: 2.2804394479751586 | mape_tmp_loss: 0.030278414200246333
+all_batch: 2370 | batch: 749 | mae_tmp_loss: 1.3362843939463298 | rmse_tmp_loss: 2.2772037723859153 | mape_tmp_loss: 0.030189507339149713
+all_batch: 2370 | batch: 874 | mae_tmp_loss: 1.3316878130776542 | rmse_tmp_loss: 2.2701137937818254 | mape_tmp_loss: 0.030045775103781903
+all_batch: 2370 | batch: 999 | mae_tmp_loss: 1.3247880893945694 | rmse_tmp_loss: 2.2601969972848894 | mape_tmp_loss: 0.02980541630461812
+all_batch: 2370 | batch: 1124 | mae_tmp_loss: 1.320918717490302 | rmse_tmp_loss: 2.255283525996738 | mape_tmp_loss: 0.029641697715553972
+all_batch: 2370 | batch: 1249 | mae_tmp_loss: 1.318394149684906 | rmse_tmp_loss: 2.2527526319503783 | mape_tmp_loss: 0.029551992797106505
+all_batch: 2370 | batch: 1374 | mae_tmp_loss: 1.3156937238519841 | rmse_tmp_loss: 2.2503617929978805 | mape_tmp_loss: 0.02944374788958918
+all_batch: 2370 | batch: 1499 | mae_tmp_loss: 1.3160766576131184 | rmse_tmp_loss: 2.251027854522069 | mape_tmp_loss: 0.029464191047474744
+all_batch: 2370 | batch: 1624 | mae_tmp_loss: 1.3127739970867451 | rmse_tmp_loss: 2.2477668470969565 | mape_tmp_loss: 0.02934590012465532
+all_batch: 2370 | batch: 1749 | mae_tmp_loss: 1.31383201449258 | rmse_tmp_loss: 2.2491082968711855 | mape_tmp_loss: 0.02942702983851944
+all_batch: 2370 | batch: 1874 | mae_tmp_loss: 1.3136945027033489 | rmse_tmp_loss: 2.2488758456548057 | mape_tmp_loss: 0.02944257669697205
+all_batch: 2370 | batch: 1999 | mae_tmp_loss: 1.3115624517500402 | rmse_tmp_loss: 2.2455067220926286 | mape_tmp_loss: 0.029343741729389874
+all_batch: 2370 | batch: 2124 | mae_tmp_loss: 1.311132957458496 | rmse_tmp_loss: 2.244398629693424 | mape_tmp_loss: 0.02931061065942049
+all_batch: 2370 | batch: 2249 | mae_tmp_loss: 1.3088254930708143 | rmse_tmp_loss: 2.2414989138709176 | mape_tmp_loss: 0.029238839690056112
+MAE 1.052243947982788
+MAE 2.662652797038012
+MAE 2.8414235459038273
+MAE 2.7380355038120103
+Epoch: 15 | mae_train_loss: 1.3053729731573838 | rmse_train_loss: 2.237437753989224 | mape_train_loss: 0.02910681915496975 | mae_val_loss: 2.8443063797250305 | rmse_val_loss: 5.3315958468254 | mape_val_loss: 0.06679510916083378
+LR: [0.0004950832101651062]
+all_batch: 2370 | batch: 124 | mae_tmp_loss: 1.330896695137024 | rmse_tmp_loss: 2.262072018623352 | mape_tmp_loss: 0.030035560488700867
+all_batch: 2370 | batch: 249 | mae_tmp_loss: 1.3076955156326293 | rmse_tmp_loss: 2.236501811027527 | mape_tmp_loss: 0.029090874191373586
+all_batch: 2370 | batch: 374 | mae_tmp_loss: 1.299900354385376 | rmse_tmp_loss: 2.2325865618387857 | mape_tmp_loss: 0.02871406671901544
+all_batch: 2370 | batch: 499 | mae_tmp_loss: 1.2974708715677261 | rmse_tmp_loss: 2.232518991947174 | mape_tmp_loss: 0.028667711744084955
+all_batch: 2370 | batch: 624 | mae_tmp_loss: 1.3011992462158204 | rmse_tmp_loss: 2.239459065437317 | mape_tmp_loss: 0.028827445632219315
+all_batch: 2370 | batch: 749 | mae_tmp_loss: 1.3014141209125518 | rmse_tmp_loss: 2.241659917036692 | mape_tmp_loss: 0.028907156622658175
+all_batch: 2370 | batch: 874 | mae_tmp_loss: 1.3015336109570095 | rmse_tmp_loss: 2.2389020462036133 | mape_tmp_loss: 0.028932321086525915
+all_batch: 2370 | batch: 999 | mae_tmp_loss: 1.2983327102661133 | rmse_tmp_loss: 2.2328457783460616 | mape_tmp_loss: 0.028822557545267045
+all_batch: 2370 | batch: 1124 | mae_tmp_loss: 1.2967595513661703 | rmse_tmp_loss: 2.230664114104377 | mape_tmp_loss: 0.02875658568739891
+all_batch: 2370 | batch: 1249 | mae_tmp_loss: 1.2961656285762786 | rmse_tmp_loss: 2.2300586393356325 | mape_tmp_loss: 0.028737499661743642
+all_batch: 2370 | batch: 1374 | mae_tmp_loss: 1.2953937503641302 | rmse_tmp_loss: 2.2295800277536566 | mape_tmp_loss: 0.028700422813946552
+all_batch: 2370 | batch: 1499 | mae_tmp_loss: 1.2973824540376664 | rmse_tmp_loss: 2.231890149195989 | mape_tmp_loss: 0.0287757337000221
+all_batch: 2370 | batch: 1624 | mae_tmp_loss: 1.29547446338947 | rmse_tmp_loss: 2.229904336342445 | mape_tmp_loss: 0.028706666075839445
+all_batch: 2370 | batch: 1749 | mae_tmp_loss: 1.2958439030987876 | rmse_tmp_loss: 2.2300430979047503 | mape_tmp_loss: 0.028753480837813445
+all_batch: 2370 | batch: 1874 | mae_tmp_loss: 1.2971598804155986 | rmse_tmp_loss: 2.2316762777964274 | mape_tmp_loss: 0.02883722140789032
+all_batch: 2370 | batch: 1999 | mae_tmp_loss: 1.2960790124535562 | rmse_tmp_loss: 2.229461436331272 | mape_tmp_loss: 0.028782394935842604
+all_batch: 2370 | batch: 2124 | mae_tmp_loss: 1.2962905873971826 | rmse_tmp_loss: 2.2290882115644566 | mape_tmp_loss: 0.02877541965640643
+all_batch: 2370 | batch: 2249 | mae_tmp_loss: 1.2941989781591627 | rmse_tmp_loss: 2.226425039185418 | mape_tmp_loss: 0.028711181629035208
+MAE 1.0259504318237305
+MAE 2.6583144056915056
+MAE 2.8426097664073926
+MAE 2.7366477668879434
+Epoch: 16 | mae_train_loss: 1.2913786788278492 | rmse_train_loss: 2.2229922096437544 | mape_train_loss: 0.028603488612401334 | mae_val_loss: 2.841533316899154 | rmse_val_loss: 5.314767252253947 | mape_val_loss: 0.0666261241313512
+LR: [0.00048054772796958517]
+all_batch: 2370 | batch: 124 | mae_tmp_loss: 1.3246430068016053 | rmse_tmp_loss: 2.255849070549011 | mape_tmp_loss: 0.029814413748681545
+all_batch: 2370 | batch: 249 | mae_tmp_loss: 1.3044081869125366 | rmse_tmp_loss: 2.2330488567352296 | mape_tmp_loss: 0.02897234446555376
+all_batch: 2370 | batch: 374 | mae_tmp_loss: 1.29637588596344 | rmse_tmp_loss: 2.228972049395243 | mape_tmp_loss: 0.028595888413488865
+all_batch: 2370 | batch: 499 | mae_tmp_loss: 1.2932903167009353 | rmse_tmp_loss: 2.2286186208724974 | mape_tmp_loss: 0.028531809939071538
+all_batch: 2370 | batch: 624 | mae_tmp_loss: 1.2975872604370118 | rmse_tmp_loss: 2.2359819887161256 | mape_tmp_loss: 0.028710571993887424
+all_batch: 2370 | batch: 749 | mae_tmp_loss: 1.298265299876531 | rmse_tmp_loss: 2.2386164515813194 | mape_tmp_loss: 0.028820333602527778
+all_batch: 2370 | batch: 874 | mae_tmp_loss: 1.2979001316343035 | rmse_tmp_loss: 2.235736387389047 | mape_tmp_loss: 0.028833007632621695
+all_batch: 2370 | batch: 999 | mae_tmp_loss: 1.2945631484985352 | rmse_tmp_loss: 2.2294305999279023 | mape_tmp_loss: 0.028708564597181976
+all_batch: 2370 | batch: 1124 | mae_tmp_loss: 1.2930392559899224 | rmse_tmp_loss: 2.2270123126771715 | mape_tmp_loss: 0.028635988381173875
+all_batch: 2370 | batch: 1249 | mae_tmp_loss: 1.2928719344615935 | rmse_tmp_loss: 2.2265829498291017 | mape_tmp_loss: 0.028626535910367967
+all_batch: 2370 | batch: 1374 | mae_tmp_loss: 1.2924125025055626 | rmse_tmp_loss: 2.2264494511864403 | mape_tmp_loss: 0.028599198831753297
+all_batch: 2370 | batch: 1499 | mae_tmp_loss: 1.2946599612633387 | rmse_tmp_loss: 2.228985930522283 | mape_tmp_loss: 0.028688073265055816
+all_batch: 2370 | batch: 1624 | mae_tmp_loss: 1.2928890140240008 | rmse_tmp_loss: 2.227084715109605 | mape_tmp_loss: 0.02861846658300895
+all_batch: 2370 | batch: 1749 | mae_tmp_loss: 1.2931666181087493 | rmse_tmp_loss: 2.2269179634366716 | mape_tmp_loss: 0.028655092965279308
+all_batch: 2370 | batch: 1874 | mae_tmp_loss: 1.294217266368866 | rmse_tmp_loss: 2.228292708651225 | mape_tmp_loss: 0.028729100545247396
+all_batch: 2370 | batch: 1999 | mae_tmp_loss: 1.2926591359376907 | rmse_tmp_loss: 2.225647457242012 | mape_tmp_loss: 0.028656735798809677
+all_batch: 2370 | batch: 2124 | mae_tmp_loss: 1.2927043191404903 | rmse_tmp_loss: 2.2252599431767184 | mape_tmp_loss: 0.0286480322519646
+all_batch: 2370 | batch: 2249 | mae_tmp_loss: 1.2908740940888723 | rmse_tmp_loss: 2.2227985671361288 | mape_tmp_loss: 0.02859303497357501
+MAE 1.0590989589691162
+MAE 2.672144094906231
+MAE 2.847136565405338
+MAE 2.7404850279770026
+Epoch: 17 | mae_train_loss: 1.2881068583530715 | rmse_train_loss: 2.219469345118929 | mape_train_loss: 0.028488730469852182 | mae_val_loss: 2.8445155703078555 | rmse_val_loss: 5.219767510554211 | mape_val_loss: 0.06657154022815959
+LR: [0.00045702882373436317]
+all_batch: 2370 | batch: 124 | mae_tmp_loss: 1.309161476135254 | rmse_tmp_loss: 2.238787013053894 | mape_tmp_loss: 0.029278804585337638
+all_batch: 2370 | batch: 249 | mae_tmp_loss: 1.292873765707016 | rmse_tmp_loss: 2.2208760466575623 | mape_tmp_loss: 0.028574785351753236
+all_batch: 2370 | batch: 374 | mae_tmp_loss: 1.2875466041564942 | rmse_tmp_loss: 2.219672658920288 | mape_tmp_loss: 0.028294269638756912
+all_batch: 2370 | batch: 499 | mae_tmp_loss: 1.2865379284620284 | rmse_tmp_loss: 2.2211493203639985 | mape_tmp_loss: 0.028291056441143155
+all_batch: 2370 | batch: 624 | mae_tmp_loss: 1.2915005170822142 | rmse_tmp_loss: 2.2291658796310423 | mape_tmp_loss: 0.028486531108617784
+all_batch: 2370 | batch: 749 | mae_tmp_loss: 1.2926132939656576 | rmse_tmp_loss: 2.2321923384666444 | mape_tmp_loss: 0.028599696268637974
+all_batch: 2370 | batch: 874 | mae_tmp_loss: 1.2923318634033203 | rmse_tmp_loss: 2.229492135865348 | mape_tmp_loss: 0.028615714468061923
+all_batch: 2370 | batch: 999 | mae_tmp_loss: 1.2897920200824737 | rmse_tmp_loss: 2.2237775970697404 | mape_tmp_loss: 0.028516189243644477
+all_batch: 2370 | batch: 1124 | mae_tmp_loss: 1.2891696317990622 | rmse_tmp_loss: 2.222211447927687 | mape_tmp_loss: 0.028468810157643423
+all_batch: 2370 | batch: 1249 | mae_tmp_loss: 1.288350394821167 | rmse_tmp_loss: 2.2215520448684694 | mape_tmp_loss: 0.028445209255814553
+all_batch: 2370 | batch: 1374 | mae_tmp_loss: 1.2882355430342933 | rmse_tmp_loss: 2.2217196133353494 | mape_tmp_loss: 0.02843354092199694
+all_batch: 2370 | batch: 1499 | mae_tmp_loss: 1.290537943204244 | rmse_tmp_loss: 2.224422147830327 | mape_tmp_loss: 0.02853375451763471
+all_batch: 2370 | batch: 1624 | mae_tmp_loss: 1.2886929348432101 | rmse_tmp_loss: 2.2224269294005174 | mape_tmp_loss: 0.028464060697417994
+all_batch: 2370 | batch: 1749 | mae_tmp_loss: 1.2898163809435708 | rmse_tmp_loss: 2.222640797478812 | mape_tmp_loss: 0.02851645949536136
+all_batch: 2370 | batch: 1874 | mae_tmp_loss: 1.2903146178563436 | rmse_tmp_loss: 2.2234560287475587 | mape_tmp_loss: 0.02856784750521183
+all_batch: 2370 | batch: 1999 | mae_tmp_loss: 1.2891050937473774 | rmse_tmp_loss: 2.221286124587059 | mape_tmp_loss: 0.02851200018869713
+all_batch: 2370 | batch: 2124 | mae_tmp_loss: 1.2890213800037609 | rmse_tmp_loss: 2.220909223051632 | mape_tmp_loss: 0.028504682080710636
+all_batch: 2370 | batch: 2249 | mae_tmp_loss: 1.2870463377369774 | rmse_tmp_loss: 2.2183512207137213 | mape_tmp_loss: 0.028442523890899286
+MAE 1.0476287603378296
+MAE 2.655954645411803
+MAE 2.8300518953978124
+MAE 2.7241191717477338
+Epoch: 18 | mae_train_loss: 1.2843833999794747 | rmse_train_loss: 2.215149094837124 | mape_train_loss: 0.028343057603367017 | mae_val_loss: 2.827144203212975 | rmse_val_loss: 5.235903630822392 | mape_val_loss: 0.06643428079952292
+LR: [0.0004255543864307431]
+all_batch: 2370 | batch: 124 | mae_tmp_loss: 1.313651288986206 | rmse_tmp_loss: 2.2399034271240232 | mape_tmp_loss: 0.02923282191157341
+all_batch: 2370 | batch: 249 | mae_tmp_loss: 1.2945062325000762 | rmse_tmp_loss: 2.220785422325134 | mape_tmp_loss: 0.028601706486195325
+all_batch: 2370 | batch: 374 | mae_tmp_loss: 1.2876945892969767 | rmse_tmp_loss: 2.2184165919621783 | mape_tmp_loss: 0.028279756508767604
+all_batch: 2370 | batch: 499 | mae_tmp_loss: 1.2855237956047059 | rmse_tmp_loss: 2.219388545036316 | mape_tmp_loss: 0.02826461268030107
+all_batch: 2370 | batch: 624 | mae_tmp_loss: 1.290384070110321 | rmse_tmp_loss: 2.2275740114212037 | mape_tmp_loss: 0.028467487189173697
+all_batch: 2370 | batch: 749 | mae_tmp_loss: 1.2909641383488972 | rmse_tmp_loss: 2.230277545293172 | mape_tmp_loss: 0.028551430775473514
+all_batch: 2370 | batch: 874 | mae_tmp_loss: 1.2903675580024718 | rmse_tmp_loss: 2.227101408277239 | mape_tmp_loss: 0.028544172581817424
+all_batch: 2370 | batch: 999 | mae_tmp_loss: 1.2872303026914595 | rmse_tmp_loss: 2.221017727255821 | mape_tmp_loss: 0.028426434295251966
+all_batch: 2370 | batch: 1124 | mae_tmp_loss: 1.2855229833920796 | rmse_tmp_loss: 2.2184246740341185 | mape_tmp_loss: 0.0283478184002969
+all_batch: 2370 | batch: 1249 | mae_tmp_loss: 1.285171180677414 | rmse_tmp_loss: 2.218144402599335 | mape_tmp_loss: 0.028339910865575076
+all_batch: 2370 | batch: 1374 | mae_tmp_loss: 1.2850592520020225 | rmse_tmp_loss: 2.2183798418045044 | mape_tmp_loss: 0.02832643747329712
+all_batch: 2370 | batch: 1499 | mae_tmp_loss: 1.2869731763601302 | rmse_tmp_loss: 2.220896923224131 | mape_tmp_loss: 0.0284125489157935
+all_batch: 2370 | batch: 1624 | mae_tmp_loss: 1.2851628168179439 | rmse_tmp_loss: 2.2189815346644477 | mape_tmp_loss: 0.028344502159609243
+all_batch: 2370 | batch: 1749 | mae_tmp_loss: 1.286167501926422 | rmse_tmp_loss: 2.21904294184276 | mape_tmp_loss: 0.02839023509249091
+all_batch: 2370 | batch: 1874 | mae_tmp_loss: 1.2849143406232197 | rmse_tmp_loss: 2.217378504625956 | mape_tmp_loss: 0.02835641819338004
+all_batch: 2370 | batch: 1999 | mae_tmp_loss: 1.284788063853979 | rmse_tmp_loss: 2.216503505408764 | mape_tmp_loss: 0.02834730298584327
+all_batch: 2370 | batch: 2124 | mae_tmp_loss: 1.2848839451565461 | rmse_tmp_loss: 2.216344639778137 | mape_tmp_loss: 0.028347326556549354
+all_batch: 2370 | batch: 2249 | mae_tmp_loss: 1.2830072144667308 | rmse_tmp_loss: 2.2139452184571162 | mape_tmp_loss: 0.028290911117775572
+MAE 1.0354750156402588
+MAE 2.639821737709612
+MAE 2.8132810648994067
+MAE 2.7099399045852333
+Epoch: 19 | mae_train_loss: 1.2804962606369694 | rmse_train_loss: 2.210891634653389 | mape_train_loss: 0.028196589098182283 | mae_val_loss: 2.8125204385000435 | rmse_val_loss: 5.243629603736145 | mape_val_loss: 0.06619935868686791
+LR: [0.00038750000000000004]
+all_batch: 2370 | batch: 124 | mae_tmp_loss: 1.317673463344574 | rmse_tmp_loss: 2.247457501411438 | mape_tmp_loss: 0.029554043017327787
+all_batch: 2370 | batch: 249 | mae_tmp_loss: 1.2958467209339142 | rmse_tmp_loss: 2.2250549235343935 | mape_tmp_loss: 0.02878846400231123
+all_batch: 2370 | batch: 374 | mae_tmp_loss: 1.2869132512410482 | rmse_tmp_loss: 2.2192629063924154 | mape_tmp_loss: 0.028356892600655555
+all_batch: 2370 | batch: 499 | mae_tmp_loss: 1.283767681479454 | rmse_tmp_loss: 2.218911686897278 | mape_tmp_loss: 0.028285404328256845
+all_batch: 2370 | batch: 624 | mae_tmp_loss: 1.287992873954773 | rmse_tmp_loss: 2.2261993476867676 | mape_tmp_loss: 0.028444877935945988
+all_batch: 2370 | batch: 749 | mae_tmp_loss: 1.2889019826253256 | rmse_tmp_loss: 2.2288478167851764 | mape_tmp_loss: 0.028527466038862866
+all_batch: 2370 | batch: 874 | mae_tmp_loss: 1.2880111954552786 | rmse_tmp_loss: 2.22536963898795 | mape_tmp_loss: 0.028507685798619474
+all_batch: 2370 | batch: 999 | mae_tmp_loss: 1.2846798694133759 | rmse_tmp_loss: 2.21891319334507 | mape_tmp_loss: 0.02837750302720815
+all_batch: 2370 | batch: 1124 | mae_tmp_loss: 1.2830745418336655 | rmse_tmp_loss: 2.216352653821309 | mape_tmp_loss: 0.02829593007846011
+all_batch: 2370 | batch: 1249 | mae_tmp_loss: 1.2828045947551727 | rmse_tmp_loss: 2.216218174934387 | mape_tmp_loss: 0.02829331587702036
+all_batch: 2370 | batch: 1374 | mae_tmp_loss: 1.2827356846549294 | rmse_tmp_loss: 2.2164412896416406 | mape_tmp_loss: 0.02827698636461388
+all_batch: 2370 | batch: 1499 | mae_tmp_loss: 1.2844028751055399 | rmse_tmp_loss: 2.218652125517527 | mape_tmp_loss: 0.028350429425016047
+all_batch: 2370 | batch: 1624 | mae_tmp_loss: 1.2823685062481807 | rmse_tmp_loss: 2.2164290047425492 | mape_tmp_loss: 0.028272478873913105
+all_batch: 2370 | batch: 1749 | mae_tmp_loss: 1.2830489018985203 | rmse_tmp_loss: 2.216203809329442 | mape_tmp_loss: 0.028308629700647934
+all_batch: 2370 | batch: 1874 | mae_tmp_loss: 1.2829147399584453 | rmse_tmp_loss: 2.215966366449992 | mape_tmp_loss: 0.028327517704168956
+all_batch: 2370 | batch: 1999 | mae_tmp_loss: 1.2817927519381047 | rmse_tmp_loss: 2.213789167046547 | mape_tmp_loss: 0.02827590388339013
+all_batch: 2370 | batch: 2124 | mae_tmp_loss: 1.2819692701171426 | rmse_tmp_loss: 2.2137051013497744 | mape_tmp_loss: 0.0282774565193583
+all_batch: 2370 | batch: 2249 | mae_tmp_loss: 1.2800324693255953 | rmse_tmp_loss: 2.2111742243236967 | mape_tmp_loss: 0.028215998616069556
+MAE 1.0138828754425049
+MAE 2.6085074614770343
+MAE 2.780780158529234
+MAE 2.680540294544245
+Epoch: 20 | mae_train_loss: 1.2777345329145842 | rmse_train_loss: 2.2082952511461476 | mape_train_loss: 0.0281270307099706 | mae_val_loss: 2.783571585928653 | rmse_val_loss: 5.258298235424494 | mape_val_loss: 0.06601309563470005
+Saving Model...
+LR: [0.0003445288237343632]
+all_batch: 2370 | batch: 124 | mae_tmp_loss: 1.2973814768791199 | rmse_tmp_loss: 2.219078227996826 | mape_tmp_loss: 0.02864160332083702
+all_batch: 2370 | batch: 249 | mae_tmp_loss: 1.2798167419433595 | rmse_tmp_loss: 2.202266324520111 | mape_tmp_loss: 0.028003694616258144
+all_batch: 2370 | batch: 374 | mae_tmp_loss: 1.275714821020762 | rmse_tmp_loss: 2.203953846613566 | mape_tmp_loss: 0.027816852256655693
+all_batch: 2370 | batch: 499 | mae_tmp_loss: 1.2748114075660706 | rmse_tmp_loss: 2.2072786948680876 | mape_tmp_loss: 0.02786976861767471
+all_batch: 2370 | batch: 624 | mae_tmp_loss: 1.280028012752533 | rmse_tmp_loss: 2.2164438539505005 | mape_tmp_loss: 0.02809037423878908
+all_batch: 2370 | batch: 749 | mae_tmp_loss: 1.2823766328493753 | rmse_tmp_loss: 2.220736814657847 | mape_tmp_loss: 0.028238383669406175
+all_batch: 2370 | batch: 874 | mae_tmp_loss: 1.28200512613569 | rmse_tmp_loss: 2.217956961223057 | mape_tmp_loss: 0.028250321837408204
+all_batch: 2370 | batch: 999 | mae_tmp_loss: 1.2795002838969232 | rmse_tmp_loss: 2.212169071316719 | mape_tmp_loss: 0.028143311130814256
+all_batch: 2370 | batch: 1124 | mae_tmp_loss: 1.2779451523356968 | rmse_tmp_loss: 2.209830475913154 | mape_tmp_loss: 0.0280730626086394
+all_batch: 2370 | batch: 1249 | mae_tmp_loss: 1.2776299784183502 | rmse_tmp_loss: 2.209905484008789 | mape_tmp_loss: 0.028074318785965443
+all_batch: 2370 | batch: 1374 | mae_tmp_loss: 1.2781269785707647 | rmse_tmp_loss: 2.2106081946112894 | mape_tmp_loss: 0.028077989377081395
+all_batch: 2370 | batch: 1499 | mae_tmp_loss: 1.2801592451731363 | rmse_tmp_loss: 2.2132393169403075 | mape_tmp_loss: 0.02816230307208995
+all_batch: 2370 | batch: 1624 | mae_tmp_loss: 1.2783113587819612 | rmse_tmp_loss: 2.211335908669692 | mape_tmp_loss: 0.02809679756943996
+all_batch: 2370 | batch: 1749 | mae_tmp_loss: 1.278500544990812 | rmse_tmp_loss: 2.2109040355001177 | mape_tmp_loss: 0.028121210916233916
+all_batch: 2370 | batch: 1874 | mae_tmp_loss: 1.2798586206118265 | rmse_tmp_loss: 2.2124716314315798 | mape_tmp_loss: 0.028204745491345724
+all_batch: 2370 | batch: 1999 | mae_tmp_loss: 1.2789203105270863 | rmse_tmp_loss: 2.210382397413254 | mape_tmp_loss: 0.028153705640230328
+all_batch: 2370 | batch: 2124 | mae_tmp_loss: 1.2788197717386134 | rmse_tmp_loss: 2.2101824501822978 | mape_tmp_loss: 0.028151765045874258
+all_batch: 2370 | batch: 2249 | mae_tmp_loss: 1.276887362877528 | rmse_tmp_loss: 2.2076814368036057 | mape_tmp_loss: 0.02809121164182822
+MAE 1.0801490545272827
+MAE 2.624484668863882
+MAE 2.793625538621969
+MAE 2.6914568311748313
+Epoch: 21 | mae_train_loss: 1.2748660434901966 | rmse_train_loss: 2.2051996337210578 | mape_train_loss: 0.028015885407788845 | mae_val_loss: 2.7900476014546753 | rmse_val_loss: 5.1717431612607445 | mape_val_loss: 0.06947679504604831
+LR: [0.0002985189042352221]
+all_batch: 2370 | batch: 124 | mae_tmp_loss: 1.2938240303993225 | rmse_tmp_loss: 2.2151774711608887 | mape_tmp_loss: 0.028560751363635062
+all_batch: 2370 | batch: 249 | mae_tmp_loss: 1.2748275990486144 | rmse_tmp_loss: 2.1972862911224365 | mape_tmp_loss: 0.02786841721460223
+all_batch: 2370 | batch: 374 | mae_tmp_loss: 1.2718981210390727 | rmse_tmp_loss: 2.2000421845118203 | mape_tmp_loss: 0.02770587401340405
+all_batch: 2370 | batch: 499 | mae_tmp_loss: 1.2714395742416382 | rmse_tmp_loss: 2.203450418949127 | mape_tmp_loss: 0.02776259508356452
+all_batch: 2370 | batch: 624 | mae_tmp_loss: 1.2765772262573243 | rmse_tmp_loss: 2.2125920585632324 | mape_tmp_loss: 0.027990398363769053
+all_batch: 2370 | batch: 749 | mae_tmp_loss: 1.2782241767247517 | rmse_tmp_loss: 2.2165304107666017 | mape_tmp_loss: 0.02811804538841049
+all_batch: 2370 | batch: 874 | mae_tmp_loss: 1.2779761917250496 | rmse_tmp_loss: 2.213866881779262 | mape_tmp_loss: 0.02813455887777465
+all_batch: 2370 | batch: 999 | mae_tmp_loss: 1.275472810983658 | rmse_tmp_loss: 2.2080069653987886 | mape_tmp_loss: 0.028022288580425082
+all_batch: 2370 | batch: 1124 | mae_tmp_loss: 1.273938558101654 | rmse_tmp_loss: 2.205844346682231 | mape_tmp_loss: 0.027952361673944527
+all_batch: 2370 | batch: 1249 | mae_tmp_loss: 1.2739445070266724 | rmse_tmp_loss: 2.20616352891922 | mape_tmp_loss: 0.02796594766303897
+all_batch: 2370 | batch: 1374 | mae_tmp_loss: 1.2745134903300892 | rmse_tmp_loss: 2.2070757820822977 | mape_tmp_loss: 0.02797030548954552
+all_batch: 2370 | batch: 1499 | mae_tmp_loss: 1.2764553837776185 | rmse_tmp_loss: 2.209603081623713 | mape_tmp_loss: 0.02805151691660285
+all_batch: 2370 | batch: 1624 | mae_tmp_loss: 1.2746984478877141 | rmse_tmp_loss: 2.207708883872399 | mape_tmp_loss: 0.027985928498208523
+all_batch: 2370 | batch: 1749 | mae_tmp_loss: 1.274655383518764 | rmse_tmp_loss: 2.2071618649618965 | mape_tmp_loss: 0.028004005616264684
+all_batch: 2370 | batch: 1874 | mae_tmp_loss: 1.2762007849375407 | rmse_tmp_loss: 2.2088040557225543 | mape_tmp_loss: 0.02809372832328081
+all_batch: 2370 | batch: 1999 | mae_tmp_loss: 1.2747802396714687 | rmse_tmp_loss: 2.2062400615215303 | mape_tmp_loss: 0.028025358415208756
+all_batch: 2370 | batch: 2124 | mae_tmp_loss: 1.2748017293144676 | rmse_tmp_loss: 2.2061091791040757 | mape_tmp_loss: 0.0280288543929072
+all_batch: 2370 | batch: 2249 | mae_tmp_loss: 1.272996478292677 | rmse_tmp_loss: 2.203683723979526 | mape_tmp_loss: 0.02797251144424081
+MAE 1.0815495252609253
+MAE 2.6594834492938353
+MAE 2.8406892154940326
+MAE 2.7341200707362736
+Epoch: 22 | mae_train_loss: 1.2709033467850102 | rmse_train_loss: 2.201038178311119 | mape_train_loss: 0.027893041473526493 | mae_val_loss: 2.834194693861708 | rmse_val_loss: 5.188316916678585 | mape_val_loss: 0.07302729937505756
+LR: [0.000251481095764778]
+all_batch: 2370 | batch: 124 | mae_tmp_loss: 1.2899169816970826 | rmse_tmp_loss: 2.2130302448272703 | mape_tmp_loss: 0.028502811416983603
+all_batch: 2370 | batch: 249 | mae_tmp_loss: 1.269354371547699 | rmse_tmp_loss: 2.1927516283988955 | mape_tmp_loss: 0.027711003795266153
+all_batch: 2370 | batch: 374 | mae_tmp_loss: 1.2682839501698813 | rmse_tmp_loss: 2.19643798605601 | mape_tmp_loss: 0.02758729547013839
+all_batch: 2370 | batch: 499 | mae_tmp_loss: 1.2678918771743775 | rmse_tmp_loss: 2.2003645405769348 | mape_tmp_loss: 0.02765460822172463
+all_batch: 2370 | batch: 624 | mae_tmp_loss: 1.2734694215774536 | rmse_tmp_loss: 2.209809519577026 | mape_tmp_loss: 0.027896303007006646
+all_batch: 2370 | batch: 749 | mae_tmp_loss: 1.2758491139411927 | rmse_tmp_loss: 2.2144534702301026 | mape_tmp_loss: 0.028054379566262166
+all_batch: 2370 | batch: 874 | mae_tmp_loss: 1.2765369574001857 | rmse_tmp_loss: 2.212991668701172 | mape_tmp_loss: 0.02811383005231619
+all_batch: 2370 | batch: 999 | mae_tmp_loss: 1.2741618592739106 | rmse_tmp_loss: 2.20733699965477 | mape_tmp_loss: 0.028012962210923434
+all_batch: 2370 | batch: 1124 | mae_tmp_loss: 1.272216516494751 | rmse_tmp_loss: 2.204630270322164 | mape_tmp_loss: 0.027924386631283497
+all_batch: 2370 | batch: 1249 | mae_tmp_loss: 1.272031600189209 | rmse_tmp_loss: 2.2047295296669005 | mape_tmp_loss: 0.02792583557665348
+all_batch: 2370 | batch: 1374 | mae_tmp_loss: 1.272548217643391 | rmse_tmp_loss: 2.2055256975347346 | mape_tmp_loss: 0.027931073611432856
+all_batch: 2370 | batch: 1499 | mae_tmp_loss: 1.2743392414251964 | rmse_tmp_loss: 2.2078924101193746 | mape_tmp_loss: 0.02800843649233381
+all_batch: 2370 | batch: 1624 | mae_tmp_loss: 1.2726321620941161 | rmse_tmp_loss: 2.20583111513578 | mape_tmp_loss: 0.027940357377895943
+all_batch: 2370 | batch: 1749 | mae_tmp_loss: 1.2726047681740351 | rmse_tmp_loss: 2.2052993572780064 | mape_tmp_loss: 0.0279580950007907
+all_batch: 2370 | batch: 1874 | mae_tmp_loss: 1.2728029932657878 | rmse_tmp_loss: 2.2053339147567748 | mape_tmp_loss: 0.027987893404563268
+all_batch: 2370 | batch: 1999 | mae_tmp_loss: 1.2712916930615903 | rmse_tmp_loss: 2.2027493702173233 | mape_tmp_loss: 0.027916182011365892
+all_batch: 2370 | batch: 2124 | mae_tmp_loss: 1.2713826590425827 | rmse_tmp_loss: 2.2026946487987744 | mape_tmp_loss: 0.027921486391740687
+all_batch: 2370 | batch: 2249 | mae_tmp_loss: 1.2696631078720093 | rmse_tmp_loss: 2.2003546314239504 | mape_tmp_loss: 0.027867151604344446
+MAE 1.0217350721359253
+MAE 2.604858111036886
+MAE 2.7792327021484944
+MAE 2.674860274078838
+Epoch: 23 | mae_train_loss: 1.2676202469485722 | rmse_train_loss: 2.1977328056524574 | mape_train_loss: 0.02778843862165693 | mae_val_loss: 2.774093259020714 | rmse_val_loss: 5.159387552132041 | mape_val_loss: 0.06989932474075149
+Saving Model...
+LR: [0.00020547117626563684]
+all_batch: 2370 | batch: 124 | mae_tmp_loss: 1.2789059681892394 | rmse_tmp_loss: 2.205159419059753 | mape_tmp_loss: 0.028245688751339912
+all_batch: 2370 | batch: 249 | mae_tmp_loss: 1.2633877346515656 | rmse_tmp_loss: 2.1886669726371766 | mape_tmp_loss: 0.027564301066100597
+all_batch: 2370 | batch: 374 | mae_tmp_loss: 1.2636076292991638 | rmse_tmp_loss: 2.1932555443445843 | mape_tmp_loss: 0.027473932544390362
+all_batch: 2370 | batch: 499 | mae_tmp_loss: 1.2643989337682724 | rmse_tmp_loss: 2.1979043674468994 | mape_tmp_loss: 0.027577473655343056
+all_batch: 2370 | batch: 624 | mae_tmp_loss: 1.2701889065742493 | rmse_tmp_loss: 2.2071269163131713 | mape_tmp_loss: 0.027813585613667965
+all_batch: 2370 | batch: 749 | mae_tmp_loss: 1.2733047547340393 | rmse_tmp_loss: 2.212181852499644 | mape_tmp_loss: 0.027987864822149277
+all_batch: 2370 | batch: 874 | mae_tmp_loss: 1.2735277611187525 | rmse_tmp_loss: 2.2099881431034634 | mape_tmp_loss: 0.028017693668603898
+all_batch: 2370 | batch: 999 | mae_tmp_loss: 1.2708821230530738 | rmse_tmp_loss: 2.204313842535019 | mape_tmp_loss: 0.02790948715247214
+all_batch: 2370 | batch: 1124 | mae_tmp_loss: 1.2690482749409147 | rmse_tmp_loss: 2.201818318155077 | mape_tmp_loss: 0.02782556205408441
+all_batch: 2370 | batch: 1249 | mae_tmp_loss: 1.2691441799163818 | rmse_tmp_loss: 2.2020069423675537 | mape_tmp_loss: 0.027835312924534082
+all_batch: 2370 | batch: 1374 | mae_tmp_loss: 1.2695507265871222 | rmse_tmp_loss: 2.2028038267655807 | mape_tmp_loss: 0.027838237291709943
+all_batch: 2370 | batch: 1499 | mae_tmp_loss: 1.2713939860661825 | rmse_tmp_loss: 2.20526007326444 | mape_tmp_loss: 0.027919086141511798
+all_batch: 2370 | batch: 1624 | mae_tmp_loss: 1.2698521844056936 | rmse_tmp_loss: 2.203441708564758 | mape_tmp_loss: 0.02785651600933992
+all_batch: 2370 | batch: 1749 | mae_tmp_loss: 1.2699295477526529 | rmse_tmp_loss: 2.2029849345343453 | mape_tmp_loss: 0.02787868733544435
+all_batch: 2370 | batch: 1874 | mae_tmp_loss: 1.2693198641459147 | rmse_tmp_loss: 2.2020763403574626 | mape_tmp_loss: 0.027874447172880172
+all_batch: 2370 | batch: 1999 | mae_tmp_loss: 1.267983527958393 | rmse_tmp_loss: 2.1994976635575294 | mape_tmp_loss: 0.02780514684319496
+all_batch: 2370 | batch: 2124 | mae_tmp_loss: 1.2681509790701024 | rmse_tmp_loss: 2.1994654092227712 | mape_tmp_loss: 0.02781253995001316
+all_batch: 2370 | batch: 2249 | mae_tmp_loss: 1.26668830315272 | rmse_tmp_loss: 2.197354247305128 | mape_tmp_loss: 0.027765724401921033
+MAE 1.053795337677002
+MAE 2.61635151712021
+MAE 2.7823636982571425
+MAE 2.682734477163549
+Epoch: 24 | mae_train_loss: 1.2647035743365307 | rmse_train_loss: 2.194748357831174 | mape_train_loss: 0.027688040755264744 | mae_val_loss: 2.7806086355009993 | rmse_val_loss: 5.258801922286298 | mape_val_loss: 0.0672019427210766
+LR: [0.00016250000000000005]
+all_batch: 2370 | batch: 124 | mae_tmp_loss: 1.271517981529236 | rmse_tmp_loss: 2.199862910270691 | mape_tmp_loss: 0.028018140085041523
+all_batch: 2370 | batch: 249 | mae_tmp_loss: 1.2589023146629335 | rmse_tmp_loss: 2.1853731174468995 | mape_tmp_loss: 0.02742308424413204
+all_batch: 2370 | batch: 374 | mae_tmp_loss: 1.2601278969446819 | rmse_tmp_loss: 2.1903948672612508 | mape_tmp_loss: 0.027366825334727764
+all_batch: 2370 | batch: 499 | mae_tmp_loss: 1.26180065202713 | rmse_tmp_loss: 2.195828096151352 | mape_tmp_loss: 0.027498998750001193
+all_batch: 2370 | batch: 624 | mae_tmp_loss: 1.2682592984199523 | rmse_tmp_loss: 2.2057327293395996 | mape_tmp_loss: 0.027762257793545724
+all_batch: 2370 | batch: 749 | mae_tmp_loss: 1.271092572450638 | rmse_tmp_loss: 2.210454146226247 | mape_tmp_loss: 0.02792643352970481
+all_batch: 2370 | batch: 874 | mae_tmp_loss: 1.270726204599653 | rmse_tmp_loss: 2.2075168307168145 | mape_tmp_loss: 0.027926696196198465
+all_batch: 2370 | batch: 999 | mae_tmp_loss: 1.2678823025822639 | rmse_tmp_loss: 2.2016001440286637 | mape_tmp_loss: 0.0278152561057359
+all_batch: 2370 | batch: 1124 | mae_tmp_loss: 1.266154232237074 | rmse_tmp_loss: 2.1990775074428983 | mape_tmp_loss: 0.02773640672200256
+all_batch: 2370 | batch: 1249 | mae_tmp_loss: 1.266301218366623 | rmse_tmp_loss: 2.1994301716804503 | mape_tmp_loss: 0.027749488601088525
+all_batch: 2370 | batch: 1374 | mae_tmp_loss: 1.2669314459887417 | rmse_tmp_loss: 2.200474266572432 | mape_tmp_loss: 0.027761139927939934
+all_batch: 2370 | batch: 1499 | mae_tmp_loss: 1.2689162048896154 | rmse_tmp_loss: 2.203170976559321 | mape_tmp_loss: 0.027847685704628627
+all_batch: 2370 | batch: 1624 | mae_tmp_loss: 1.267534822500669 | rmse_tmp_loss: 2.201481229488666 | mape_tmp_loss: 0.027792662903666495
+all_batch: 2370 | batch: 1749 | mae_tmp_loss: 1.2675896101338522 | rmse_tmp_loss: 2.201049406187875 | mape_tmp_loss: 0.027814226065895387
+all_batch: 2370 | batch: 1874 | mae_tmp_loss: 1.266741818936666 | rmse_tmp_loss: 2.199828398513794 | mape_tmp_loss: 0.027795892711977164
+all_batch: 2370 | batch: 1999 | mae_tmp_loss: 1.2656179282665252 | rmse_tmp_loss: 2.1974266824126243 | mape_tmp_loss: 0.02773047870583832
+all_batch: 2370 | batch: 2124 | mae_tmp_loss: 1.2659051586599912 | rmse_tmp_loss: 2.197541626930237 | mape_tmp_loss: 0.027740033997770617
+all_batch: 2370 | batch: 2249 | mae_tmp_loss: 1.2644243361155192 | rmse_tmp_loss: 2.195369481722514 | mape_tmp_loss: 0.027692876588139268
+MAE 1.046443223953247
+MAE 2.618733258530645
+MAE 2.7821445909898674
+MAE 2.680502425000517
+Epoch: 25 | mae_train_loss: 1.262475412606187 | rmse_train_loss: 2.192797094457763 | mape_train_loss: 0.027615953431728017 | mae_val_loss: 2.7772741711745828 | rmse_val_loss: 5.2134193693850674 | mape_val_loss: 0.06821396173961923
+LR: [0.00012444561356925697]
+all_batch: 2370 | batch: 124 | mae_tmp_loss: 1.2693890404701234 | rmse_tmp_loss: 2.1975267162323 | mape_tmp_loss: 0.02796578461676836
+all_batch: 2370 | batch: 249 | mae_tmp_loss: 1.2568769359588623 | rmse_tmp_loss: 2.183365936756134 | mape_tmp_loss: 0.027373461619019508
+all_batch: 2370 | batch: 374 | mae_tmp_loss: 1.2583418815930685 | rmse_tmp_loss: 2.188936718304952 | mape_tmp_loss: 0.027326778856416545
+all_batch: 2370 | batch: 499 | mae_tmp_loss: 1.259612266421318 | rmse_tmp_loss: 2.193434216976166 | mape_tmp_loss: 0.027429530123248697
+all_batch: 2370 | batch: 624 | mae_tmp_loss: 1.2661646757125855 | rmse_tmp_loss: 2.203230170249939 | mape_tmp_loss: 0.027688637693226336
+all_batch: 2370 | batch: 749 | mae_tmp_loss: 1.2691501859029135 | rmse_tmp_loss: 2.208104528427124 | mape_tmp_loss: 0.027850114575276773
+all_batch: 2370 | batch: 874 | mae_tmp_loss: 1.2690053258623395 | rmse_tmp_loss: 2.205248727253505 | mape_tmp_loss: 0.027857463828154974
+all_batch: 2370 | batch: 999 | mae_tmp_loss: 1.2659348016381264 | rmse_tmp_loss: 2.1994167617559435 | mape_tmp_loss: 0.027744272361509503
+all_batch: 2370 | batch: 1124 | mae_tmp_loss: 1.2642685945828755 | rmse_tmp_loss: 2.1970659521950617 | mape_tmp_loss: 0.02766911382145352
+all_batch: 2370 | batch: 1249 | mae_tmp_loss: 1.2644385065555572 | rmse_tmp_loss: 2.1973123846054077 | mape_tmp_loss: 0.02768423518538475
+all_batch: 2370 | batch: 1374 | mae_tmp_loss: 1.2651467475891114 | rmse_tmp_loss: 2.198479492794384 | mape_tmp_loss: 0.02769905176487836
+all_batch: 2370 | batch: 1499 | mae_tmp_loss: 1.2670510055621464 | rmse_tmp_loss: 2.2010630482037863 | mape_tmp_loss: 0.02778279051122566
+all_batch: 2370 | batch: 1624 | mae_tmp_loss: 1.2656634583840003 | rmse_tmp_loss: 2.199372310418349 | mape_tmp_loss: 0.02772840644018008
+all_batch: 2370 | batch: 1749 | mae_tmp_loss: 1.26569881098611 | rmse_tmp_loss: 2.198855809075492 | mape_tmp_loss: 0.027748102914009774
+all_batch: 2370 | batch: 1874 | mae_tmp_loss: 1.2648536754926045 | rmse_tmp_loss: 2.1976471870422363 | mape_tmp_loss: 0.027730425881346065
+all_batch: 2370 | batch: 1999 | mae_tmp_loss: 1.2635660351812839 | rmse_tmp_loss: 2.1951513547301293 | mape_tmp_loss: 0.027662882446311415
+all_batch: 2370 | batch: 2124 | mae_tmp_loss: 1.2638112386535196 | rmse_tmp_loss: 2.195249873554005 | mape_tmp_loss: 0.02767236099085387
+all_batch: 2370 | batch: 2249 | mae_tmp_loss: 1.2624096296363407 | rmse_tmp_loss: 2.1931927386919656 | mape_tmp_loss: 0.02762833254246248
+MAE 1.0086190700531006
+MAE 2.5879512570872167
+MAE 2.7592732535665903
+MAE 2.6574747659439266
+Epoch: 26 | mae_train_loss: 1.2605080327152702 | rmse_train_loss: 2.1907265831649556 | mape_train_loss: 0.027553119930882747 | mae_val_loss: 2.755410387859506 | rmse_val_loss: 5.171045166961218 | mape_val_loss: 0.06751485533570334
+Saving Model...
+LR: [9.297117626563684e-05]
+all_batch: 2370 | batch: 124 | mae_tmp_loss: 1.2670502943992614 | rmse_tmp_loss: 2.1960067949295046 | mape_tmp_loss: 0.02793642996996641
+all_batch: 2370 | batch: 249 | mae_tmp_loss: 1.2550332114696503 | rmse_tmp_loss: 2.1818530416488646 | mape_tmp_loss: 0.02734516267478466
+all_batch: 2370 | batch: 374 | mae_tmp_loss: 1.2562919063568114 | rmse_tmp_loss: 2.187051642100016 | mape_tmp_loss: 0.027283862399558226
+all_batch: 2370 | batch: 499 | mae_tmp_loss: 1.257940307021141 | rmse_tmp_loss: 2.1916035838127135 | mape_tmp_loss: 0.027388142611831427
+all_batch: 2370 | batch: 624 | mae_tmp_loss: 1.2646470131874084 | rmse_tmp_loss: 2.2016712926864623 | mape_tmp_loss: 0.027644292964041233
+all_batch: 2370 | batch: 749 | mae_tmp_loss: 1.2673882206281026 | rmse_tmp_loss: 2.206511362393697 | mape_tmp_loss: 0.027792888761808476
+all_batch: 2370 | batch: 874 | mae_tmp_loss: 1.267499675818852 | rmse_tmp_loss: 2.203817541667393 | mape_tmp_loss: 0.027804402209818363
+all_batch: 2370 | batch: 999 | mae_tmp_loss: 1.2644394399523735 | rmse_tmp_loss: 2.1980232640504838 | mape_tmp_loss: 0.027692080840468408
+all_batch: 2370 | batch: 1124 | mae_tmp_loss: 1.2628107856114705 | rmse_tmp_loss: 2.1957425774468318 | mape_tmp_loss: 0.027618328298131625
+all_batch: 2370 | batch: 1249 | mae_tmp_loss: 1.262940493106842 | rmse_tmp_loss: 2.1960143469810487 | mape_tmp_loss: 0.027632375264912842
+all_batch: 2370 | batch: 1374 | mae_tmp_loss: 1.263630737694827 | rmse_tmp_loss: 2.196996290033514 | mape_tmp_loss: 0.02764459187334234
+all_batch: 2370 | batch: 1499 | mae_tmp_loss: 1.265675826191902 | rmse_tmp_loss: 2.199714423894882 | mape_tmp_loss: 0.027731676176811257
+all_batch: 2370 | batch: 1624 | mae_tmp_loss: 1.2642350273132323 | rmse_tmp_loss: 2.1980345962964574 | mape_tmp_loss: 0.02767590141009826
+all_batch: 2370 | batch: 1749 | mae_tmp_loss: 1.264368690422603 | rmse_tmp_loss: 2.197552677699498 | mape_tmp_loss: 0.02769722761639527
+all_batch: 2370 | batch: 1874 | mae_tmp_loss: 1.2634341007550558 | rmse_tmp_loss: 2.196267271486918 | mape_tmp_loss: 0.02767698972026507
+all_batch: 2370 | batch: 1999 | mae_tmp_loss: 1.262055133998394 | rmse_tmp_loss: 2.1937543991208077 | mape_tmp_loss: 0.027609039071947335
+all_batch: 2370 | batch: 2124 | mae_tmp_loss: 1.2623448861066033 | rmse_tmp_loss: 2.193887558880974 | mape_tmp_loss: 0.02762072208742885
+all_batch: 2370 | batch: 2249 | mae_tmp_loss: 1.2609648838043213 | rmse_tmp_loss: 2.191879279560513 | mape_tmp_loss: 0.027577191513859563
+MAE 1.0039044618606567
+MAE 2.58239477931863
+MAE 2.755390024303797
+MAE 2.6566378789090637
+Epoch: 27 | mae_train_loss: 1.2591429717933076 | rmse_train_loss: 2.189396112780028 | mape_train_loss: 0.027504094873991195 | mae_val_loss: 2.7560424858567405 | rmse_val_loss: 5.221063866116906 | mape_val_loss: 0.06646673873824588
+LR: [6.945227203041478e-05]
+all_batch: 2370 | batch: 124 | mae_tmp_loss: 1.2659205522537231 | rmse_tmp_loss: 2.196050588607788 | mape_tmp_loss: 0.02789892504364252
+all_batch: 2370 | batch: 249 | mae_tmp_loss: 1.2537860412597657 | rmse_tmp_loss: 2.181201452255249 | mape_tmp_loss: 0.027303769387304784
+all_batch: 2370 | batch: 374 | mae_tmp_loss: 1.255410530726115 | rmse_tmp_loss: 2.186625829696655 | mape_tmp_loss: 0.02725023248294989
+all_batch: 2370 | batch: 499 | mae_tmp_loss: 1.2567662950754166 | rmse_tmp_loss: 2.191044435739517 | mape_tmp_loss: 0.027352488204836847
+all_batch: 2370 | batch: 624 | mae_tmp_loss: 1.2633987652778627 | rmse_tmp_loss: 2.2008867012023927 | mape_tmp_loss: 0.027610130307078363
+all_batch: 2370 | batch: 749 | mae_tmp_loss: 1.265913818915685 | rmse_tmp_loss: 2.205293170452118 | mape_tmp_loss: 0.027751011894394953
+all_batch: 2370 | batch: 874 | mae_tmp_loss: 1.265720135484423 | rmse_tmp_loss: 2.2023000616346087 | mape_tmp_loss: 0.027754311836191585
+all_batch: 2370 | batch: 999 | mae_tmp_loss: 1.2627689856886863 | rmse_tmp_loss: 2.1965459150075914 | mape_tmp_loss: 0.027644658451899885
+all_batch: 2370 | batch: 1124 | mae_tmp_loss: 1.261149180200365 | rmse_tmp_loss: 2.1943196987575955 | mape_tmp_loss: 0.02757002506405115
+all_batch: 2370 | batch: 1249 | mae_tmp_loss: 1.261317823076248 | rmse_tmp_loss: 2.1946726962089538 | mape_tmp_loss: 0.02758330577984452
+all_batch: 2370 | batch: 1374 | mae_tmp_loss: 1.2620019952600652 | rmse_tmp_loss: 2.195668611266396 | mape_tmp_loss: 0.027594918535514313
+all_batch: 2370 | batch: 1499 | mae_tmp_loss: 1.2641215652624767 | rmse_tmp_loss: 2.198430897394816 | mape_tmp_loss: 0.027685696225613357
+all_batch: 2370 | batch: 1624 | mae_tmp_loss: 1.2626964336908781 | rmse_tmp_loss: 2.1966913539446318 | mape_tmp_loss: 0.027628898572463256
+all_batch: 2370 | batch: 1749 | mae_tmp_loss: 1.2629451785768782 | rmse_tmp_loss: 2.196272489615849 | mape_tmp_loss: 0.027652455415044512
+all_batch: 2370 | batch: 1874 | mae_tmp_loss: 1.2620413000424704 | rmse_tmp_loss: 2.1949932334264117 | mape_tmp_loss: 0.027632554584741592
+all_batch: 2370 | batch: 1999 | mae_tmp_loss: 1.26071930834651 | rmse_tmp_loss: 2.1925087856650354 | mape_tmp_loss: 0.027566625894512982
+all_batch: 2370 | batch: 2124 | mae_tmp_loss: 1.2610634002405054 | rmse_tmp_loss: 2.192680003446691 | mape_tmp_loss: 0.02757944625309285
+all_batch: 2370 | batch: 2249 | mae_tmp_loss: 1.259669400718477 | rmse_tmp_loss: 2.1906604143778483 | mape_tmp_loss: 0.027536320852322712
+MAE 1.0107851028442383
+MAE 2.5913930612035316
+MAE 2.767780271928702
+MAE 2.669706694707522
+Epoch: 28 | mae_train_loss: 1.2578181773046904 | rmse_train_loss: 2.1881963715271606 | mape_train_loss: 0.027464267211860117 | mae_val_loss: 2.7714970643910983 | rmse_val_loss: 5.247674099806338 | mape_val_loss: 0.06597688412662112
+LR: [5.4916789834893724e-05]
+all_batch: 2370 | batch: 124 | mae_tmp_loss: 1.2643162150382996 | rmse_tmp_loss: 2.194525560379028 | mape_tmp_loss: 0.027853628374636175
+all_batch: 2370 | batch: 249 | mae_tmp_loss: 1.2526523144245147 | rmse_tmp_loss: 2.1801835260391234 | mape_tmp_loss: 0.02727670971304178
+all_batch: 2370 | batch: 374 | mae_tmp_loss: 1.2544076937039694 | rmse_tmp_loss: 2.185770087560018 | mape_tmp_loss: 0.027231186921397844
+all_batch: 2370 | batch: 499 | mae_tmp_loss: 1.2558619195222855 | rmse_tmp_loss: 2.190288186311722 | mape_tmp_loss: 0.02733133358694613
+all_batch: 2370 | batch: 624 | mae_tmp_loss: 1.2625181528091431 | rmse_tmp_loss: 2.2001641313552858 | mape_tmp_loss: 0.02758756789416075
+all_batch: 2370 | batch: 749 | mae_tmp_loss: 1.265149668931961 | rmse_tmp_loss: 2.2047247943878174 | mape_tmp_loss: 0.0277317850291729
+all_batch: 2370 | batch: 874 | mae_tmp_loss: 1.26492105783735 | rmse_tmp_loss: 2.2017409879139493 | mape_tmp_loss: 0.027733289926179818
+all_batch: 2370 | batch: 999 | mae_tmp_loss: 1.2619918798804284 | rmse_tmp_loss: 2.19602844452858 | mape_tmp_loss: 0.02762247670441866
+all_batch: 2370 | batch: 1124 | mae_tmp_loss: 1.2604044771724277 | rmse_tmp_loss: 2.1937568264007568 | mape_tmp_loss: 0.027549398364292252
+all_batch: 2370 | batch: 1249 | mae_tmp_loss: 1.2605594321727753 | rmse_tmp_loss: 2.1939717750549317 | mape_tmp_loss: 0.02756206285879016
+all_batch: 2370 | batch: 1374 | mae_tmp_loss: 1.2611804358308965 | rmse_tmp_loss: 2.1948737213828347 | mape_tmp_loss: 0.027572652203115548
+all_batch: 2370 | batch: 1499 | mae_tmp_loss: 1.2633158056735991 | rmse_tmp_loss: 2.1976067654291787 | mape_tmp_loss: 0.02766335602104664
+all_batch: 2370 | batch: 1624 | mae_tmp_loss: 1.261921090566195 | rmse_tmp_loss: 2.1958842888612016 | mape_tmp_loss: 0.027606973203902062
+all_batch: 2370 | batch: 1749 | mae_tmp_loss: 1.2620846049445016 | rmse_tmp_loss: 2.195374309880393 | mape_tmp_loss: 0.02762841268682054
+all_batch: 2370 | batch: 1874 | mae_tmp_loss: 1.261187386449178 | rmse_tmp_loss: 2.1941047326405845 | mape_tmp_loss: 0.02760752245634794
+all_batch: 2370 | batch: 1999 | mae_tmp_loss: 1.259860583603382 | rmse_tmp_loss: 2.191594305753708 | mape_tmp_loss: 0.02754090447491035
+all_batch: 2370 | batch: 2124 | mae_tmp_loss: 1.2602222340808196 | rmse_tmp_loss: 2.1917814722061157 | mape_tmp_loss: 0.02755419250051765
+all_batch: 2370 | batch: 2249 | mae_tmp_loss: 1.2588736570146348 | rmse_tmp_loss: 2.189800154209137 | mape_tmp_loss: 0.02751170458147923
+MAE 1.0241034030914307
+MAE 2.5922730812932007
+MAE 2.7656985500558693
+MAE 2.669021251787775
+Epoch: 29 | mae_train_loss: 1.256982109290135 | rmse_train_loss: 2.187322698414074 | mape_train_loss: 0.02743834988390909 | mae_val_loss: 2.770984428918968 | rmse_val_loss: 5.261526282561028 | mape_val_loss: 0.06618769769425277
+LR: [0.0005]
+all_batch: 2370 | batch: 124 | mae_tmp_loss: 1.3643050050735475 | rmse_tmp_loss: 2.2866550521850586 | mape_tmp_loss: 0.030848301358520985
+all_batch: 2370 | batch: 249 | mae_tmp_loss: 1.3191030056476594 | rmse_tmp_loss: 2.241063578605652 | mape_tmp_loss: 0.02933917085453868
+all_batch: 2370 | batch: 374 | mae_tmp_loss: 1.3093469098409016 | rmse_tmp_loss: 2.2374105415344236 | mape_tmp_loss: 0.029012841473023097
+all_batch: 2370 | batch: 499 | mae_tmp_loss: 1.3010035427808762 | rmse_tmp_loss: 2.2323913633823396 | mape_tmp_loss: 0.02881595667824149
+all_batch: 2370 | batch: 624 | mae_tmp_loss: 1.3021076084136962 | rmse_tmp_loss: 2.2366469942092895 | mape_tmp_loss: 0.028886804640293123
+all_batch: 2370 | batch: 749 | mae_tmp_loss: 1.3007256468137105 | rmse_tmp_loss: 2.2375166301727294 | mape_tmp_loss: 0.02892741030578812
+all_batch: 2370 | batch: 874 | mae_tmp_loss: 1.3001382855687822 | rmse_tmp_loss: 2.2344774654933386 | mape_tmp_loss: 0.02894018774373191
+all_batch: 2370 | batch: 999 | mae_tmp_loss: 1.2955096600055696 | rmse_tmp_loss: 2.2268477412462233 | mape_tmp_loss: 0.0287687678122893
+all_batch: 2370 | batch: 1124 | mae_tmp_loss: 1.2932033695644802 | rmse_tmp_loss: 2.2236741037368772 | mape_tmp_loss: 0.02866292708284325
+all_batch: 2370 | batch: 1249 | mae_tmp_loss: 1.291509397125244 | rmse_tmp_loss: 2.222066404056549 | mape_tmp_loss: 0.02860843623429537
+all_batch: 2370 | batch: 1374 | mae_tmp_loss: 1.2903979346101935 | rmse_tmp_loss: 2.2213674740357834 | mape_tmp_loss: 0.028560758189721543
+all_batch: 2370 | batch: 1499 | mae_tmp_loss: 1.291370270172755 | rmse_tmp_loss: 2.2229169700145723 | mape_tmp_loss: 0.028613094286993147
+all_batch: 2370 | batch: 1624 | mae_tmp_loss: 1.28902956533432 | rmse_tmp_loss: 2.220382057776818 | mape_tmp_loss: 0.028526101793807285
+all_batch: 2370 | batch: 1749 | mae_tmp_loss: 1.2896929877485548 | rmse_tmp_loss: 2.2200475027901785 | mape_tmp_loss: 0.028557799229132277
+all_batch: 2370 | batch: 1874 | mae_tmp_loss: 1.288668845876058 | rmse_tmp_loss: 2.2189745544433594 | mape_tmp_loss: 0.028542890450855098
+all_batch: 2370 | batch: 1999 | mae_tmp_loss: 1.2871585355401038 | rmse_tmp_loss: 2.216445367336273 | mape_tmp_loss: 0.028478690520860255
+all_batch: 2370 | batch: 2124 | mae_tmp_loss: 1.2866655580015744 | rmse_tmp_loss: 2.2157962086621454 | mape_tmp_loss: 0.028460019292200312
+all_batch: 2370 | batch: 2249 | mae_tmp_loss: 1.284552161640591 | rmse_tmp_loss: 2.2131108186509874 | mape_tmp_loss: 0.028395309324065844
+MAE 1.0404218435287476
+MAE 2.6106077869339743
+MAE 2.780806530174331
+MAE 2.674833516345864
+Epoch: 30 | mae_train_loss: 1.2817523028277145 | rmse_train_loss: 2.209862488281878 | mape_train_loss: 0.028290904824963853 | mae_val_loss: 2.777710366720534 | rmse_val_loss: 5.146994443936537 | mape_val_loss: 0.06608954973066342
+LR: [0.0004950832101651062]
+all_batch: 2370 | batch: 124 | mae_tmp_loss: 1.3219329624176026 | rmse_tmp_loss: 2.250063967704773 | mape_tmp_loss: 0.029715705990791322
+all_batch: 2370 | batch: 249 | mae_tmp_loss: 1.2976630091667176 | rmse_tmp_loss: 2.2236251983642576 | mape_tmp_loss: 0.028825476072728635
+all_batch: 2370 | batch: 374 | mae_tmp_loss: 1.2879892449378967 | rmse_tmp_loss: 2.2173195435206097 | mape_tmp_loss: 0.028380323616166908
+all_batch: 2370 | batch: 499 | mae_tmp_loss: 1.2842292239665984 | rmse_tmp_loss: 2.2165919556617735 | mape_tmp_loss: 0.028293712673708796
+all_batch: 2370 | batch: 624 | mae_tmp_loss: 1.2876603177070618 | rmse_tmp_loss: 2.2233380346298217 | mape_tmp_loss: 0.02843251726180315
+all_batch: 2370 | batch: 749 | mae_tmp_loss: 1.2879104023774466 | rmse_tmp_loss: 2.225647292613983 | mape_tmp_loss: 0.028508097353080908
+all_batch: 2370 | batch: 874 | mae_tmp_loss: 1.287080964429038 | rmse_tmp_loss: 2.222557203565325 | mape_tmp_loss: 0.028508412087602276
+all_batch: 2370 | batch: 999 | mae_tmp_loss: 1.2836239941716194 | rmse_tmp_loss: 2.2160326800346373 | mape_tmp_loss: 0.028375070868059994
+all_batch: 2370 | batch: 1124 | mae_tmp_loss: 1.2819188159836663 | rmse_tmp_loss: 2.213389825714959 | mape_tmp_loss: 0.028290518754058414
+all_batch: 2370 | batch: 1249 | mae_tmp_loss: 1.2811628745555879 | rmse_tmp_loss: 2.2126512223243715 | mape_tmp_loss: 0.02826386861130595
+all_batch: 2370 | batch: 1374 | mae_tmp_loss: 1.2809300202456388 | rmse_tmp_loss: 2.2127770396145907 | mape_tmp_loss: 0.028242935308001257
+all_batch: 2370 | batch: 1499 | mae_tmp_loss: 1.2827175447543462 | rmse_tmp_loss: 2.2150315481026968 | mape_tmp_loss: 0.028325911714384953
+all_batch: 2370 | batch: 1624 | mae_tmp_loss: 1.2808001381433927 | rmse_tmp_loss: 2.212893461227417 | mape_tmp_loss: 0.02825132146019202
+all_batch: 2370 | batch: 1749 | mae_tmp_loss: 1.2817667514256068 | rmse_tmp_loss: 2.212882691179003 | mape_tmp_loss: 0.028295970633625985
+LR: [0.0005]
+LR: [0.0005]
+LR: [0.0005]
+LR: [0.0005]
+LR: [0.0005]
+LR: [0.0005]
+LR: [0.0005]
+LR: [0.0005]
+LR: [0.0005]
+LR: [0.0005]
+LR: [0.0005]
+LR: [0.0005]
+LR: [0.0005]
+LR: [0.0005]
+LR: [0.0005]
+LR: [0.0005]
+LR: [0.0005]
+all_batch: None | batch: 124 | mae_tmp_loss: 6.734581172943115 | rmse_tmp_loss: 9.221409717559814 | mape_tmp_loss: 0.16292204159498214
+all_batch: None | batch: 249 | mae_tmp_loss: 4.8311047306060795 | rmse_tmp_loss: 6.878428483009339 | mape_tmp_loss: 0.12151581134647131
+all_batch: None | batch: 374 | mae_tmp_loss: 3.9778297770818076 | rmse_tmp_loss: 5.782427926381429 | mape_tmp_loss: 0.10225902442634106
+all_batch: None | batch: 499 | mae_tmp_loss: 3.467628861427307 | rmse_tmp_loss: 5.109728456735611 | mape_tmp_loss: 0.09047479761019349
