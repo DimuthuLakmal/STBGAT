@@ -147,6 +147,15 @@ class TransformerDecoder(nn.Module):
         mat = mat.permute(1, 0, 2)  # (4 * 170, 36, 16)
         return mat
 
+    def _return_mat(self, out, shp):
+        out = self.fc_out(out)
+
+        out = out.permute(1, 0, 2)
+        out = out.reshape(shp[1], shp[0], shp[2], out.shape[-1])
+        out = out.permute(1, 0, 2, 3)
+
+        return out
+
     def forward(self, x, enc_x, tgt_mask, device):
         embed_out = self.embedding(x)
         embed_shp = embed_out.shape
@@ -188,13 +197,7 @@ class TransformerDecoder(nn.Module):
         elif not self.graph_input and self.graph_semantic_input:
             out_g = out_g_semantic
         elif not self.graph_input and not self.graph_semantic_input:
-            return out_d
+            return self._return_mat(out_d, embed_shp)
 
         out = out_d + self._organize_matrix(out_g)
-        out = self.fc_out(out)
-
-        out = out.permute(1, 0, 2)
-        out = out.reshape(embed_shp[1], embed_shp[0], embed_shp[2], out.shape[-1])
-        out = out.permute(1, 0, 2, 3)
-
-        return out
+        return self._return_mat(out, embed_shp)
