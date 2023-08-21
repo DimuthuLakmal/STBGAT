@@ -15,7 +15,9 @@ def train(model: torch.nn.Module,
     mae_train_loss = 0.
     rmse_train_loss = 0.
     mape_train_loss = 0.
-    n_batch_train = data_loader.get_dataset().get_n_batch_train()
+
+    dataset = data_loader.get_dataset()
+    n_batch_train = dataset.get_n_batch_train()
 
     model.train()
 
@@ -37,8 +39,8 @@ def train(model: torch.nn.Module,
 
         mae_loss_val, rmse_loss_val, mape_loss_val = calculate_loss(y_pred=out,
                                                                     y=train_y_target,
-                                                                    _mean=data_loader.dataset.get_mean(),
-                                                                    _std=data_loader.dataset.get_std())
+                                                                    _max=dataset.get_max(),
+                                                                    _min=dataset.get_min())
         mae_train_loss += mae_loss_val
         rmse_train_loss += rmse_loss_val
         mape_train_loss += mape_loss_val
@@ -54,11 +56,11 @@ def train(model: torch.nn.Module,
         rmse_tmp_loss = rmse_train_loss / float(batch + 1)
         mape_tmp_loss = mape_train_loss / float(batch + 1)
 
-        out_txt = f"all_batch: {data_loader.n_batch_train} | batch: {batch} | mae_tmp_loss: {mae_tmp_loss} | rmse_tmp_loss: {rmse_tmp_loss} | mape_tmp_loss: {mape_tmp_loss}"
+        out_txt = f"all_batch: {n_batch_train} | batch: {batch} | mae_tmp_loss: {mae_tmp_loss} | rmse_tmp_loss: {rmse_tmp_loss} | mape_tmp_loss: {mape_tmp_loss}"
         if offset % 500 == 0:
             logger.info(out_txt)
 
-    mae_train_loss = mae_train_loss / float(data_loader.n_batch_train)
-    rmse_train_loss = rmse_train_loss / float(data_loader.n_batch_train)
-    mape_train_loss = mape_train_loss / float(data_loader.n_batch_train)
+    mae_train_loss = mae_train_loss / float(n_batch_train)
+    rmse_train_loss = rmse_train_loss / float(n_batch_train)
+    mape_train_loss = mape_train_loss / float(n_batch_train)
     return mae_train_loss, rmse_train_loss, mape_train_loss

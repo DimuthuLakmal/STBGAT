@@ -39,8 +39,8 @@ def test(_type: str,
 
             mae_loss_val, rmse_loss_val, mape_loss_val = calculate_loss(y_pred=out,
                                                                         y=test_y_target,
-                                                                        _mean=data_loader.dataset.get_mean(),
-                                                                        _std=data_loader.dataset.get_std())
+                                                                        _max=data_loader.dataset.get_max(),
+                                                                        _min=data_loader.dataset.get_min())
             mae_loss += mae_loss_val
             rmse_loss += rmse_loss_val
             mape_loss += mape_loss_val
@@ -50,7 +50,7 @@ def test(_type: str,
 
             offset += data_loader.batch_size
 
-    mae_loss = mae_loss / float(data_loader.n_batch_test)
-    rmse_loss = rmse_loss / float(data_loader.n_batch_test)
-    mape_loss = mape_loss / float(data_loader.n_batch_test)
+    mae_loss = mae_loss / float(n_batch)
+    rmse_loss = rmse_loss / float(n_batch)
+    mape_loss = mape_loss / float(n_batch)
     return mae_loss, rmse_loss, mape_loss

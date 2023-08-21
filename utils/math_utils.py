@@ -192,11 +192,11 @@ def evaluation(y, y_, x_stats):
         return np.concatenate(tmp_list, axis=-1)
 
 
-def calculate_loss(y_pred, y, _mean, _std):
+def calculate_loss(y_pred, y, _max, _min):
     y_pred_cpu = y_pred.cpu().detach().numpy()
     train_y_cpu = y.cpu().detach().numpy()
-    y_pred_inv = z_inverse(y_pred_cpu, _mean, _std)
-    y_inv = z_inverse(train_y_cpu, _mean, _std)
+    y_pred_inv = denormalize(y_pred_cpu, _max, _min)
+    y_inv = denormalize(train_y_cpu, _max, _min)
 
     return masked_MAE(y_inv, y_pred_inv), masked_RMSE(y_inv, y_pred_inv), MAPE(y_inv, y_pred_inv)
 
