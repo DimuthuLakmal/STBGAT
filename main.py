@@ -89,8 +89,8 @@ def prepare_data(model_configs: dict, data_configs: dict):
     model_configs['transformer']['encoder']['edge_index_semantic'] = edge_index_semantic
     model_configs['transformer']['encoder']['edge_attr_semantic'] = edge_attr_semantic
 
-    max_lkup_len_enc, lkup_idx_enc, max_lkup_len_dec, lkup_idx_dec = create_lookup_index(data_configs['last_week'],
-                                                                                         data_configs['last_day'],
+    max_lkup_len_enc, lkup_idx_enc, max_lkup_len_dec, lkup_idx_dec = create_lookup_index(data_configs['num_of_weeks'],
+                                                                                         data_configs['num_of_days'],
                                                                                          data_configs['dec_seq_offset'],
                                                                                          dec_seq_len)
 

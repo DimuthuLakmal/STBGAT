@@ -49,6 +49,48 @@ class DataLoader:
         self.n_seq = self.len_input * 2
         self.points_per_week = self.points_per_hour * 24 * self.num_days_per_week
 
+    def _generate_new_x_arr(self, x_set: np.array, records_time_idx: dict):
+        # WARNING: This has be changed accordingly.
+        speed_idx = 0
+        last_dy_idx = 1
+        last_wk_idx = 2
+
+        # Attach rep vectors for last day and last week data and drop weekly time index value
+        new_n_f = x_set.shape[3] - 1
+        # To add rep last hour seq
+        if self.rep_vectors:
+            new_n_f += 1
+        # To add rep last dy seq
+        if self.num_of_days and self.rep_vectors:
+            new_n_f += 1
+        # To add rep last wk seq
+        if self.num_of_weeks and self.rep_vectors:
+            new_n_f += 1
+
+        new_x_set = np.zeros((x_set.shape[0], x_set.shape[1], x_set.shape[2], new_n_f))
+        for i, x in enumerate(x_set):
+            # WARNING: had to determine which index represent weekly time idx
+            record_key = x[0, 0, 1]
+            record_key_yesterday = record_key - 24 * self.points_per_hour
+            if record_key_yesterday < 0: record_key_yesterday = record_key + self.points_per_week - 24 * self.points_per_hour
+
+            tmp = x[:, :, speed_idx:speed_idx + 1]
+            if self.num_of_days:
+                last_dy_data = x[:, :, last_dy_idx:last_dy_idx + 1]
+                tmp = np.concatenate((tmp, last_dy_data), axis=-1)
+            if self.num_of_weeks:
+                last_wk_data = x[:, :, last_wk_idx:last_wk_idx + 1]
+                tmp = np.concatenate((tmp, last_wk_data), axis=-1)
+            if self.rep_vectors:
+                tmp = np.concatenate((tmp, records_time_idx[record_key]), axis=-1)
+            if self.num_of_days and self.rep_vectors:
+                tmp = np.concatenate((tmp, records_time_idx[record_key_yesterday]), axis=-1)
+            if self.num_of_weeks and self.rep_vectors:
+                tmp = np.concatenate((tmp, records_time_idx[record_key]), axis=-1)
+
+            new_x_set[i] = tmp
+        return new_x_set
+
     # generate training, validation and test data
     def load_node_data_file(self):
         if not self.preprocess:
@@ -119,39 +161,13 @@ class DataLoader:
         testing_y_set = np.array(all_targets[split_line2:])
 
         # Derive global representation vector for each sensor for similar time steps
-        records_time_idx = derive_rep_timeline(training_x_set, self.points_per_week, self.num_of_vertices)
+        records_time_idx = None
+        if self.rep_vectors:
+            records_time_idx = derive_rep_timeline(training_x_set, self.points_per_week, self.num_of_vertices)
 
-        new_train_x_set = np.zeros(
-            (training_x_set.shape[0], training_x_set.shape[1], training_x_set.shape[2], training_x_set.shape[3] + 2))
-        for i, x in enumerate(training_x_set):
-            record_key = x[0, 0, -1]
-            record_key_yesterday = record_key - 24 * 12
-            record_key_yesterday = record_key_yesterday if record_key_yesterday >= 0 else record_key + points_per_week - 24 * 12
-            x = np.concatenate((x[:, :, 0:1], x[:, :, 1:2], x[:, :, 2:3], records_time_idx[record_key],
-                                records_time_idx[record_key_yesterday], records_time_idx[record_key]), axis=-1)
-            new_train_x_set[i] = x
-
-        new_val_x_set = np.zeros(
-            (
-                validation_x_set.shape[0], validation_x_set.shape[1], validation_x_set.shape[2],
-                validation_x_set.shape[3] + 2))
-        for i, x in enumerate(validation_x_set):
-            record_key = x[0, 0, -1]
-            record_key_yesterday = record_key - 24 * 12
-            record_key_yesterday = record_key_yesterday if record_key_yesterday >= 0 else record_key + points_per_week - 24 * 12
-            x = np.concatenate((x[:, :, 0:1], x[:, :, 1:2], x[:, :, 2:3], records_time_idx[record_key],
-                                records_time_idx[record_key_yesterday], records_time_idx[record_key]), axis=-1)
-            new_val_x_set[i] = x
-
-        new_test_x_set = np.zeros(
-            (testing_x_set.shape[0], testing_x_set.shape[1], testing_x_set.shape[2], testing_x_set.shape[3] + 2))
-        for i, x in enumerate(testing_x_set):
-            record_key = x[0, 0, -1]
-            record_key_yesterday = record_key - 24 * 12
-            record_key_yesterday = record_key_yesterday if record_key_yesterday >= 0 else record_key + points_per_week - 24 * 12
-            x = np.concatenate((x[:, :, 0:1], x[:, :, 1:2], x[:, :, 2:3], records_time_idx[record_key],
-                                records_time_idx[record_key_yesterday], records_time_idx[record_key]), axis=-1)
-            new_test_x_set[i] = x
+        new_train_x_set = self._generate_new_x_arr(training_x_set, records_time_idx)
+        new_val_x_set = self._generate_new_x_arr(validation_x_set, records_time_idx)
+        new_test_x_set = self._generate_new_x_arr(testing_x_set, records_time_idx)
 
         # Add tailing target values form x values to facilitate local trend attention in decoder
         training_y_set = np.concatenate(
