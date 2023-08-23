@@ -113,7 +113,6 @@ if __name__ == '__main__':
     mae_loss = 0.
     rmse_loss = 0.
     mape_loss = 0.
-    n_batch = 0
     seq_offset = model_configs['transformer']['decoder']['seq_offset']
 
     offset = 0
