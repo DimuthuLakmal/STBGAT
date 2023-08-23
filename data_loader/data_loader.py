@@ -130,10 +130,13 @@ class DataLoader:
             sample = None
             # if self.num_of_days_target > 0:
             #     sample = np.concatenate((sample, day_sample_target[:, :, 0:1]), axis=2)
+            if self.num_of_hours > 0:
+                # sample = np.concatenate((sample, day_sample[:, :, 0:1]), axis=2)
+                sample = hour_sample[:, :, 0:1]
 
             if self.num_of_days > 0:
                 # sample = np.concatenate((sample, day_sample[:, :, 0:1]), axis=2)
-                sample = np.concatenate((hour_sample[:, :, 0:1], day_sample[:, :, 0:1]), axis=2)
+                sample = np.concatenate((sample, day_sample[:, :, 0:1]), axis=2)
 
             if self.num_of_weeks > 0:
                 sample = np.concatenate((sample, week_sample[:, :, 0:1]), axis=2)
