@@ -2,8 +2,8 @@
 model:
   batch_size: 4
   epochs: 100
-  model_output_path: "output/model/pems08/multi-cross-attn/epoch_v1_{}_model.pt"
-  model_input_path: "output/model/pems08/multi-cross-attn/epoch_v1_40_model.pt"
+  model_output_path: "output/model/pems04/multi-cross-attn/epoch_v1_{}_model.pt"
+  model_input_path: "output/model/pems04/multi-cross-attn/epoch_v1_40_model.pt"
   load_saved_model: False
   device: cuda
   transformer:
@@ -67,11 +67,11 @@ model:
 
 # Data Configs
 data:
-  edge_weight_filename: "data/PEMS08/PEMS08.csv"
-  semantic_adj_filename: "data/PEMS08/PEMS08.csv"
+  edge_weight_filename: "data/PEMS04/PEMS04.csv"
+  semantic_adj_filename: "data/PEMS04/PEMS04.csv"
   edge_weight_scaling: True
-  node_data_filename: "data/PEMS08/PEMS08.npz"
-  num_of_vertices: 170
+  node_data_filename: "data/PEMS04/PEMS04.npz"
+  num_of_vertices: 307
   points_per_hour: 12
   len_input: 12
   num_for_predict: 12
@@ -83,4 +83,4 @@ data:
   num_days_per_week: 7
   rep_vectors: False
   preprocess: True
-  preprocess_output_path: "data/PEMS08/PEMS08_Preprocessed.pickle"
+  preprocess_output_path: "data/PEMS04/PEMS04_Preprocessed.pickle"
