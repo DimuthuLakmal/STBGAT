@@ -224,7 +224,7 @@ class DataLoader:
             for row in range(w.shape[0]):
                 # Drop edges with large distance between vertices. This adds incorrect attention in training time and
                 # degrade test performance (Over-fitting).
-                if float(w[row][2]) > 500:
+                if float(w[row][2]) > 300:
                     continue
                 dst_edges.append(int(w[row][0]))
                 src_edges.append(int(w[row][1]))

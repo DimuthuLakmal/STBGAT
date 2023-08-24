@@ -62,6 +62,7 @@ class TransformerEncoder(nn.Module):
         if self.merge_emb:
             self.emb_dim = self.emb_dim * emb_expansion_factor
         self.out_norm = nn.LayerNorm(self.emb_dim * 3)
+        self.out_e_lin = nn.Linear(self.emb_dim, self.emb_dim * 4)
 
     def _create_graph(self, x, edge_index, edge_attr):
         graph = data.Data(x=(Tensor(x[0]), Tensor(x[1])),
@@ -136,10 +137,12 @@ class TransformerEncoder(nn.Module):
             elif not self.graph_input and self.graph_semantic_input:
                 out_g = out_g_semantic
             elif not self.graph_input and not self.graph_semantic_input:
+                out_e = self.out_e_lin(out_e)
                 return out_e
 
-            out = out_e + self._organize_matrix(out_g)
+            out = self.out_e_lin(out_e) + self._organize_matrix(out_g)
             return out  # 32x10x512
 
         else:
+            out_e = self.out_e_lin(out_e)
             return out_e

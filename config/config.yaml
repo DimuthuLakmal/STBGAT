@@ -1,6 +1,6 @@
 # Model Configs
 model:
-  batch_size: 2
+  batch_size: 4
   epochs: 100
   model_output_path: "output/model/pems04/multi-cross-attn/epoch_v1_{}_model.pt"
   model_input_path: "output/model/pems04/multi-cross-attn/epoch_v1_25_model.pt"
@@ -26,14 +26,14 @@ model:
       sgat:
         first_in_f_size: 576
         n_layers: 1
-        out_f_sizes: [ 16, 16 ]
+        out_f_sizes: [ 64, 64 ]
         n_heads: [ 4, 1 ]
         alpha: 0.2
         dropout: 0.7
         edge_dim: 1
         skip_conn: False
     decoder:
-      emb_dim: 16
+      emb_dim: 64
       seq_len: 13
       seq_offset: 1 # Indicates how many timesteps in the previous hour consider as inputs in the decoder
       input_dim: 1
@@ -57,7 +57,7 @@ model:
       sgat:
         first_in_f_size: 208
         n_layers: 1
-        out_f_sizes: [ 16, 16 ]
+        out_f_sizes: [ 64, 64 ]
         n_heads: [ 4, 1 ]
         alpha: 0.2
         dropout: 0.7

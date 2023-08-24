@@ -37,7 +37,7 @@ def train_validate(model, configs: dict, data_loader: DataLoader):
                                                                  device=configs['device'],
                                                                  seq_offset=dec_offset)
 
-        mae_val_loss, rmse_val_loss, mape_val_loss = test(_type='val',
+        mae_val_loss, rmse_val_loss, mape_val_loss = test(_type='test',
                                                           model=model,
                                                           data_loader=data_loader,
                                                           device=configs['device'],
