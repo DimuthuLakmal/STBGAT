@@ -18,11 +18,12 @@ model:
       local_trends: True
       graph_semantic_input: False
       graph_input: True
+      dropout_e: 0.2
       encoder_block:
         n_heads: 8
         expansion_factor: 4
-        src_dropout: 0.2
-        ff_dropout: 0.2
+        src_dropout: 0.4
+        ff_dropout: 0.4
       sgat:
         first_in_f_size: 576
         n_layers: 1
@@ -51,8 +52,8 @@ model:
         n_heads: 8
         expansion_factor: 4
         cross_attn_features: 1 # Used to indicates how many feature-wise cross attentions in the decoder
-        src_dropout: 0.2
-        cross_attn_dropout: 0.2
+        src_dropout: 0.3
+        cross_attn_dropout: 0.3
         ff_dropout: 0.2
       sgat:
         first_in_f_size: 208
