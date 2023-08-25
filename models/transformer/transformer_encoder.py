@@ -18,6 +18,7 @@ class TransformerEncoder(nn.Module):
         input_dim = configs['input_dim']
         self.merge_emb = configs['merge_emb']
         emb_expansion_factor = configs['emb_expansion_factor']
+        dropout_e = configs['dropout_e']
         max_lookup_len = configs['max_lookup_len']
         self.lookup_idx = configs['lookup_idx']
 
@@ -62,6 +63,9 @@ class TransformerEncoder(nn.Module):
         if self.merge_emb:
             self.emb_dim = self.emb_dim * emb_expansion_factor
         self.out_norm = nn.LayerNorm(self.emb_dim * 3)
+
+        self.out_e_lin = nn.Linear(self.emb_dim, self.emb_dim * 4)
+        self.dropout_e = nn.Dropout(dropout_e)
 
     def _create_graph(self, x, edge_index, edge_attr):
         graph = data.Data(x=(Tensor(x[0]), Tensor(x[1])),
@@ -136,10 +140,12 @@ class TransformerEncoder(nn.Module):
             elif not self.graph_input and self.graph_semantic_input:
                 out_g = out_g_semantic
             elif not self.graph_input and not self.graph_semantic_input:
+                out_e = self.dropout_e(self.out_e_lin(out_e))
                 return out_e
 
-            out = out_e + self._organize_matrix(out_g)
+            out = self.out_e_lin(out_e) + self._organize_matrix(out_g)
             return out  # 32x10x512
 
         else:
+            out_e = self.dropout_e(self.out_e_lin(out_e))
             return out_e

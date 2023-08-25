@@ -3,14 +3,14 @@ model:
   batch_size: 4
   epochs: 100
   model_output_path: "output/model/pems04/multi-cross-attn/epoch_v1_{}_model.pt"
-  model_input_path: "output/model/pems04/multi-cross-attn/epoch_v1_40_model.pt"
+  model_input_path: "output/model/pems04/multi-cross-attn/epoch_v1_25_model.pt"
   load_saved_model: False
-  device: cpu
+  device: cuda
   transformer:
     encoder:
-      features: 2 # To indicates multiple encoders (feature-wise). default is 1
+      features: 1 # To indicates multiple encoders (feature-wise). default is 1
       emb_dim: 16
-      seq_len: 24
+      seq_len: 36
       input_dim: 1
       merge_emb: False # Indicate whether the graph embeddings merge with non-graph embedding.
       emb_expansion_factor: 3 # If embeddings are merged, it will expand the dimension. the factor depends on whether we use graph, semantinc graph and raw sensor data.
@@ -18,22 +18,23 @@ model:
       local_trends: True
       graph_semantic_input: False
       graph_input: True
+      dropout_e: 0.2
       encoder_block:
         n_heads: 8
         expansion_factor: 4
-        src_dropout: 0.2
-        ff_dropout: 0.2
+        src_dropout: 0.4
+        ff_dropout: 0.4
       sgat:
-        first_in_f_size: 384
+        first_in_f_size: 576
         n_layers: 1
-        out_f_sizes: [ 16, 16 ]
+        out_f_sizes: [ 64, 64 ]
         n_heads: [ 4, 1 ]
         alpha: 0.2
         dropout: 0.7
         edge_dim: 1
         skip_conn: False
     decoder:
-      emb_dim: 16
+      emb_dim: 64
       seq_len: 13
       seq_offset: 1 # Indicates how many timesteps in the previous hour consider as inputs in the decoder
       input_dim: 1
@@ -43,21 +44,21 @@ model:
       out_dim: 1
       out_start_idx: 0 # When set decoder offset, this indicates the start index of the decoder output to calculate loss
       out_end_idx: -1 # When set decoder offset, this indicates the end index of the decoder output to calculate loss
-      per_enc_feature_len: 24 # used in decoder cross attention (feature-wise cross attention). This should be tuned along with cross_attn_features
+      per_enc_feature_len: 36 # used in decoder cross attention (feature-wise cross attention). This should be tuned along with cross_attn_features
       local_trends: True
       graph_semantic_input: False
       graph_input: False
       decoder_block:
         n_heads: 8
         expansion_factor: 4
-        cross_attn_features: 2 # Used to indicates how many feature-wise cross attentions in the decoder
-        src_dropout: 0.2
-        cross_attn_dropout: 0.2
+        cross_attn_features: 1 # Used to indicates how many feature-wise cross attentions in the decoder
+        src_dropout: 0.3
+        cross_attn_dropout: 0.3
         ff_dropout: 0.2
       sgat:
         first_in_f_size: 208
         n_layers: 1
-        out_f_sizes: [ 16, 16 ]
+        out_f_sizes: [ 64, 64 ]
         n_heads: [ 4, 1 ]
         alpha: 0.2
         dropout: 0.7
@@ -75,12 +76,12 @@ data:
   points_per_hour: 12
   len_input: 12
   num_for_predict: 12
-  num_of_weeks: 0
+  num_of_weeks: 1
   num_of_hours: 1
   num_of_days: 1
   num_of_days_target: 0
   num_of_weeks_target: 0
   num_days_per_week: 7
-  rep_vectors: True
+  rep_vectors: False
   preprocess: True
   preprocess_output_path: "data/PEMS04/PEMS04_Preprocessed.pickle"
