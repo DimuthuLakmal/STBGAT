@@ -40,6 +40,8 @@ class DataLoader:
         self.edge_weight_filename = data_configs['edge_weight_filename']
         self.semantic_adj_filename = data_configs['semantic_adj_filename']
         self.edge_weight_scaling = data_configs['edge_weight_scaling']
+        self.distance_threshold = data_configs['distance_threshold']
+        self.semantic_threashold = data_configs['semantic_threashold']
 
         # PEMSD7 Specific Variables
         self.n_train = 34
@@ -231,7 +233,7 @@ class DataLoader:
             for row in range(w.shape[0]):
                 # Drop edges with large distance between vertices. This adds incorrect attention in training time and
                 # degrade test performance (Over-fitting).
-                if float(w[row][2]) > 600:
+                if float(w[row][2]) > self.distance_threshold:
                     continue
                 dst_edges.append(int(w[row][0]))
                 src_edges.append(int(w[row][1]))
@@ -258,9 +260,9 @@ class DataLoader:
             edge_index = np.array(val[0])
             edge_attr = np.array(val[1])
 
-            edge_index_np = edge_index.reshape((2, -1, 5))[:, :, :3].reshape(2, -1)
+            edge_index_np = edge_index.reshape((2, -1, 5))[:, :, :self.semantic_threashold].reshape(2, -1)
             edge_index = [list(edge_index_np[0]), list(edge_index_np[1])]
-            edge_attr = edge_attr.reshape((-1, 5))[:, :3].reshape(-1, 1)
+            edge_attr = edge_attr.reshape((-1, 5))[:, :self.semantic_threashold].reshape(-1, 1)
 
             new_semantic_edge_details[key] = [edge_index, edge_attr]
 

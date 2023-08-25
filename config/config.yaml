@@ -85,3 +85,5 @@ data:
   rep_vectors: False
   preprocess: True
   preprocess_output_path: "data/PEMS04/PEMS04_Preprocessed.pickle"
+  distance_threshold: 700
+  semantic_threashold: 3

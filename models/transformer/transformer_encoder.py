@@ -30,11 +30,21 @@ class TransformerEncoder(nn.Module):
         self.graph_input = configs['graph_input']
         self.graph_semantic_input = configs['graph_semantic_input']
         self.seq_len = configs['seq_len']
+
+        # semantic graph related
         self.num_of_weeks = configs['num_of_weeks']
         self.num_of_days = configs['num_of_days']
         self.basic_input_len = configs['basic_input_len']
         self.day_slot = configs['points_per_hour'] * 24
         self.total_time_idx = configs['num_days_per_week'] * self.day_slot
+        self.last_week_end = -1
+        self.last_day_end = -1
+        if self.num_of_weeks:
+            self.last_week_end = self.basic_input_len
+        if self.num_of_weeks and self.num_of_days:
+            self.last_day_end = self.basic_input_len * 2
+        if not self.num_of_weeks and self.num_of_days:
+            self.last_day_end = self.basic_input_len
 
         n_layers = configs['n_layers']
 
@@ -92,15 +102,6 @@ class TransformerEncoder(nn.Module):
             semantic_edge_index_hr, semantic_edge_attr_hr = self.edge_details[time_idx]
             semantic_edge_index_lst_dy, semantic_edge_attr_lst_dy = self.edge_details[last_day_time_idx]
 
-            last_week_end = -1
-            last_day_end = -1
-            if self.num_of_weeks:
-                last_week_end = self.basic_input_len
-            if self.num_of_weeks and self.num_of_days:
-                last_day_end = self.basic_input_len * 2
-            if not self.num_of_weeks and self.num_of_days:
-                last_day_end = self.basic_input_len
-
             graphs = []
             graphs_semantic = []
             x_src = x_all_t.permute(1, 0, 2)  # N, T, F
@@ -111,9 +112,9 @@ class TransformerEncoder(nn.Module):
                     graph = self._create_graph((x_src, x), self.edge_index, self.edge_attr)
                     graphs.append(to(graph))
                 if self.graph_semantic_input:
-                    if last_week_end != -1 and i < last_week_end:
+                    if self.last_week_end != -1 and i < self.last_week_end:
                         graph_semantic = self._create_graph((x_src, x), semantic_edge_index_hr, semantic_edge_attr_hr)
-                    elif last_day_end != -1 and i < last_day_end:
+                    elif self.last_day_end != -1 and i < self.last_day_end:
                         graph_semantic = self._create_graph((x_src, x), semantic_edge_index_lst_dy, semantic_edge_attr_lst_dy)
                     else:
                         graph_semantic = self._create_graph((x_src, x), semantic_edge_index_hr, semantic_edge_attr_hr)
