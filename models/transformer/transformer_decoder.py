@@ -43,8 +43,7 @@ class TransformerDecoder(nn.Module):
         # graph related
         self.edge_index = configs['edge_index']
         self.edge_attr = configs['edge_attr']
-        self.edge_index_semantic = configs['edge_index_semantic']
-        self.edge_attr_semantic = configs['edge_attr_semantic']
+        self.edge_details = configs['edge_details']
         self.graph_input = configs['graph_input']
         self.graph_semantic_input = configs['graph_semantic_input']
 

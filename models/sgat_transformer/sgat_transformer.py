@@ -46,14 +46,14 @@ class SGATTransformer(nn.Module):
             .to(self.device)
         return enc_outs
 
-    def forward(self, x, y=None, train=True):
+    def forward(self, x, time_idx, y=None, train=True):
         enc_outs = self._create_enc_out(x)
         tgt_mask = self._create_mask(enc_outs.shape[1], self.device)
 
         for idx, encoder in enumerate(self.encoders):
             x_i = x[idx]
 
-            enc_out = encoder(x_i, idx)
+            enc_out = encoder(x_i, time_idx, idx)
             enc_outs[idx] = enc_out
 
         if train:
