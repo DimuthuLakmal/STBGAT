@@ -170,7 +170,7 @@ class TransformerEncoder(nn.Module):
                 out_e = self.dropout_e(self.out_e_lin(out_e))
                 return out_e
 
-            out = self.out_e_lin(out_e) + self._organize_matrix(out_g)
+            out = self.dropout_e(self.out_e_lin(out_e)) + self._organize_matrix(out_g)
             return out  # 32x10x512
 
         else:
