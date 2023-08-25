@@ -235,12 +235,8 @@ class DataLoader:
                 # degrade test performance (Over-fitting).
                 if float(w[row][2]) > self.distance_threshold:
                     continue
-                dst_edges.append(int(w[row][0]))
-                src_edges.append(int(w[row][1]))
-                edge_attr.append([float(w[row][2])])
-
-                dst_edges.append(int(w[row][1]))
-                src_edges.append(int(w[row][0]))
+                dst_edges.append(int(float(w[row][0])))
+                src_edges.append(int(float(w[row][1])))
                 edge_attr.append([float(w[row][2])])
 
             edge_index = [src_edges, dst_edges]

@@ -68,7 +68,7 @@ model:
 
 # Data Configs
 data:
-  edge_weight_filename: "data/PEMS04/PEMS04.csv"
+  edge_weight_filename: "data/PEMS04/PEMS04_dij.csv"
   semantic_adj_filename: "data/PEMS04/PEMS04_time_idx_semantic_edges.pickle"
   edge_weight_scaling: True
   node_data_filename: "data/PEMS04/PEMS04.npz"
