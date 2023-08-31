@@ -177,9 +177,6 @@ class GATConvV8(MessagePassingV8):
         # For expansion of destination node's value to match with source node's values dimension
         self.exp_lin = Linear(self.single_input_dim, out_channels, bias=bias, weight_initializer='glorot')
 
-        # For squeeze the message value dimension to single node value dimension
-        self.rev_exp_lin = Linear(out_channels, self.single_input_dim, bias=bias, weight_initializer='glorot')
-
         # Defining multiple parameters instead of single parameter to accommodate sequence data
         self.att = nn.ParameterList([
             Parameter(torch.Tensor(1, heads, out_channels)) for _ in range(self.seq_len)
@@ -200,7 +197,7 @@ class GATConvV8(MessagePassingV8):
         if bias and concat:
             self.bias = Parameter(torch.Tensor(heads * out_channels))
         elif bias and not concat:
-            self.bias = Parameter(torch.Tensor(out_channels))
+            self.bias = Parameter(torch.Tensor(out_channels * self.seq_len))
         else:
             self.register_parameter('bias', None)
 
@@ -306,7 +303,8 @@ class GATConvV8(MessagePassingV8):
                 index: Tensor, ptr: OptTensor,
                 size_i: Optional[int]) -> Tensor:
 
-        msg_f = torch.zeros_like(x_j)
+        x_j_shp = x_j.size()
+        msg_f = torch.zeros((x_j_shp[0], x_j_shp[1], x_j_shp[2] * self.seq_len))
 
         for t in range(self.seq_len):
             start = t * self.single_input_dim
@@ -334,7 +332,9 @@ class GATConvV8(MessagePassingV8):
             alpha = F.dropout(alpha, p=self.dropout, training=self.training)
 
             msg_t = x_j * alpha.unsqueeze(-1)
-            msg_t = self.rev_exp_lin(msg_t)
+
+            start = t * self.out_channels
+            end = (t+1) * self.out_channels
             msg_f[:, :, start: end] = msg_t
 
         return msg_f
