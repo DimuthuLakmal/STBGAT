@@ -5,7 +5,7 @@ model:
   model_output_path: "output/model/pems04/multi-cross-attn/epoch_v1_{}_model.pt"
   model_input_path: "output/model/pems04/multi-cross-attn/epoch_v1_25_model.pt"
   load_saved_model: False
-  device: cpu
+  device: cuda
   transformer:
     encoder:
       features: 1 # To indicates multiple encoders (feature-wise). default is 1
@@ -16,9 +16,9 @@ model:
       emb_expansion_factor: 3 # If embeddings are merged, it will expand the dimension. the factor depends on whether we use graph, semantinc graph and raw sensor data.
       n_layers: 4
       local_trends: True
-      graph_semantic_input: True
+      graph_semantic_input: False
       graph_input: True
-      dropout_e: 0.2
+      dropout_e: 0.0
       encoder_block:
         n_heads: 8
         expansion_factor: 4
@@ -27,14 +27,14 @@ model:
       sgat:
         first_in_f_size: 576
         n_layers: 1
-        out_f_sizes: [ 64, 64 ]
+        out_f_sizes: [ 576, 576 ]
         n_heads: [ 4, 1 ]
         alpha: 0.2
         dropout: 0.7
         edge_dim: 1
         skip_conn: False
     decoder:
-      emb_dim: 64
+      emb_dim: 16
       seq_len: 13
       seq_offset: 1 # Indicates how many timesteps in the previous hour consider as inputs in the decoder
       input_dim: 1
@@ -58,7 +58,7 @@ model:
       sgat:
         first_in_f_size: 208
         n_layers: 1
-        out_f_sizes: [ 64, 64 ]
+        out_f_sizes: [ 208, 208 ]
         n_heads: [ 4, 1 ]
         alpha: 0.2
         dropout: 0.7
@@ -85,5 +85,5 @@ data:
   rep_vectors: False
   preprocess: True
   preprocess_output_path: "data/PEMS04/PEMS04_Preprocessed.pickle"
-  distance_threshold: 700
+  distance_threshold: 2000
   semantic_threashold: 3
