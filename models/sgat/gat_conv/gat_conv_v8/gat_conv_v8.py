@@ -1,6 +1,7 @@
 from typing import Optional, Tuple, Union
 
 import torch
+from torch import nn
 import torch.nn.functional as F
 from torch import Tensor
 from torch.nn import Parameter
@@ -179,11 +180,20 @@ class GATConvV8(MessagePassingV8):
         # For squeeze the message value dimension to single node value dimension
         self.rev_exp_lin = Linear(out_channels, self.single_input_dim, bias=bias, weight_initializer='glorot')
 
-        self.att = Parameter(torch.Tensor(1, heads, out_channels))
+        # Defining multiple parameters instead of single parameter to accommodate sequence data
+        self.att = nn.ParameterList([
+            Parameter(torch.Tensor(1, heads, out_channels)) for _ in range(self.seq_len)
+        ])
+
+        # self.att = Parameter(torch.Tensor(1, heads, out_channels))
 
         if edge_dim is not None:
-            self.lin_edge = Linear(edge_dim, heads * out_channels, bias=False,
-                                   weight_initializer='glorot')
+            self.lin_edge = nn.ModuleList([
+                Linear(edge_dim, heads * out_channels, bias=False, weight_initializer='glorot')
+                for _ in range(self.seq_len)
+            ])
+            # self.lin_edge = Linear(edge_dim, heads * out_channels, bias=False,
+            #                        weight_initializer='glorot')
         else:
             self.lin_edge = None
 
@@ -203,7 +213,8 @@ class GATConvV8(MessagePassingV8):
         self.lin_l.reset_parameters()
         self.lin_r.reset_parameters()
         if self.lin_edge is not None:
-            self.lin_edge.reset_parameters()
+            for l in self.lin_edge:
+                l.reset_parameters()
         glorot(self.att)
         zeros(self.bias)
 
@@ -312,12 +323,12 @@ class GATConvV8(MessagePassingV8):
                 else:
                     edge_attr_t = edge_attr
                 assert self.lin_edge is not None
-                edge_attr_t = self.lin_edge(edge_attr_t)
+                edge_attr_t = self.lin_edge[t](edge_attr_t)
                 edge_attr_t = edge_attr_t.view(-1, self.heads, self.out_channels)
                 x = x + edge_attr_t
 
             x = F.leaky_relu(x, self.negative_slope)
-            alpha = (x * self.att).sum(dim=-1)
+            alpha = (x * self.att[t]).sum(dim=-1)
             alpha = softmax(alpha, index, ptr, size_i)
             self._alpha = alpha
             alpha = F.dropout(alpha, p=self.dropout, training=self.training)
