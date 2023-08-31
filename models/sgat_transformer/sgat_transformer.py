@@ -42,7 +42,7 @@ class SGATTransformer(nn.Module):
 
     def _create_enc_out(self, x):
         emb_dim = self.emb_dim if not self.merge_emb else self.emb_dim * self.enc_emb_expansion_factor
-        enc_outs = torch.zeros((self.enc_features, x[0].shape[0] * x[0].shape[2], x[0].shape[1], emb_dim * 4))\
+        enc_outs = torch.zeros((self.enc_features, x[0].shape[0] * x[0].shape[2], x[0].shape[1], emb_dim))\
             .to(self.device)
         return enc_outs
 
