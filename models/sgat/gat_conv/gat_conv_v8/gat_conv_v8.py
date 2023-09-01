@@ -171,11 +171,16 @@ class GATConvV8(MessagePassingV8):
             if share_weights:
                 self.lin_r = self.lin_l
             else:
-                self.lin_r = Linear(in_channels[1], heads * out_channels,
-                                    bias=bias, weight_initializer='glorot')
+                self.lin_r = nn.ModuleList([
+                    Linear(self.single_input_dim, heads * self.single_input_dim,
+                           bias=bias, weight_initializer='glorot') for _ in range(self.seq_len)
+                ])
 
         # For expansion of destination node's value to match with source node's values dimension
         self.exp_lin = Linear(self.single_input_dim, out_channels, bias=bias, weight_initializer='glorot')
+
+        self.msg_f = torch.zeros((4993, 4, 32 * self.seq_len)).to('cuda')
+        self.x_r_new = torch.zeros((307, 4, 288)).to('cuda')
 
         # Defining multiple parameters instead of single parameter to accommodate sequence data
         self.att = nn.ParameterList([
@@ -208,7 +213,9 @@ class GATConvV8(MessagePassingV8):
     def reset_parameters(self):
         super().reset_parameters()
         self.lin_l.reset_parameters()
-        self.lin_r.reset_parameters()
+        # self.lin_r.reset_parameters()
+        for l in self.lin_r:
+            l.reset_parameters()
         if self.lin_edge is not None:
             for l in self.lin_edge:
                 l.reset_parameters()
@@ -245,8 +252,17 @@ class GATConvV8(MessagePassingV8):
             x_l, x_r = x[0], x[1]
             assert x[0].dim() == 2
             x_l = self.lin_l(x_l).view(-1, H, C)
+
             if x_r is not None:
-                x_r = self.lin_r(x_r).view(-1, H, C)
+                x_r_new = torch.zeros_like(self.x_r_new)
+                for t in range(self.seq_len):
+                    start = t * self.single_input_dim
+                    end = (t + 1) * self.single_input_dim
+                    x_r_t = self.lin_r[t](x_r[:, start: end]).view(-1, H, 8)
+                    x_r_new[:, :, start: end] = x_r_t
+
+                # x_r = self.lin_r(x_r).view(-1, H, C)
+                x_r = x_r_new
 
         assert x_l is not None
         assert x_r is not None
@@ -304,7 +320,7 @@ class GATConvV8(MessagePassingV8):
                 size_i: Optional[int]) -> Tensor:
 
         x_j_shp = x_j.size()
-        msg_f = torch.zeros((x_j_shp[0], x_j_shp[1], x_j_shp[2] * self.seq_len))
+        msg_f = torch.zeros_like(self.msg_f)
 
         for t in range(self.seq_len):
             start = t * self.single_input_dim
