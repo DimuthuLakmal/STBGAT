@@ -163,8 +163,13 @@ class GATConvV8(MessagePassingV8):
                 self.lin_r = Linear(in_channels, heads * out_channels,
                                     bias=bias, weight_initializer='glorot')
         else:
-            self.lin_l = Linear(in_channels[0], heads * out_channels,
-                                bias=bias, weight_initializer='glorot')
+            # self.lin_l = Linear(in_channels[0], heads * out_channels,
+            #                     bias=bias, weight_initializer='glorot')
+
+            self.lin_l = nn.ModuleList([
+                    Linear(in_channels[0], heads * out_channels,
+                           bias=bias, weight_initializer='glorot') for _ in range(self.seq_len)
+                ])
 
             self.single_input_dim = int(in_channels[0] / seq_len)
 
@@ -212,10 +217,11 @@ class GATConvV8(MessagePassingV8):
 
     def reset_parameters(self):
         super().reset_parameters()
-        self.lin_l.reset_parameters()
+        # self.lin_l.reset_parameters()
         # self.lin_r.reset_parameters()
-        for l in self.lin_r:
-            l.reset_parameters()
+        for l_r, l_l in zip(self.lin_r, self.lin_l):
+            l_r.reset_parameters()
+            l_l.reset_parameters()
         if self.lin_edge is not None:
             for l in self.lin_edge:
                 l.reset_parameters()
@@ -251,7 +257,7 @@ class GATConvV8(MessagePassingV8):
         else:
             x_l, x_r = x[0], x[1]
             assert x[0].dim() == 2
-            x_l = self.lin_l(x_l).view(-1, H, C)
+            # x_l = self.lin_l(x_l).view(-1, H, C)
 
             if x_r is not None:
                 x_r_new = torch.zeros_like(self.x_r_new)
@@ -323,6 +329,8 @@ class GATConvV8(MessagePassingV8):
         msg_f = torch.zeros_like(self.msg_f)
 
         for t in range(self.seq_len):
+            x_j = self.lin_l[t](x_j).view(-1, self.heads, self.out_channels)
+
             start = t * self.single_input_dim
             end = (t+1) * self.single_input_dim
 
