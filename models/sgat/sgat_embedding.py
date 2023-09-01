@@ -14,9 +14,7 @@ class SGATEmbedding(nn.Module):
                 GATV2(sgat_configs) for _ in range(sgat_configs['seq_len'])
             ])
         else:
-            self.gats = nn.ModuleList([
-                GAT(sgat_configs) for _ in range(sgat_configs['seq_len'])
-            ])
+            self.gats = GAT(sgat_configs)
 
         # self.gat = GATV2(n_layers=n_layers,
         #                  first_in_f_size=first_in_f_size,
@@ -27,5 +25,5 @@ class SGATEmbedding(nn.Module):
         #                  edge_dim=edge_dim)
 
     def forward(self, x):
-        out = self.gats[0](x)
+        out = self.gats(x)
         return out
