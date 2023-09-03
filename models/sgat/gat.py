@@ -12,7 +12,6 @@ class GAT(nn.Module):
 
         self.n_layers = configs['n_layers']
         self.dropout = configs['dropout']
-        self.dropout = configs['dropout']
         self.seq_len = configs['seq_len']
 
         out_f_sizes = configs['out_f_sizes']
@@ -20,13 +19,14 @@ class GAT(nn.Module):
         first_in_f_size = configs['first_in_f_size']
         alpha = configs['alpha']
         edge_dim = configs['edge_dim']
+        num_edges = configs['num_edges']
 
         self.layer_stack = nn.ModuleList()
         for l in range(self.n_layers):
             in_f_size = out_f_sizes[l - 1] * n_heads[l - 1] if l else first_in_f_size
             concat = True if l < (self.n_layers - 1) else False
             gat_layer = GATLayer(in_f_size, out_f_sizes[l], n_heads=n_heads[l], dropout=self.dropout, alpha=alpha,
-                                 concat=concat, edge_dim=edge_dim)
+                                 concat=concat, edge_dim=edge_dim, num_edges=num_edges)
             self.layer_stack.append(gat_layer)
 
     def forward(self, batch_data):

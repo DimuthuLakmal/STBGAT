@@ -51,6 +51,7 @@ class TransformerEncoder(nn.Module):
         # embedding
         self.embedding = TokenEmbedding(input_dim=input_dim, embed_dim=self.emb_dim)
         configs['sgat']['seq_len'] = self.seq_len
+        configs['sgat']['num_edges'] = 4993
         self.graph_embedding = SGATEmbedding(configs['sgat'])
         self.graph_embedding_semantic = SGATEmbedding(configs['sgat'])
         self.bipart_lin = nn.Linear(self.emb_dim, self.seq_len * self.emb_dim)

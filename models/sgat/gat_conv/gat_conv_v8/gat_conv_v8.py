@@ -134,6 +134,7 @@ class GATConvV8(MessagePassingV8):
             bias: bool = True,
             share_weights: bool = False,
             seq_len: int = 36,
+            num_edges: int = 4993,
             **kwargs,
     ):
         super().__init__(node_dim=0, **kwargs)
@@ -149,6 +150,7 @@ class GATConvV8(MessagePassingV8):
         self.fill_value = fill_value
         self.share_weights = share_weights
         self.seq_len = seq_len
+        self.num_edges = num_edges
 
         single_input_dim = 0
         if isinstance(in_channels, int):
@@ -184,7 +186,7 @@ class GATConvV8(MessagePassingV8):
         # For expansion of destination node's value to match with source node's values dimension
         self.exp_lin = Linear(self.single_input_dim, out_channels, bias=bias, weight_initializer='glorot')
 
-        self.msg_f = torch.zeros((4993, 4, 64 * self.seq_len)).to('cuda')
+        self.msg_f = torch.zeros((num_edges, 4, 64 * self.seq_len)).to('cuda')
         self.x_r_new = torch.zeros((307, 4, 576)).to('cuda')
 
         # Defining multiple parameters instead of single parameter to accommodate sequence data
