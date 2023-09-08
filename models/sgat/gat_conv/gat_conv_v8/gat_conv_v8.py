@@ -1,4 +1,5 @@
 from typing import Optional, Tuple, Union
+import time
 
 import torch
 from torch import nn
@@ -168,10 +169,7 @@ class GATConvV8(MessagePassingV8):
             # self.lin_l = Linear(in_channels[0], heads * out_channels,
             #                     bias=bias, weight_initializer='glorot')
 
-            self.lin_l = nn.ModuleList([
-                    Linear(in_channels[0], heads * out_channels,
-                           bias=bias, weight_initializer='glorot') for _ in range(self.seq_len)
-                ])
+            self.lin_l = Linear(in_channels[0], seq_len * heads * out_channels, bias=bias, weight_initializer='glorot')
 
             self.single_input_dim = int(in_channels[0] / seq_len)
 
@@ -179,28 +177,23 @@ class GATConvV8(MessagePassingV8):
                 self.lin_r = self.lin_l
             else:
                 self.lin_r = nn.ModuleList([
-                    Linear(self.single_input_dim, heads * self.single_input_dim,
+                    Linear(self.single_input_dim, heads * out_channels,
                            bias=bias, weight_initializer='glorot') for _ in range(self.seq_len)
                 ])
 
         # For expansion of destination node's value to match with source node's values dimension
-        self.exp_lin = Linear(self.single_input_dim, out_channels, bias=bias, weight_initializer='glorot')
+        self.exp_lin = Linear(4608, 2304, bias=bias, weight_initializer='glorot')
 
-        self.msg_f = torch.zeros((num_edges, 4, 64 * self.seq_len)).to('cuda')
-        self.x_r_new = torch.zeros((307, 4, 576)).to('cuda')
+        # self.msg_f = torch.zeros((num_edges, 4, 64 * self.seq_len)).to('cuda')
+        # self.x_r_new = torch.zeros((36, num_edges, 4, 64)).to('cuda')
 
         # Defining multiple parameters instead of single parameter to accommodate sequence data
-        self.att = nn.ParameterList([
-            Parameter(torch.Tensor(1, heads, out_channels)) for _ in range(self.seq_len)
-        ])
+        self.att = Parameter(torch.Tensor(seq_len, 1, heads, out_channels))
 
         # self.att = Parameter(torch.Tensor(1, heads, out_channels))
 
         if edge_dim is not None:
-            self.lin_edge = nn.ModuleList([
-                Linear(edge_dim, heads * out_channels, bias=False, weight_initializer='glorot')
-                for _ in range(self.seq_len)
-            ])
+            self.lin_edge = Linear(edge_dim, seq_len * heads * out_channels, bias=False, weight_initializer='glorot')
             # self.lin_edge = Linear(edge_dim, heads * out_channels, bias=False,
             #                        weight_initializer='glorot')
         else:
@@ -219,14 +212,13 @@ class GATConvV8(MessagePassingV8):
 
     def reset_parameters(self):
         super().reset_parameters()
-        # self.lin_l.reset_parameters()
-        # self.lin_r.reset_parameters()
-        for l_r, l_l in zip(self.lin_r, self.lin_l):
+        self.lin_l.reset_parameters()
+        # self.l_r.reset_parameters()
+        for l_r in self.lin_r:
             l_r.reset_parameters()
-            l_l.reset_parameters()
         if self.lin_edge is not None:
-            for l in self.lin_edge:
-                l.reset_parameters()
+            self.lin_edge.reset_parameters()
+
         glorot(self.att)
         zeros(self.bias)
 
@@ -327,43 +319,85 @@ class GATConvV8(MessagePassingV8):
                 index: Tensor, ptr: OptTensor,
                 size_i: Optional[int]) -> Tensor:
 
-        x_j_shp = x_j.size()
-        msg_f = torch.zeros_like(self.msg_f)
+        # st1 = time.time()
+        #
+        # x_j_shp = x_j.size()
+        # msg_f = torch.zeros_like(self.msg_f)
+        # x_i_new = torch.zeros_like(self.x_r_new)
 
-        for t in range(self.seq_len):
-            x_j_t = self.lin_l[t](x_j).view(-1, self.heads, self.out_channels)
+        # ed1 = time.time()
+        # print(f'Time 1: {ed1 - st1}')
 
-            start = t * self.single_input_dim
-            end = (t+1) * self.single_input_dim
+        x_j = self.lin_l(x_j).view(-1, self.seq_len, self.heads, self.out_channels)
+        x_j = x_j.permute(1, 0, 2, 3)
 
-            x_i_t = self.lin_r[t](x_i[:, start: end]).view(-1, self.heads, 16)
+        # ed2 = time.time()
+        # print(f'Time 2: {ed2 - ed1}')
 
-            # x_i_t = x_i[:, :, start: end]
-            x_i_t = self.exp_lin(x_i_t)
+        x_i = x_i.view(-1, self.seq_len, self.single_input_dim)
+        x_i = x_i.permute(1, 0, 2)
+        x_i_new = [self.lin_r[t](x_i[t]) for t in range(self.seq_len)]
+        # x_i_new = self.lin_r[0](x_i).view(self.seq_len, -1, self.heads, self.out_channels)
 
-            x = x_i_t + x_j_t
+        # ed00 = time.time()
+        # print(f'Time 00: {ed00 - ed2}')
+        #
+        x_i_new = torch.stack(x_i_new).view(self.seq_len, -1, self.heads, self.out_channels)
 
-            if edge_attr is not None:
-                if edge_attr.dim() == 1:
-                    edge_attr_t = edge_attr.view(-1, 1)
-                else:
-                    edge_attr_t = edge_attr
-                assert self.lin_edge is not None
-                edge_attr_t = self.lin_edge[t](edge_attr_t)
-                edge_attr_t = edge_attr_t.view(-1, self.heads, self.out_channels)
-                x = x + edge_attr_t
+        # for t in range(self.seq_len):
+        #     start = t * self.single_input_dim
+        #     end = (t+1) * self.single_input_dim
+        #
+        #     x_i_t = self.lin_r[t](x_i[:, start: end]).view(-1, self.heads, 16)
+        #
+        #     # x_i_t = x_i[:, :, start: end]
+        #     x_i_t = self.exp_lin(x_i_t)
+        #     x_i_new[t] = x_i_t
+        #
+            # x = x_i_t + x_j_t
 
-            x = F.leaky_relu(x, self.negative_slope)
-            alpha = (x * self.att[t]).sum(dim=-1)
-            alpha = softmax(alpha, index, ptr, size_i)
-            self._alpha = alpha
-            alpha = F.dropout(alpha, p=self.dropout, training=self.training)
+        # ed0 = time.time()
+        # print(f'Time 0: {ed0 - ed00}')
 
-            msg_t = x_j_t * alpha.unsqueeze(-1)
+        x = x_j + x_i_new
 
-            start = t * self.out_channels
-            end = (t+1) * self.out_channels
-            msg_f[:, :, start: end] = msg_t
+        # ed3 = time.time()
+        # print(f'Time 3: {ed3 - ed0}')
+
+        if edge_attr is not None:
+            if edge_attr.dim() == 1:
+                edge_attr = edge_attr.view(-1, 1)
+            else:
+                edge_attr = edge_attr
+            assert self.lin_edge is not None
+            edge_attr = self.lin_edge(edge_attr)
+            edge_attr = edge_attr.view(-1, self.seq_len, self.heads, self.out_channels)
+            edge_attr = edge_attr.permute(1, 0, 2, 3)
+
+            x = x + edge_attr
+
+        # ed4 = time.time()
+        # print(f'Time 4: {ed4 - ed3}')
+
+        x = F.leaky_relu(x, self.negative_slope)
+        alpha = (x * self.att).sum(dim=-1)
+        alpha = softmax(alpha, index, ptr, size_i, dim=1)
+        self._alpha = alpha
+        alpha = F.dropout(alpha, p=self.dropout, training=self.training)
+
+        msg_t = x_j * alpha.unsqueeze(-1)
+
+        # ed5 = time.time()
+        # print(f'Time 5: {ed5 - ed4}')
+
+        msg_f = msg_t.permute(1, 2, 0, 3).reshape(-1, self.heads, self.seq_len * self.out_channels)
+        # for t in range(self.seq_len):
+        #     start = t * self.out_channels
+        #     end = (t+1) * self.out_channels
+        #     msg_f[:, :, start: end] = msg_t[t]
+
+        # ed6 = time.time()
+        # print(f'Time 6: {ed6 - ed5}')
 
         return msg_f
 
