@@ -251,18 +251,14 @@ class DataLoader:
         semantic_file = open(self.semantic_adj_filename, 'rb')
         semantic_edge_details = pickle.load(semantic_file)
 
-        new_semantic_edge_details = {}
-        for key, val in semantic_edge_details.items():
-            edge_index = np.array(val[0])
-            edge_attr = np.array(val[1])
+        edge_index = np.array(semantic_edge_details[0])
+        edge_attr = np.array(semantic_edge_details[1])
 
-            edge_index_np = edge_index.reshape((2, -1, 5))[:, :, :self.semantic_threashold].reshape(2, -1)
-            edge_index = [list(edge_index_np[0]), list(edge_index_np[1])]
-            edge_attr = edge_attr.reshape((-1, 5))[:, :self.semantic_threashold].reshape(-1, 1)
+        edge_index_np = edge_index.reshape((2, -1, 5))[:, :, :self.semantic_threashold].reshape(2, -1)
+        edge_index = [list(edge_index_np[0]), list(edge_index_np[1])]
+        edge_attr = edge_attr.reshape((-1, 5))[:, :self.semantic_threashold].reshape(-1, 1)
 
-            new_semantic_edge_details[key] = [edge_index, edge_attr]
-
-        return new_semantic_edge_details
+        return [edge_index, edge_attr]
 
     def load_batch(self, _type: str, offset: int, device: str = 'cpu'):
         xs = self.dataset.get_data(_type)

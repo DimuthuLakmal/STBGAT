@@ -95,20 +95,17 @@ class TransformerEncoder(nn.Module):
         x_batch_graphs = []
         x_batch_graphs_semantic = []
         for idx, x_all_t in enumerate(x_batch):
-            time_idx = x_time_idx[idx, 0, 0, 0]
-            last_day_time_idx = time_idx - self.day_slot
-            if last_day_time_idx < 0:
-                last_day_time_idx = self.total_time_idx - self.day_slot + time_idx
-
-            semantic_edge_index_hr, semantic_edge_attr_hr = self.edge_details[time_idx]
-            semantic_edge_index_lst_dy, semantic_edge_attr_lst_dy = self.edge_details[last_day_time_idx]
-
-            graphs_semantic = []
+            semantic_edge_index, semantic_edge_attr = self.edge_details
             x_src = x_all_t.permute(1, 0, 2)  # N, T, F
             x_src = x_src.reshape(x_src.shape[0], -1)  # N, T*F
 
             if self.graph_input:
                 graph = self._create_graph((x_src, x_src), self.edge_index, self.edge_attr)
+                x_batch_graphs.append(to(graph))
+
+            if self.graph_semantic_input:
+                graph_semantic = self._create_graph((x_src, x_src), semantic_edge_index, semantic_edge_attr)
+                x_batch_graphs_semantic.append(to(graph_semantic))
 
             # if self.graph_semantic_input:
             #     if self.last_week_end != -1 and i < self.last_week_end:
@@ -119,10 +116,6 @@ class TransformerEncoder(nn.Module):
             #     else:
             #         graph_semantic = self._create_graph((x_src, x), semantic_edge_index_hr, semantic_edge_attr_hr)
             #     graphs_semantic.append(to(graph_semantic))
-
-                x_batch_graphs.append(to(graph))
-
-            x_batch_graphs_semantic.append(graphs_semantic)
 
         return x_batch_graphs, x_batch_graphs_semantic
 
@@ -163,7 +156,7 @@ class TransformerEncoder(nn.Module):
                 # out_g_dis = out_g_dis.reshape(batch_size, num_nodes, time_steps, -1)  # (4, 307, 12, 16)
                 # out_g_dis = out_g_dis.permute(0, 2, 1, 3)  # (4, 12, 307, 16)
             if self.graph_semantic_input:
-                out_g_semantic = self.graph_embedding_semantic(out_g_semantic).transpose(0, 1)
+                out_g_semantic = self.graph_embedding_semantic(out_g_semantic)
 
             if self.graph_input and self.graph_semantic_input:
                 out_g = self.out_norm(out_g_dis + out_g_semantic)

@@ -135,7 +135,6 @@ class GATConvV8(MessagePassingV8):
             bias: bool = True,
             share_weights: bool = False,
             seq_len: int = 36,
-            num_edges: int = 4993,
             **kwargs,
     ):
         super().__init__(node_dim=0, **kwargs)
@@ -151,7 +150,6 @@ class GATConvV8(MessagePassingV8):
         self.fill_value = fill_value
         self.share_weights = share_weights
         self.seq_len = seq_len
-        self.num_edges = num_edges
 
         single_input_dim = 0
         if isinstance(in_channels, int):
