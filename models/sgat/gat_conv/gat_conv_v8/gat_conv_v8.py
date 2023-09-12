@@ -383,7 +383,7 @@ class GATConvV8(MessagePassingV8):
         self._alpha = alpha
         alpha = F.dropout(alpha, p=self.dropout, training=self.training)
 
-        msg_t = self.exp_lin(x_j * alpha.unsqueeze(-1))
+        msg_t = x_j * alpha.unsqueeze(-1)
 
         # ed5 = time.time()
         # print(f'Time 5: {ed5 - ed4}')
