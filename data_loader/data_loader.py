@@ -116,7 +116,7 @@ class DataLoader:
             new_data_seq[idx] = np.concatenate((data_seq[idx], new_arr), axis=-1)
 
         for idx in range(new_data_seq.shape[0]):
-            sample = get_sample_indices(data_seq, self.num_of_weeks,
+            sample = get_sample_indices(new_data_seq, self.num_of_weeks,
                                         self.num_of_days,
                                         self.num_of_hours,
                                         idx,
@@ -136,17 +136,17 @@ class DataLoader:
             #     sample = np.concatenate((sample, day_sample_target[:, :, 0:1]), axis=2)
             if self.num_of_hours > 0:
                 # sample = np.concatenate((sample, day_sample[:, :, 0:1]), axis=2)
-                sample = hour_sample[:, :, 0:1]
+                sample = hour_sample[:, :, [0, 3]]
 
             if self.num_of_days > 0:
                 # sample = np.concatenate((sample, day_sample[:, :, 0:1]), axis=2)
-                sample = np.concatenate((sample, day_sample[:, :, 0:1]), axis=2)
+                sample = np.concatenate((sample, day_sample[:, :, [0, 3]]), axis=2)
 
             if self.num_of_weeks > 0:
-                sample = np.concatenate((sample, week_sample[:, :, 0:1]), axis=2)
+                sample = np.concatenate((sample, week_sample[:, :, [0, 3]]), axis=2)
 
             if self.num_of_weeks_target > 0:
-                sample = np.concatenate((sample, week_sample_target[:, :, 0:1]), axis=2)
+                sample = np.concatenate((sample, week_sample_target[:, :, [0, 3]]), axis=2)
                 ### hr and wk_dy indices are not used as features. So skipping attaching ###
 
             # sample = np.concatenate((sample, hr_idx_sample, wk_dy_idx_sample, time_idx_sample), axis=2)
@@ -154,7 +154,7 @@ class DataLoader:
 
             # target = np.concatenate((target[:, :, 0:1], hr_idx_target, wk_dy_idx_target), axis=2)
             all_samples.append(sample)
-            all_targets.append(target[:, :, 0:1])
+            all_targets.append(target[:, :, [0, 3]])
 
         split_line1 = int(len(all_samples) * 0.6)
         split_line2 = int(len(all_samples) * 0.8)
@@ -172,26 +172,21 @@ class DataLoader:
         if self.rep_vectors:
             records_time_idx = derive_rep_timeline(training_x_set, self.points_per_week, self.num_of_vertices)
 
-        new_train_x_set, train_time_idx = self._generate_new_x_arr(training_x_set, records_time_idx)
-        new_val_x_set, val_time_idx = self._generate_new_x_arr(validation_x_set, records_time_idx)
-        new_test_x_set, test_time_idx = self._generate_new_x_arr(testing_x_set, records_time_idx)
+        # new_train_x_set, train_time_idx = self._generate_new_x_arr(training_x_set, records_time_idx)
+        # new_val_x_set, val_time_idx = self._generate_new_x_arr(validation_x_set, records_time_idx)
+        # new_test_x_set, test_time_idx = self._generate_new_x_arr(testing_x_set, records_time_idx)
 
         # Add tailing target values form x values to facilitate local trend attention in decoder
         training_y_set = np.concatenate(
-            (new_train_x_set[:, -1 * self.dec_seq_offset:, :, 0:1], training_y_set[:, :, :, :]), axis=1)
+            (training_x_set[:, -1 * self.dec_seq_offset:], training_y_set), axis=1)
         validation_y_set = np.concatenate(
-            (new_val_x_set[:, -1 * self.dec_seq_offset:, :, 0:1], validation_y_set[:, :, :, :]), axis=1)
+            (validation_x_set[:, -1 * self.dec_seq_offset:], validation_y_set), axis=1)
         testing_y_set = np.concatenate(
-            (new_test_x_set[:, -1 * self.dec_seq_offset:, :, 0:1], testing_y_set[:, :, :, :]), axis=1)
+            (testing_x_set[:, -1 * self.dec_seq_offset:], testing_y_set), axis=1)
 
         # max-min normalization on input and target values
-        (stats_x, x_train, x_val, x_test) = min_max_normalize(new_train_x_set, new_val_x_set, new_test_x_set)
+        (stats_x, x_train, x_val, x_test) = min_max_normalize(training_x_set, validation_x_set, testing_x_set)
         (stats_y, y_train, y_val, y_test) = min_max_normalize(training_y_set, validation_y_set, testing_y_set)
-
-        # concat time idx
-        x_train = np.concatenate((x_train, train_time_idx), axis=-1)
-        x_val = np.concatenate((x_val, val_time_idx), axis=-1)
-        x_test = np.concatenate((x_test, test_time_idx), axis=-1)
 
         # shuffling training data 0th axis
         idx_samples = np.arange(0, x_train.shape[0])
@@ -204,7 +199,7 @@ class DataLoader:
         self.n_batch_val = int(len(x_val) / self.batch_size)
 
         data = {'train': x_train, 'val': x_val, 'test': x_test}
-        y = {'train': y_train[:, :, :, 0:1], 'val': y_val[:, :, :, 0:1], 'test': y_test[:, :, :, 0:1]}
+        y = {'train': y_train, 'val': y_val, 'test': y_test}
 
         self.dataset = Dataset(
             data=data,
