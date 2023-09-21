@@ -51,6 +51,12 @@ class DataLoader:
         self.n_seq = self.len_input * 2
         self.points_per_week = self.points_per_hour * 24 * self.num_days_per_week
 
+        self.num_f = 1
+        if self.num_of_weeks:
+            self.num_f += 1
+        if self.num_of_days:
+            self.num_f += 1
+
     def _generate_new_x_arr(self, x_set: np.array, records_time_idx: dict):
         # WARNING: This has be changed accordingly.
         speed_idx = 0
@@ -150,7 +156,7 @@ class DataLoader:
                 ### hr and wk_dy indices are not used as features. So skipping attaching ###
 
             # sample = np.concatenate((sample, hr_idx_sample, wk_dy_idx_sample, time_idx_sample), axis=2)
-            sample = np.concatenate((sample, time_idx_sample), axis=2)
+            # sample = np.concatenate((sample, time_idx_sample), axis=2)
 
             # target = np.concatenate((target[:, :, 0:1], hr_idx_target, wk_dy_idx_target), axis=2)
             all_samples.append(sample)
@@ -178,11 +184,11 @@ class DataLoader:
 
         # Add tailing target values form x values to facilitate local trend attention in decoder
         training_y_set = np.concatenate(
-            (training_x_set[:, -1 * self.dec_seq_offset:], training_y_set), axis=1)
+            (training_x_set[:, -1 * self.dec_seq_offset:, :, [0, 3]], training_y_set), axis=1)
         validation_y_set = np.concatenate(
-            (validation_x_set[:, -1 * self.dec_seq_offset:], validation_y_set), axis=1)
+            (validation_x_set[:, -1 * self.dec_seq_offset:, :, [0, 3]], validation_y_set), axis=1)
         testing_y_set = np.concatenate(
-            (testing_x_set[:, -1 * self.dec_seq_offset:], testing_y_set), axis=1)
+            (testing_x_set[:, -1 * self.dec_seq_offset:, :, [0, 3]], testing_y_set), axis=1)
 
         # max-min normalization on input and target values
         (stats_x, x_train, x_val, x_test) = min_max_normalize(training_x_set, validation_x_set, testing_x_set)
@@ -258,32 +264,37 @@ class DataLoader:
     def load_batch(self, _type: str, offset: int, device: str = 'cpu'):
         xs = self.dataset.get_data(_type)
         ys = self.dataset.get_y(_type)
+
         limit = (offset + self.batch_size) if (offset + self.batch_size) <= len(xs) else len(xs)
 
-        enc_xs_time_idx = xs[offset: limit, :, :, -1:]
-        xs = xs[offset: limit, :, :, :-1]  # [9358, 13, 228, 1] # Avoid selecting time idx
-        ys = ys[offset: limit, :]
+        xs = xs[offset: limit]
+        ys = ys[offset: limit]
 
         # ys_input will be used as decoder inputs while ys will be used as ground truth data
         ys_input = np.copy(ys)
+        ys = ys[:, :, :, 0:1]
         if _type != 'train':
-            ys_input[:, self.dec_seq_offset:, :, :] = 0
+            ys_input[:, self.dec_seq_offset:, :, 0:1] = 0
 
-        num_inner_f_enc = int(xs.shape[-1] / self.enc_features)
+        # reshaping
+        xs_shp = xs.shape
+        xs = np.reshape(xs, (xs_shp[0], xs_shp[1], xs_shp[2], self.num_f, 2))
+
+        num_inner_f_enc = int(xs.shape[-2] / self.enc_features)
         enc_xs = []
         for k in range(self.enc_features):
             batched_xs = [[] for i in range(self.batch_size)]
 
             for idx, x_timesteps in enumerate(xs):
                 seq_len = xs.shape[1]
-                tmp_xs = np.zeros((seq_len * num_inner_f_enc, xs.shape[2], 1))
+                tmp_xs = np.zeros((seq_len * num_inner_f_enc, xs.shape[2], 2))
                 for inner_f in range(num_inner_f_enc):
                     start_idx = (k * num_inner_f_enc) + num_inner_f_enc - inner_f - 1
                     end_idx = start_idx + 1
 
                     tmp_xs_start_idx = seq_len * inner_f
                     tmp_xs_end_idx = seq_len * inner_f + seq_len
-                    tmp_xs[tmp_xs_start_idx: tmp_xs_end_idx] = x_timesteps[:, :, start_idx: end_idx]
+                    tmp_xs[tmp_xs_start_idx: tmp_xs_end_idx] = np.squeeze(x_timesteps[:, :, start_idx: end_idx], axis=-2)
 
                 batched_xs[idx] = torch.Tensor(tmp_xs).to(device)
 
@@ -298,4 +309,4 @@ class DataLoader:
 
         dec_ys = torch.stack(dec_ys)
 
-        return enc_xs, enc_xs_time_idx, dec_ys, dec_ys_target
+        return enc_xs, None, dec_ys, dec_ys_target

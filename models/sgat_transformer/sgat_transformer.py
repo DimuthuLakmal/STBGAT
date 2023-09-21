@@ -65,7 +65,7 @@ class SGATTransformer(nn.Module):
             for i in range(dec_out_len):
 
                 dec_out = self.decoder(y, enc_outs, tgt_mask=tgt_mask, device=self.device)
-                y[:, i + self.dec_seq_offset] = dec_out[:, i + self.dec_out_start_idx]
+                y[:, i + self.dec_seq_offset, :, 0:1] = dec_out[:, i + self.dec_out_start_idx]
                 final_out[:, i + self.dec_seq_offset] = dec_out[:, i + self.dec_out_start_idx]
 
             return final_out[:, self.dec_seq_offset:]
