@@ -36,8 +36,7 @@ def load_rep_vector(node_data_filename, output_filename, load_file=False):
         new_data_seq[idx] = np.concatenate((data_seq[idx], new_arr), axis=-1)
 
     for idx in range(new_data_seq.shape[0]):
-        sample = get_sample_indices(data_seq,
-                                    num_of_weeks,
+        sample = get_sample_indices(new_data_seq, num_of_weeks,
                                     num_of_days,
                                     num_of_hours,
                                     idx,
@@ -55,31 +54,33 @@ def load_rep_vector(node_data_filename, output_filename, load_file=False):
         sample = None
         # if num_of_days_target > 0:
         #     sample = np.concatenate((sample, day_sample_target[:, :, 0:1]), axis=2)
+        if num_of_hours > 0:
+            # sample = np.concatenate((sample, day_sample[:, :, 0:1]), axis=2)
+            sample = hour_sample[:, :, [0, 3]]
 
         if num_of_days > 0:
             # sample = np.concatenate((sample, day_sample[:, :, 0:1]), axis=2)
-            sample = np.concatenate((hour_sample[:, :, 0:1], day_sample[:, :, 0:1]), axis=2)
+            sample = np.concatenate((sample, day_sample[:, :, [0, 3]]), axis=2)
 
         if num_of_weeks > 0:
-            sample = np.concatenate((sample, week_sample[:, :, 0:1]), axis=2)
+            sample = np.concatenate((sample, week_sample[:, :, [0, 3]]), axis=2)
 
         if num_of_weeks_target > 0:
-            sample = np.concatenate((sample, week_sample_target[:, :, 0:1]), axis=2)
+            sample = np.concatenate((sample, week_sample_target[:, :, [0, 3]]), axis=2)
             ### hr and wk_dy indices are not used as features. So skipping attaching ###
 
         # sample = np.concatenate((sample, hr_idx_sample, wk_dy_idx_sample, time_idx_sample), axis=2)
-        sample = np.concatenate((sample, time_idx_sample), axis=2)
+        # sample = np.concatenate((sample, time_idx_sample), axis=2)
 
         # target = np.concatenate((target[:, :, 0:1], hr_idx_target, wk_dy_idx_target), axis=2)
         all_samples.append(sample)
-        all_targets.append(target[:, :, 0:1])
+        all_targets.append(target[:, :, [0, 3]])
 
     split_line1 = int(len(all_samples) * 0.6)
-
     training_x_set = np.array(all_samples[:split_line1])
 
     # Derive global representation vector for each sensor for similar time steps
-    records_time_idx = derive_rep_timeline(training_x_set, points_per_week, num_of_vertices)
+    records_time_idx = derive_rep_timeline(training_x_set, points_per_week, num_of_vertices, load_file=False)
 
     with open(output_filename, 'wb') as file:
         pickle.dump(records_time_idx, file)
@@ -131,7 +132,7 @@ def find_most_similar_sensors(data):
     sorted_values = sorted(value_count_dict, key=lambda x: -value_count_dict[x])
 
     # Select the top 5 values and their counts
-    top_5_values = sorted_values[:5]
+    top_5_values = sorted_values[:10]
     top_5_counts = [value_count_dict[value] for value in top_5_values]
 
     # Find the indices of the top 5 values
@@ -145,16 +146,16 @@ def find_most_similar_sensors(data):
 
 if __name__ == '__main__':
 
-    graph_signal_matrix_filename = "../data/PEMS07/PeMS07.npz"
-    rep_output_file = "../data/PEMS07/PeMS07_rep_vector.csv"
-    time_idx_rep_output_file = "../data/PEMS07/PeMS07_time_idx_semantic_rels.pickle"
-    edge_details_file = "../data/PEMS07/PeMS07_time_idx_semantic_edges.pickle"
-    records_time_idx = load_rep_vector(graph_signal_matrix_filename, rep_output_file, load_file=True)
+    graph_signal_matrix_filename = "../data/PEMS04/PEMS04.npz"
+    rep_output_file = "../data/PEMS04/PEMS04_rep_vector.pickle"
+    time_idx_rep_output_file = "../data/PEMS04/PEMS04_time_idx_semantic_rels.pickle"
+    edge_details_file = "../data/PEMS04/PEMS04_time_idx_semantic_edges.pickle"
+    records_time_idx = load_rep_vector(graph_signal_matrix_filename, rep_output_file, load_file=False)
 
     n_sensors = 307
     semantic_rels = {}
 
-    for sensor in range(150, 307):
+    for sensor in range(0, 307):
         time_idx_distances = []
         time_idx_sensors = []
 
@@ -176,7 +177,7 @@ if __name__ == '__main__':
                 except ValueError as ex:
                     print(ex)
 
-            min_indices = np.argpartition(distances, 5)[:5]
+            min_indices = np.argpartition(distances, 10)[:10]
             sorted_distances = np.array(distances)[min_indices]
             sorted_sensors = np.array(sensor_js)[min_indices]
             time_idx_distances.append(sorted_distances)

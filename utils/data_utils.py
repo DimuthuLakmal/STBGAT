@@ -215,8 +215,9 @@ def derive_rep_timeline(x_set: np.array, points_per_week: int, num_of_vertices: 
 
         records_time_idx[record_key] = np.array(sensor_means).transpose(1, 0, 2)
 
-    with open(output_filename, 'wb') as file:
-        pickle.dump(records_time_idx, file)
+    if output_filename is not None:
+        with open(output_filename, 'wb') as file:
+            pickle.dump(records_time_idx, file)
 
     return records_time_idx
 
