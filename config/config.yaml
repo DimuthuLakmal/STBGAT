@@ -8,7 +8,7 @@ model:
   device: cuda
   transformer:
     encoder:
-      features: 1 # To indicates multiple encoders (feature-wise). default is 1
+      features: 2 # To indicates multiple encoders (feature-wise). default is 1
       emb_dim: 16
       seq_len: 36
       input_dim: 2
@@ -51,9 +51,9 @@ model:
       decoder_block:
         n_heads: 8
         expansion_factor: 4
-        cross_attn_features: 1 # Used to indicates how many feature-wise cross attentions in the decoder
+        cross_attn_features: 2 # Used to indicates how many feature-wise cross attentions in the decoder
         src_dropout: 0.3
-        cross_attn_dropout: 0.3
+        cross_attn_dropout: [0.3, 0.5]
         ff_dropout: 0.2
       sgat:
         first_in_f_size: 208
@@ -82,7 +82,8 @@ data:
   num_of_days_target: 0
   num_of_weeks_target: 0
   num_days_per_week: 7
-  rep_vectors: False
+  rep_vectors: True
+  rep_vector_filename: "data/PEMS04/PEMS04_rep_vector.pickle"
   preprocess: False
   preprocess_output_path: "data/PEMS04/PEMS04_Preprocessed.pickle"
   distance_threshold: 2000

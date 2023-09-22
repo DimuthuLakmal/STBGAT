@@ -1,4 +1,5 @@
 import numpy as np
+import pickle
 
 from utils.math_utils import normalize
 
@@ -156,7 +157,7 @@ def get_sample_indices(data_sequence, num_of_weeks, num_of_days, num_of_hours,
     return week_sample, day_sample, hour_sample, target, wk_dys, hrs, week_sample_target, day_sample_target
 
 
-def derive_rep_timeline(x_set: np.array, points_per_week: int, num_of_vertices: int):
+def derive_rep_timeline(x_set: np.array, points_per_week: int, num_of_vertices: int, load_file=True, output_filename= None):
     """
     For every data point per week, we derive a representation time series.
 
@@ -170,6 +171,12 @@ def derive_rep_timeline(x_set: np.array, points_per_week: int, num_of_vertices: 
     -------
     records_time_idx: set of representation vectors per each data point in a week
     """
+
+    if load_file:
+        output_file = open(output_filename, 'rb')
+        records_time_idx = pickle.load(output_file)
+        return records_time_idx
+
     training_size = x_set.shape[0]
     num_weeks_training = int(training_size / points_per_week)
     seq_len = x_set.shape[1]
@@ -180,7 +187,7 @@ def derive_rep_timeline(x_set: np.array, points_per_week: int, num_of_vertices: 
         # x and y values representation vectors
         record = [x_set[time_idx]]
 
-        record_key = record[0][0, 0, -1]
+        record_key = record[0][0, 0, 1]
         for week in range(1, num_weeks_training + 1):
             idx = time_idx + points_per_week * week
             if idx >= training_size: continue
@@ -207,6 +214,9 @@ def derive_rep_timeline(x_set: np.array, points_per_week: int, num_of_vertices: 
             sensor_means.append(mean)
 
         records_time_idx[record_key] = np.array(sensor_means).transpose(1, 0, 2)
+
+    with open(output_filename, 'wb') as file:
+        pickle.dump(records_time_idx, file)
 
     return records_time_idx
 

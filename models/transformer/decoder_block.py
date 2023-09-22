@@ -22,7 +22,7 @@ class DecoderBlock(nn.Module):
         self.dropout1 = nn.Dropout(src_dropout)
 
         self.cross_attn_layers = nn.ModuleList([
-            CrossAttentionLayer(emb_dim, n_heads, dropout=cross_attn_dropout) for i in range(cross_attn_features)
+            CrossAttentionLayer(emb_dim, n_heads, dropout=cross_attn_dropout[i]) for i in range(cross_attn_features)
         ])
         self.norm2 = nn.LayerNorm(emb_dim)
 
