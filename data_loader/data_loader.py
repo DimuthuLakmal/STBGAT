@@ -196,11 +196,11 @@ class DataLoader:
 
         # Add tailing target values form x values to facilitate local trend attention in decoder
         training_y_set = np.concatenate(
-            (training_x_set[:, -1 * self.dec_seq_offset:, :, [0, 3]], training_y_set), axis=1)
+            (training_x_set[:, -1 * self.dec_seq_offset:, :, 0:2], training_y_set), axis=1)
         validation_y_set = np.concatenate(
-            (validation_x_set[:, -1 * self.dec_seq_offset:, :, [0, 3]], validation_y_set), axis=1)
+            (validation_x_set[:, -1 * self.dec_seq_offset:, :, 0:2], validation_y_set), axis=1)
         testing_y_set = np.concatenate(
-            (testing_x_set[:, -1 * self.dec_seq_offset:, :, [0, 3]], testing_y_set), axis=1)
+            (testing_x_set[:, -1 * self.dec_seq_offset:, :, 0:2], testing_y_set), axis=1)
 
         # max-min normalization on input and target values
         (stats_x, x_train, x_val, x_test) = min_max_normalize(training_x_set, validation_x_set, testing_x_set)
