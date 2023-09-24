@@ -267,9 +267,9 @@ class DataLoader:
         edge_index = np.array(semantic_edge_details[0])
         edge_attr = np.array(semantic_edge_details[1])
 
-        edge_index_np = edge_index.reshape((2, -1, 10))[:, :, :self.semantic_threashold].reshape(2, -1)
+        edge_index_np = edge_index.reshape((2, -1, 5))[:, :, :self.semantic_threashold].reshape(2, -1)
         edge_index = [list(edge_index_np[0]), list(edge_index_np[1])]
-        edge_attr = edge_attr.reshape((-1, 10))[:, :self.semantic_threashold].reshape(-1, 1)
+        edge_attr = edge_attr.reshape((-1, 5))[:, :self.semantic_threashold].reshape(-1, 1)
 
         return [edge_index, edge_attr]
 
