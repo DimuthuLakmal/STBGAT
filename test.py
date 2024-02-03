@@ -10,6 +10,21 @@ def test(_type: str,
          data_loader: DataLoader,
          device: str,
          seq_offset: int = 0) -> tuple:
+    """
+    Make predictions and calculates losses using test/validation
+    Parameters
+    ----------
+    _type
+    model: SGATTransformer
+    data_loader: DataLoader
+    device: str, cpu or cuda
+    seq_offset: int, suffixed input that needed to be ignored when calculating loss.
+
+    Returns
+    -------
+    loss: tuple, MAE, RMSE and MAPE test/validation losses
+    """
+
     model.eval()
 
     mae_loss = 0.
@@ -24,13 +39,14 @@ def test(_type: str,
     offset = 0
     with torch.inference_mode():
         for batch in range(n_batch):
-            test_x, test_x_time_idx, test_y, test_y_target = data_loader.load_batch(_type=_type,
-                                                                                    offset=offset,
-                                                                                    device=device)
+            test_x, test_y, test_y_target = data_loader.load_batch(_type=_type,
+                                                                   offset=offset,
+                                                                   device=device)
 
-            out = model(test_x, test_x_time_idx, test_y, False)
+            out = model(test_x, test_y, False)
             out = out.reshape(out.shape[0] * out.shape[1] * out.shape[2], -1)
 
+            # reshape target data
             test_y_tensor = ()
             for y in test_y_target:
                 y = y[seq_offset:]
@@ -50,6 +66,7 @@ def test(_type: str,
             if batch % 100 == 0:
                 logger.info(f"MAE {mae_loss / (batch + 1)}")
 
+            # used to retrieve the correct batch
             offset += data_loader.batch_size
 
     mae_loss = mae_loss / float(n_batch)

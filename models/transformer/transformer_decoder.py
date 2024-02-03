@@ -13,8 +13,6 @@ class TransformerDecoder(nn.Module):
 
         self.emb_dim = configs['emb_dim']
         input_dim = configs['input_dim']
-        self.merge_emb = configs['merge_emb']
-        emb_expansion_factor = configs['emb_expansion_factor']
         max_lookup_len = configs['max_lookup_len']
         self.lookup_idx = configs['lookup_idx']
         self.device = configs['device']
@@ -61,10 +59,6 @@ class TransformerDecoder(nn.Module):
                 for _ in range(n_layers)
             ]
         )
-
-        # by merging embeddings we increase the num embeddings
-        if self.merge_emb:
-            self.emb_dim = self.emb_dim * emb_expansion_factor
 
         self.fc_out = nn.Linear(self.emb_dim, out_dim)
 

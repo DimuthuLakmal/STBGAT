@@ -1,90 +1,74 @@
 # Model Configs
 model:
   batch_size: 4
-  epochs: 120
-  model_output_path: "output/model/pems04/multi-cross-attn/epoch_v1_{}_model.pt"
-  model_input_path: "output/model/pems04/multi-cross-attn/epoch_v1_88_model.pt"
-  load_saved_model: False
-  device: cuda
+  train_epochs: 120
+  finetune_epochs: 20
+  model_output_path: "output/model/pems04/multi-cross-attn/epoch_v1_{}_model.pt" # save trained model to this path
+  load_saved_model: False # if you want pre-trained model weights to be loaded
+  model_input_path: "output/model/pems04/multi-cross-attn/epoch_v1_88_model.pt" # pretrained model path
+  device: cuda # decides GPU or CPU for training
   transformer:
     encoder:
-      features: 2 # To indicates multiple encoders (feature-wise). default is 1
-      emb_dim: 16
-      seq_len: 36
-      input_dim: 2
-      merge_emb: False # Indicate whether the graph embeddings merge with non-graph embedding.
-      emb_expansion_factor: 3 # If embeddings are merged, it will expand the dimension. the factor depends on whether we use graph, semantinc graph and raw sensor data.
-      n_layers: 4
-      local_trends: True
-      graph_semantic_input: True
-      graph_input: True
-      dropout_e: 0.0
-      encoder_block:
+      features: 2 # To indicates multiple encoders (feature-wise). default is 1. =2 when rep_vector is True
+      emb_dim: 16 # dimension that embedding layer maps the input of the model to.
+      seq_len: 36 # input sequence length
+      input_dim: 2 # input dimension, inputs is traffic flow value, in some dataset it may be combined with time index
+      n_layers: 4 # # of temporal encoder layers
+      local_trends: True # decides whether the temporal encoder apply convolution to distinguish local trends in time series data
+      graph_semantic_input: True # to enable semantics based graph
+      graph_input: True # to enable distance based graph
+      dropout_e: 0.0 # dropout applied to the final output of temporal encoder layer
+      encoder_block: # temporal encoder layer configs
         n_heads: 8
         expansion_factor: 4
         src_dropout: 0.4
         ff_dropout: 0.4
-      sgat:
-        first_in_f_size: 576
-        n_layers: 1
-        out_f_sizes: [ 64, 576 ]
-        n_heads: [ 8, 1 ]
+      sgat: # bipartite graph attention network configs
+        first_in_f_size: 576 # input size (concatenated output sequence of the final temporal encoder layer)
+        n_layers: 1 # # of graph layers
+        out_f_sizes: [ 64 ] # output size of the graph
+        n_heads: [ 8 ] # number of heads
         alpha: 0.2
         dropout: 0.7
-        edge_dim: 1
-        skip_conn: False
+        edge_dim: 1 # edge attribute dimension
     decoder:
-      emb_dim: 64
-      seq_len: 13
+      emb_dim: 64 # decoder input dimension
+      seq_len: 13 # decoder input sequence length
       seq_offset: 1 # Indicates how many timesteps in the previous hour consider as inputs in the decoder
-      input_dim: 2
-      n_layers: 4
-      merge_emb: False # Indicate whether the graph embeddings merge with non-graph embedding.
-      emb_expansion_factor: 3 # If embeddings are merged, it will expand the dimension. the factor depends on whether we use graph, semantinc graph and raw sensor data.
-      out_dim: 1
+      input_dim: 2  # input dimension
+      n_layers: 4 # # of temporal decoder layers
+      out_dim: 1 # output dimension (predicted traffic flow value)
       out_start_idx: 0 # When set decoder offset, this indicates the start index of the decoder output to calculate loss
       out_end_idx: -1 # When set decoder offset, this indicates the end index of the decoder output to calculate loss
-      per_enc_feature_len: 36 # used in decoder cross attention (feature-wise cross attention). This should be tuned along with cross_attn_features
-      local_trends: True
-      graph_semantic_input: False
-      graph_input: False
-      decoder_block:
+      per_enc_feature_len: 36 # used in decoder cross attention. This should be tuned along with cross_attn_features. This only works when # of encoder features=1. By default keep it equals to seq_length of encoder
+      local_trends: True # indicates to apply convolution to extract local trend information.
+      decoder_block: # temporal decoder layer configs
         n_heads: 8
         expansion_factor: 4
-        cross_attn_features: 2 # Used to indicates how many feature-wise cross attentions in the decoder
+        cross_attn_features: 2 # Used to indicates how many feature-wise cross attentions in the decoder. This value=2 when rep_vector is True. otherwise 1.
         src_dropout: 0.3
         cross_attn_dropout: [0.3, 0.3]
         ff_dropout: 0.2
-      sgat:
-        first_in_f_size: 208
-        n_layers: 1
-        out_f_sizes: [ 208, 208 ]
-        n_heads: [ 4, 1 ]
-        alpha: 0.2
-        dropout: 0.7
-        edge_dim: 1
-        skip_conn: False
-    lookup_index: True
+    lookup_index: True # Use to inject weekly time index information of the input sequence to positional encoding
 
 # Data Configs
 data:
-  edge_weight_filename: "data/PEMS04/PEMS04_dij.csv"
-  semantic_adj_filename: "data/PEMS04/PEMS04_time_idx_semantic_edges.pickle"
-  edge_weight_scaling: True
-  node_data_filename: "data/PEMS04/PEMS04.npz"
-  num_of_vertices: 307
-  points_per_hour: 12
-  len_input: 12
-  num_for_predict: 12
-  num_of_weeks: 1
-  num_of_hours: 1
-  num_of_days: 1
+  edge_weight_filename: "data/PEMS04/PEMS04_dij.csv" # distance based edge weights
+  semantic_adj_filename: "data/PEMS04/PEMS04_time_idx_semantic_edges.pickle" # semantic based edge weights
+  edge_weight_scaling: True # to normalize the edge weights
+  node_data_filename: "data/PEMS04/PEMS04.npz" # traffic flow values
+  num_of_vertices: 307 # # of vertices
+  points_per_hour: 12 # # of data records per hour per vertex
+  num_for_predict: 12 # prediction sequence length
+  num_of_weeks: 1 # to indicate to take last week traffic flow values into account
+  num_of_hours: 1 # to indicate to take last hour traffic flow values into account
+  num_of_days: 1 # to indicate to take last day traffic flow values into account
   num_of_days_target: 0
   num_of_weeks_target: 0
-  num_days_per_week: 7
-  rep_vectors: True
-  rep_vector_filename: "data/PEMS04/PEMS04_rep_vector.pickle"
-  preprocess: False
+  num_days_per_week: 7 # # of days per week in the dataset. Some dataset don't have weekend data
+  rep_vectors: True # to derive representative traffic sequence
+  rep_vector_filename: "data/PEMS04/PEMS04_rep_vector.pickle" # save representative traffic sequence values
+  preprocess: True # to start preprocessing stages
   preprocess_output_path: "data/PEMS04/PEMS04_Preprocessed.pickle"
-  distance_threshold: 2000
-  semantic_threashold: 5
+  distance_threshold: 2000 # distance threshold to drop longer irrelevant connections in distance based graphs
+  semantic_threashold: 5 # # of semantically similar neighbours in semantic based graph.

@@ -164,35 +164,20 @@ def masked_MAE(v, v_, null_val=0.0):
         return np.mean(mae)
 
 
-def evaluation(y, y_, x_stats):
-    '''
-    Evaluation function: interface to calculate MAPE, MAE and RMSE between ground truth and prediction.
-    Extended version: multi-step prediction can be calculated by self-calling.
-    :param y: np.ndarray or int, ground truth.
-    :param y_: np.ndarray or int, prediction.
-    :param x_stats: dict, paras of z-scores (mean & std).
-    :return: np.ndarray, averaged metric values.
-    '''
-    dim = len(y_.shape)
-
-    if dim == 3:
-        # single_step case
-        v = z_inverse(y, x_stats['mean'], x_stats['std'])
-        v_ = z_inverse(y_, x_stats['mean'], x_stats['std'])
-        return np.array([MAPE(v, v_), MAE(v, v_), RMSE(v, v_)])
-    else:
-        # multi_step case
-        tmp_list = []
-        # y -> [time_step, batch_size, n_route, 1]
-        y = np.swapaxes(y, 0, 1)
-        # recursively call
-        for i in range(y_.shape[0]):
-            tmp_res = evaluation(y[i], y_[i], x_stats)
-            tmp_list.append(tmp_res)
-        return np.concatenate(tmp_list, axis=-1)
-
-
 def calculate_loss(y_pred, y, _max, _min):
+    """
+    Calculate MAE, RMSE and MAPE values. drop target values=0 when calculating loss.
+    Parameters
+    ----------
+    y_pred: Tensor, predicted values by model
+    y: Tensor, target values
+    _max: float, used to denormalize the values
+    _min: float, used to denormalize the values
+
+    Returns
+    -------
+    loss: tuple, MAE, RMSE and MAPE values
+    """
     y_pred_cpu = y_pred.cpu().detach().numpy()
     train_y_cpu = y.cpu().detach().numpy()
     y_pred_inv = denormalize(y_pred_cpu, _max, _min)

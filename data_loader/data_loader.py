@@ -6,11 +6,11 @@ import torch
 
 from utils.data_utils import scale_weights, derive_rep_timeline, get_sample_indices
 from data_loader.dataset import Dataset
-from utils.math_utils import z_score_normalize, min_max_normalize
+from utils.math_utils import min_max_normalize
 
 
 class DataLoader:
-    def __init__(self, data_configs):
+    def __init__(self, data_configs: dict):
         self.dataset = None
         self.n_batch_train = None
         self.n_batch_test = None
@@ -18,17 +18,16 @@ class DataLoader:
 
         self.num_of_vertices = data_configs['num_of_vertices']
         self.points_per_hour = data_configs['points_per_hour']
-        self.len_input = data_configs['len_input']
         self.num_for_predict = data_configs['num_for_predict']
         self.num_of_hours = data_configs['num_of_hours']
         self.num_of_days = data_configs['num_of_days']
         self.num_of_days = data_configs['num_of_days']
         self.num_of_weeks = data_configs['num_of_weeks']
-        self.num_of_days_target = data_configs['num_of_days_target']
-        self.num_of_weeks_target = data_configs['num_of_weeks_target']
         self.num_days_per_week = data_configs['num_days_per_week']
         self.rep_vectors = data_configs['rep_vectors']
         self.rep_vector_filename = data_configs['rep_vector_filename']
+        self.time_idx_feature = data_configs['time_idx_feature']
+        self.points_per_week = self.points_per_hour * 24 * self.num_days_per_week
 
         self.batch_size = data_configs['batch_size']
         self.enc_features = data_configs['enc_features']
@@ -44,14 +43,7 @@ class DataLoader:
         self.distance_threshold = data_configs['distance_threshold']
         self.semantic_threashold = data_configs['semantic_threashold']
 
-        # PEMSD7 Specific Variables
-        self.n_train = 34
-        self.n_test = 5
-        self.n_val = 5
-        self.day_slot = self.points_per_hour * 24
-        self.n_seq = self.len_input * 2
-        self.points_per_week = self.points_per_hour * 24 * self.num_days_per_week
-
+        # self.num_f is used in load_batch function
         self.num_f = 1
         if self.num_of_weeks:
             self.num_f += 1
@@ -65,52 +57,73 @@ class DataLoader:
             self.num_f += 1
 
     def _generate_new_x_arr(self, x_set: np.array, records_time_idx: dict):
-        # WARNING: This has be changed accordingly.
-        speed_idx = 0
-        last_dy_idx = 2
-        last_wk_idx = 4
+        """
+        Used to combine both x_set and representative_vector
+        Parameters
+        ----------
+        x_set: np.array, time series data
+        records_time_idx: dict, representative vectors of each node for each weekly-time-idx
+
+        Returns
+        -------
+        new_x_set: np.array: combined time series array.
+        """
+        speed_idx, last_dy_idx, last_wk_idx = 0, 2, 2
+        if self.num_of_days and self.num_of_weeks:
+            last_wk_idx = 4
+
+        input_dim_per_record = 1
+        if self.time_idx_feature:
+            input_dim_per_record = 2
 
         # Attach rep vectors for last day and last week data and drop weekly time index value
         new_n_f = x_set.shape[3]
         # To add rep last hour seq
         if self.rep_vectors:
-            new_n_f += 2
+            new_n_f += 2 if self.time_idx_feature else 1
         # To add rep last dy seq
         if self.num_of_days and self.rep_vectors:
-            new_n_f += 2
+            new_n_f += 2 if self.time_idx_feature else 1
         # To add rep last wk seq
         if self.num_of_weeks and self.rep_vectors:
-            new_n_f += 2
+            new_n_f += 2 if self.time_idx_feature else 1
 
         new_x_set = np.zeros((x_set.shape[0], x_set.shape[1], x_set.shape[2], new_n_f))
         for i, x in enumerate(x_set):
-            # WARNING: had to determine which index represent weekly time idx
             record_key = x[0, 0, 1]
-            record_key_yesterday = x[0, 0, 3]
+            record_key_yesterday = x[0, 0, last_dy_idx + 1]
 
-            tmp = x[:, :, speed_idx:speed_idx + 2]
+            tmp = x[:, :, speed_idx:speed_idx + input_dim_per_record]
             if self.num_of_days:
-                last_dy_data = x[:, :, last_dy_idx:last_dy_idx + 2]
+                last_dy_data = x[:, :, last_dy_idx:last_dy_idx + input_dim_per_record]
                 tmp = np.concatenate((tmp, last_dy_data), axis=-1)
             if self.num_of_weeks:
-                last_wk_data = x[:, :, last_wk_idx:last_wk_idx + 2]
+                last_wk_data = x[:, :, last_wk_idx:last_wk_idx + input_dim_per_record]
                 tmp = np.concatenate((tmp, last_wk_data), axis=-1)
             if self.rep_vectors:
                 tmp = np.concatenate((tmp, records_time_idx[record_key]), axis=-1)
-                tmp = np.concatenate((tmp, x[:, :, speed_idx + 1:speed_idx + 2]), axis=-1)
+                if self.time_idx_feature:
+                    tmp = np.concatenate((tmp, x[:, :, speed_idx + 1:speed_idx + 2]), axis=-1)
             if self.num_of_days and self.rep_vectors:
                 tmp = np.concatenate((tmp, records_time_idx[record_key_yesterday]), axis=-1)
-                tmp = np.concatenate((tmp, x[:, :, last_dy_idx + 1:last_dy_idx + 2]), axis=-1)
+                if self.time_idx_feature:
+                    tmp = np.concatenate((tmp, x[:, :, last_dy_idx + 1:last_dy_idx + 2]), axis=-1)
             if self.num_of_weeks and self.rep_vectors:
                 tmp = np.concatenate((tmp, records_time_idx[record_key]), axis=-1)
-                tmp = np.concatenate((tmp, x[:, :, last_wk_idx + 1:last_wk_idx + 2]), axis=-1)
+                if self.time_idx_feature:
+                    tmp = np.concatenate((tmp, x[:, :, last_wk_idx + 1:last_wk_idx + 2]), axis=-1)
 
             new_x_set[i] = tmp
 
         return new_x_set
 
-    # generate training, validation and test data
     def load_node_data_file(self):
+        """
+        Used to generate time sequence adding repetitive patterns along with representative time sequence
+        Returns
+        -------
+
+        """
         if not self.preprocess:
             preprocessed_file = open(self.preprocess_output_path, 'rb')
             self.dataset = pickle.load(preprocessed_file)
@@ -122,13 +135,14 @@ class DataLoader:
         all_targets = []
 
         new_data_seq = np.zeros((data_seq.shape[0], data_seq.shape[1], data_seq.shape[2] + 1))
-        points_per_week = self.points_per_hour * 24 * 7
 
+        # Adding weekly time index
         for idx in range(data_seq.shape[0]):
-            time_idx = np.array(idx % points_per_week)
+            time_idx = np.array(idx % self.points_per_week)
             new_arr = np.expand_dims(np.repeat(time_idx, self.num_of_vertices, axis=0), axis=1)
             new_data_seq[idx] = np.concatenate((data_seq[idx], new_arr), axis=-1)
 
+        # take repetitive patterns (last week, last day)
         for idx in range(new_data_seq.shape[0]):
             sample = get_sample_indices(new_data_seq, self.num_of_weeks,
                                         self.num_of_days,
@@ -136,37 +150,22 @@ class DataLoader:
                                         idx,
                                         self.num_for_predict,
                                         self.points_per_hour,
-                                        num_of_days_target=self.num_of_days_target,
-                                        num_of_weeks_target=self.num_of_weeks_target)
+                                        self.num_days_per_week)
             if (sample[0] is None) and (sample[1] is None) and (sample[2] is None):
                 continue
 
-            week_sample, day_sample, hour_sample, target, wk_dys, hrs, week_sample_target, day_sample_target = sample
-
-            time_idx_sample = np.repeat(np.expand_dims(new_data_seq[idx, :, -1:], axis=0), self.len_input, axis=0)
+            week_sample, day_sample, hour_sample, target = sample
 
             sample = None
-            # if self.num_of_days_target > 0:
-            #     sample = np.concatenate((sample, day_sample_target[:, :, 0:1]), axis=2)
             if self.num_of_hours > 0:
-                # sample = np.concatenate((sample, day_sample[:, :, 0:1]), axis=2)
-                sample = hour_sample[:, :, [0, 3]]
+                sample = hour_sample[:, :, [0, 3]]  # get traffic flow val and weekly time-idx
 
             if self.num_of_days > 0:
-                # sample = np.concatenate((sample, day_sample[:, :, 0:1]), axis=2)
                 sample = np.concatenate((sample, day_sample[:, :, [0, 3]]), axis=2)
 
             if self.num_of_weeks > 0:
                 sample = np.concatenate((sample, week_sample[:, :, [0, 3]]), axis=2)
 
-            if self.num_of_weeks_target > 0:
-                sample = np.concatenate((sample, week_sample_target[:, :, [0, 3]]), axis=2)
-                ### hr and wk_dy indices are not used as features. So skipping attaching ###
-
-            # sample = np.concatenate((sample, hr_idx_sample, wk_dy_idx_sample, time_idx_sample), axis=2)
-            # sample = np.concatenate((sample, time_idx_sample), axis=2)
-
-            # target = np.concatenate((target[:, :, 0:1], hr_idx_target, wk_dy_idx_target), axis=2)
             all_samples.append(sample)
             all_targets.append(target[:, :, [0, 3]])
 
@@ -182,19 +181,20 @@ class DataLoader:
         testing_y_set = np.array(all_targets[split_line2:])
 
         # Derive global representation vector for each sensor for similar time steps
+        # if there's no saved file to load rep vectors, set load_file=True.
         records_time_idx = None
         if self.rep_vectors:
             records_time_idx = derive_rep_timeline(training_x_set,
                                                    self.points_per_week,
                                                    self.num_of_vertices,
-                                                   load_file=False,
+                                                   load_file=True,
                                                    output_filename=self.rep_vector_filename)
 
         training_x_set = self._generate_new_x_arr(training_x_set, records_time_idx)
         validation_x_set = self._generate_new_x_arr(validation_x_set, records_time_idx)
         testing_x_set = self._generate_new_x_arr(testing_x_set, records_time_idx)
 
-        # Add tailing target values form x values to facilitate local trend attention in decoder
+        # Add suffix target values taken from the end of x value sequence
         training_y_set = np.concatenate(
             (training_x_set[:, -1 * self.dec_seq_offset:, :, 0:2], training_y_set), axis=1)
         validation_y_set = np.concatenate(
@@ -237,6 +237,12 @@ class DataLoader:
         return self.dataset
 
     def load_edge_data_file(self):
+        """
+        Return edge attributes and edge indices for distance based graph
+        Returns
+        -------
+        edge_index, edge_attr: np.array, np.array
+        """
         try:
             w = pd.read_csv(self.edge_weight_filename, header=None).values[1:]
 
@@ -244,8 +250,7 @@ class DataLoader:
             src_edges = []
             edge_attr = []
             for row in range(w.shape[0]):
-                # Drop edges with large distance between vertices. This adds incorrect attention in training time and
-                # degrade test performance (Over-fitting).
+                # Drop edges with large distance between vertices
                 if float(w[row][2]) > self.distance_threshold:
                     continue
                 dst_edges.append(int(float(w[row][0])))
@@ -261,6 +266,12 @@ class DataLoader:
             print(f'ERROR: input file was not found in {self.edge_weight_filename}.')
 
     def load_semantic_edge_data_file(self):
+        """
+        Return semantic edge weights
+        Returns
+        -------
+        [edge_index, edge_attr]: list[np.array, np.array], edge index array and edge attribute(weight) array
+        """
         semantic_file = open(self.semantic_adj_filename, 'rb')
         semantic_edge_details = pickle.load(semantic_file)
 
@@ -274,6 +285,18 @@ class DataLoader:
         return [edge_index, edge_attr]
 
     def load_batch(self, _type: str, offset: int, device: str = 'cpu'):
+        """
+        Used to load batches
+        Parameters
+        ----------
+        _type: str, indicate whether the batch is a train, val or test batch
+        offset: int, current offset from the start of the dataset.
+        device: str, cpu or cuda
+
+        Returns
+        -------
+        (enc_xs, dec_ys, dec_ys_target): tuple(Tensor, Tensor, Tensor), encoder input, decoder input and decoder target tensors
+        """
         xs = self.dataset.get_data(_type)
         ys = self.dataset.get_y(_type)
 
@@ -285,13 +308,17 @@ class DataLoader:
         # ys_input will be used as decoder inputs while ys will be used as ground truth data
         ys_input = np.copy(ys)
         ys = ys[:, :, :, 0:1]
+
+        # if _type!='train', input values of the decoder set to 0 to make sure there's no data leakage
         if _type != 'train':
             ys_input[:, self.dec_seq_offset:, :, 0:1] = 0
 
         # reshaping
         xs_shp = xs.shape
-        xs = np.reshape(xs, (xs_shp[0], xs_shp[1], xs_shp[2], self.num_f, 2))
+        input_dim_per_record = 2 if self.time_idx_feature else 1
+        xs = np.reshape(xs, (xs_shp[0], xs_shp[1], xs_shp[2], self.num_f, input_dim_per_record))  # (4, 12, 307, 12) -> (4, 12, 307, 6, 2)
 
+        # self.enc_features use to determine whether model accept representative time sequence as input
         num_inner_f_enc = int(xs.shape[-2] / self.enc_features)
         enc_xs = []
         for k in range(self.enc_features):
@@ -299,7 +326,7 @@ class DataLoader:
 
             for idx, x_timesteps in enumerate(xs):
                 seq_len = xs.shape[1]
-                tmp_xs = np.zeros((seq_len * num_inner_f_enc, xs.shape[2], 2))
+                tmp_xs = np.zeros((seq_len * num_inner_f_enc, xs.shape[2], input_dim_per_record))
                 for inner_f in range(num_inner_f_enc):
                     start_idx = (k * num_inner_f_enc) + num_inner_f_enc - inner_f - 1
                     end_idx = start_idx + 1
@@ -321,4 +348,4 @@ class DataLoader:
 
         dec_ys = torch.stack(dec_ys)
 
-        return enc_xs, None, dec_ys, dec_ys_target
+        return enc_xs, dec_ys, dec_ys_target

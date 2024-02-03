@@ -42,119 +42,64 @@ def search_data(sequence_length, num_of_depend, label_start_idx,
 
 
 def get_sample_indices(data_sequence, num_of_weeks, num_of_days, num_of_hours,
-                       label_start_idx, num_for_predict, points_per_hour=12,
-                       num_of_weeks_target=1, num_of_days_target=1):
-    '''
+                       label_start_idx, num_for_predict, num_days_per_week, points_per_hour=12):
+    """
     Parameters
     ----------
-    data_sequence: np.ndarray
-                   shape is (sequence_length, num_of_vertices, num_of_features)
-    num_of_weeks, num_of_days, num_of_hours: int
-    label_start_idx: int, the first index of predicting target, 预测值开始的那个点
-    num_for_predict: int,
-                     the number of points will be predicted for each sample
-    points_per_hour: int, default 12, number of points per hour
+    data_sequence: np.ndarray, traffic data
+    num_of_weeks: int, get last week data
+    num_of_days: int, get last day data
+    num_of_hours: int, get last hour data
+    label_start_idx: int, index of dat
+    num_for_predict: int, length of prediction sequence
+    num_days_per_week: int
+    points_per_hour: int
+
     Returns
-    ----------
-    week_sample: np.ndarray
-                 shape is (num_of_weeks * points_per_hour,
-                           num_of_vertices, num_of_features)
-    day_sample: np.ndarray
-                 shape is (num_of_days * points_per_hour,
-                           num_of_vertices, num_of_features)
-    hour_sample: np.ndarray
-                 shape is (num_of_hours * points_per_hour,
-                           num_of_vertices, num_of_features)
-    target: np.ndarray
-            shape is (num_for_predict, num_of_vertices, num_of_features)
-    '''
-
-    points_per_day = points_per_hour * 24
-    points_per_wk = points_per_hour * 24 * 7
-    wk_dys, hrs = [], []
-
-    week_sample, day_sample, hour_sample, week_sample_target, day_sample_target = None, None, None, None, None
+    -------
+    week_sample: np.ndarray: values corresponding to 1-hour period in last week,
+    day_sample: np.ndarray: values corresponding to 1-hour period in last day ,
+    hour_sample: np.ndarray: values corresponding to last hour ,
+    target: np.ndarray: values corresponding to 1-hour period which is required to be predicted
+    """
+    week_sample, day_sample, hour_sample = None, None, None
 
     if label_start_idx + num_for_predict > data_sequence.shape[0]:
-        return week_sample, day_sample, hour_sample, None, None, None, None, None
+        return week_sample, day_sample, hour_sample, None
 
     if num_of_weeks > 0:
         week_indices = search_data(data_sequence.shape[0], num_of_weeks,
                                    label_start_idx, num_for_predict,
-                                   7 * 24, points_per_hour)
+                                   num_days_per_week * 24, points_per_hour)
         if not week_indices:
-            return None, None, None, None, None, None, None, None
+            return None, None, None, None
 
         week_sample = np.concatenate([data_sequence[i: j]
                                       for i, j in week_indices], axis=0)
-
-    if num_of_weeks_target > 0:
-        week_indices_target = search_data(data_sequence.shape[0], num_of_weeks_target,
-                                          label_start_idx + num_for_predict, num_for_predict,
-                                          7 * 24, points_per_hour)
-        if not week_indices_target:
-            return None, None, None, None, None, None, None, None
-
-        week_sample_target = np.concatenate([data_sequence[i: j]
-                                             for i, j in week_indices_target], axis=0)
 
     if num_of_days > 0:
         day_indices = search_data(data_sequence.shape[0], num_of_days,
                                   label_start_idx, num_for_predict,
                                   24, points_per_hour)
         if not day_indices:
-            return None, None, None, None, None, None, None, None
+            return None, None, None, None
 
         day_sample = np.concatenate([data_sequence[i: j]
                                      for i, j in day_indices], axis=0)
-
-    if num_of_days_target > 0:
-        day_indices_target = search_data(data_sequence.shape[0], num_of_days_target,
-                                         label_start_idx + num_for_predict, num_for_predict,
-                                         24, points_per_hour)
-        if not day_indices_target:
-            return None, None, None, None, None, None, None, None
-
-        day_sample_target = np.concatenate([data_sequence[i: j]
-                                            for i, j in day_indices_target], axis=0)
 
     if num_of_hours > 0:
         hour_indices = search_data(data_sequence.shape[0], num_of_hours,
                                    label_start_idx, num_for_predict,
                                    1, points_per_hour)
         if not hour_indices:
-            return None, None, None, None, None, None, None, None
+            return None, None, None, None
 
         hour_sample = np.concatenate([data_sequence[i: j]
                                       for i, j in hour_indices], axis=0)
 
-        if hour_indices:
-            for idx in range(hour_indices[0][0], hour_indices[0][1]):
-                per_wk_idx = idx % points_per_wk
-                wk_dy = (per_wk_idx // points_per_day) + 1
-                wk_dys.append(wk_dy)
-
-                per_dy_idx = idx % points_per_day
-                hr = (per_dy_idx // points_per_hour) + 1
-                hrs.append(hr)
-
     target = data_sequence[label_start_idx: label_start_idx + num_for_predict]
 
-    tgt_start_idx = label_start_idx
-    tgt_end_idx = label_start_idx + num_for_predict
-    for idx in range(tgt_start_idx, tgt_end_idx):
-        per_wk_idx = idx % points_per_wk
-        wk_dy = (per_wk_idx // points_per_day) + 1
-        wk_dys.append(wk_dy)
-
-        per_dy_idx = idx % points_per_day
-        hr = (per_dy_idx // points_per_hour) + 1
-        hrs.append(hr)
-
-    wk_dys = np.array(wk_dys)
-    hrs = np.array(hrs)
-
-    return week_sample, day_sample, hour_sample, target, wk_dys, hrs, week_sample_target, day_sample_target
+    return week_sample, day_sample, hour_sample, target
 
 
 def derive_rep_timeline(x_set: np.array, points_per_week: int, num_of_vertices: int, load_file=True, output_filename= None):
