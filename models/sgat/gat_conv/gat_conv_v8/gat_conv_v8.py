@@ -346,7 +346,6 @@ class GATConvV8(MessagePassingV8):
         msg_t = x_j * alpha.unsqueeze(-1)
         msg_f = msg_t.permute(1, 2, 0, 3).reshape(-1, self.heads, self.seq_len * 64)
 
-
         return msg_f
 
     def __repr__(self) -> str:

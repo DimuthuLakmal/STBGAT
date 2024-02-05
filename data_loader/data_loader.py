@@ -144,7 +144,8 @@ class DataLoader:
 
         # take repetitive patterns (last week, last day)
         for idx in range(new_data_seq.shape[0]):
-            sample = get_sample_indices(new_data_seq, self.num_of_weeks,
+            sample = get_sample_indices(new_data_seq,
+                                        self.num_of_weeks,
                                         self.num_of_days,
                                         self.num_of_hours,
                                         idx,

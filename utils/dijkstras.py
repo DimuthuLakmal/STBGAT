@@ -43,12 +43,17 @@ def load_adj(filename, num_of_vertices):
 
 
 if __name__ == '__main__':
+    """
+    This script helps to find shortest distances between nodes. 
+    Original distance file only contains distance if a pair of node exists in a same road segment.
+    """
+
     # load configs
     with open("../config/config.yaml", "r") as stream:
         configs = yaml.safe_load(stream)
 
     data_configs = configs['data']
-    edge_filename = data_configs['edge_weight_filename']
+    edge_filename = data_configs['edge_weight_filename_original']
     adj = load_adj(f'../{edge_filename}', data_configs['num_of_vertices'])
 
     # Output shortest distances

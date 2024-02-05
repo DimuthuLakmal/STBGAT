@@ -12,6 +12,7 @@ class GAT(nn.Module):
 
         self.n_layers = configs['n_layers']
         self.dropout = configs['dropout']
+        self.dropout_g = configs['dropout_g']
         self.seq_len = configs['seq_len']
         self.out_f_sizes = configs['out_f_sizes']
 
@@ -25,12 +26,11 @@ class GAT(nn.Module):
         for l in range(self.n_layers):
             in_f_size = self.out_f_sizes[l - 1] * n_heads[l - 1] if l else first_in_f_size
             concat = True if l < (self.n_layers - 1) else False
-            gat_layer = GATLayer(in_f_size, self.out_f_sizes[l], n_heads=n_heads[l], dropout=self.dropout, alpha=alpha,
+            gat_layer = GATLayer(in_f_size, self.out_f_sizes[l], n_heads=n_heads[l], dropout=self.dropout_g, alpha=alpha,
                                  concat=concat, edge_dim=edge_dim, seq_len=seq_len)
             self.layer_stack.append(gat_layer)
 
     def forward(self, batch_data):
-        # ToDo: implement using pytorch geometric batch data
         out = ()
         for data in batch_data:
             x, edge_index, edge_attr = data.x, data.edge_index, data.edge_attr

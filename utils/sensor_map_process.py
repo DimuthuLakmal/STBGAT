@@ -1,5 +1,4 @@
 import pandas as pd
-import random
 import csv
 import numpy as np
 import geopy.distance
@@ -52,6 +51,7 @@ def load_data_file(file: str):
     return df
 
 
+""" NOT RELEVANT """
 if __name__ == '__main__':
     df = load_data_file('../data/PEMSD7/PeMSD7_M_Station_Info.csv')
 

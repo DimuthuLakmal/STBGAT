@@ -135,15 +135,11 @@ def prepare_data(model_configs: dict, data_configs: dict):
     data_loader = DataLoader(data_configs)
     data_loader.load_node_data_file()
     edge_index, edge_attr = data_loader.load_edge_data_file()
-    edge_details = data_loader.load_semantic_edge_data_file()
-
-    model_configs['transformer']['decoder']['edge_index'] = edge_index
-    model_configs['transformer']['decoder']['edge_attr'] = edge_attr
-    model_configs['transformer']['decoder']['edge_details'] = edge_details
+    sem_edge_details = data_loader.load_semantic_edge_data_file()
 
     model_configs['transformer']['encoder']['edge_index'] = edge_index
     model_configs['transformer']['encoder']['edge_attr'] = edge_attr
-    model_configs['transformer']['encoder']['edge_details'] = edge_details
+    model_configs['transformer']['encoder']['sem_edge_details'] = sem_edge_details
 
     max_lkup_len_enc, lkup_idx_enc, max_lkup_len_dec, lkup_idx_dec = create_lookup_index(data_configs['num_of_weeks'],
                                                                                          data_configs['num_of_days'],

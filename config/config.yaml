@@ -17,7 +17,8 @@ model:
       local_trends: True # decides whether the temporal encoder apply convolution to distinguish local trends in time series data
       graph_semantic_input: True # to enable semantics based graph
       graph_input: True # to enable distance based graph
-      dropout_e: 0.0 # dropout applied to the final output of temporal encoder layer
+      dropout_e_normal: 0.0 # dropout applied to the final output of temporal encoder layer of the first encoder
+      dropout_e_rep: 0.2 # dropout applied to the final output of temporal encoder layer of the second encoder (representative time sequence)
       encoder_block: # temporal encoder layer configs
         n_heads: 8
         expansion_factor: 4
@@ -29,7 +30,9 @@ model:
         out_f_sizes: [ 64 ] # output size of the graph
         n_heads: [ 8 ] # number of heads
         alpha: 0.2
-        dropout: 0.7
+        dropout: 0.7 # dropout applied to the output of the graph network
+        dropout_g_dis: 0.6 # dropout inside graph network (distance graph)
+        dropout_g_sem: 0.6 # dropout inside graph network (semantic graph)
         edge_dim: 1 # edge attribute dimension
     decoder:
       emb_dim: 64 # decoder input dimension
@@ -53,7 +56,8 @@ model:
 
 # Data Configs
 data:
-  edge_weight_filename: "data/PEMS04/PEMS04_dij.csv" # distance based edge weights
+  edge_weight_filename_original: 'data/PEMS04/PEMS04.csv' # orignal distance file
+  edge_weight_filename: "data/PEMS04/PEMS04_dij.csv" # distance based edge weights (shortest path distange among nodes)
   semantic_adj_filename: "data/PEMS04/PEMS04_time_idx_semantic_edges.pickle" # semantic based edge weights
   edge_weight_scaling: True # to normalize the edge weights
   node_data_filename: "data/PEMS04/PEMS04.npz" # traffic flow values
