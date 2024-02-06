@@ -42,7 +42,7 @@ def search_data(sequence_length, num_of_depend, label_start_idx,
 
 
 def get_sample_indices(data_sequence, num_of_weeks, num_of_days, num_of_hours,
-                       label_start_idx, num_for_predict, num_days_per_week, points_per_hour=12):
+                       label_start_idx, num_for_predict, points_per_hour=12, num_days_per_week=7):
     """
     Parameters
     ----------
