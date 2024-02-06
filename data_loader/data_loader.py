@@ -26,7 +26,9 @@ class DataLoader:
         self.num_days_per_week = data_configs['num_days_per_week']
         self.rep_vectors = data_configs['rep_vectors']
         self.rep_vector_filename = data_configs['rep_vector_filename']
-        self.time_idx_feature = data_configs['time_idx_feature']
+        self.rep_vector_from_file = data_configs['rep_vector_from_file']
+        self.time_idx_enc_feature = data_configs['time_idx_enc_feature']
+        self.time_idx_dec_feature = data_configs['time_idx_dec_feature']
         self.points_per_week = self.points_per_hour * 24 * self.num_days_per_week
 
         self.batch_size = data_configs['batch_size']
@@ -73,20 +75,20 @@ class DataLoader:
             last_wk_idx = 4
 
         input_dim_per_record = 1
-        if self.time_idx_feature:
+        if self.time_idx_enc_feature:
             input_dim_per_record = 2
 
         # Attach rep vectors for last day and last week data and drop weekly time index value
         new_n_f = x_set.shape[3]
         # To add rep last hour seq
         if self.rep_vectors:
-            new_n_f += 2 if self.time_idx_feature else 1
+            new_n_f += 2 if self.time_idx_enc_feature else 1
         # To add rep last dy seq
         if self.num_of_days and self.rep_vectors:
-            new_n_f += 2 if self.time_idx_feature else 1
+            new_n_f += 2 if self.time_idx_enc_feature else 1
         # To add rep last wk seq
         if self.num_of_weeks and self.rep_vectors:
-            new_n_f += 2 if self.time_idx_feature else 1
+            new_n_f += 2 if self.time_idx_enc_feature else 1
 
         new_x_set = np.zeros((x_set.shape[0], x_set.shape[1], x_set.shape[2], new_n_f))
         for i, x in enumerate(x_set):
@@ -102,15 +104,15 @@ class DataLoader:
                 tmp = np.concatenate((tmp, last_wk_data), axis=-1)
             if self.rep_vectors:
                 tmp = np.concatenate((tmp, records_time_idx[record_key]), axis=-1)
-                if self.time_idx_feature:
+                if self.time_idx_enc_feature:
                     tmp = np.concatenate((tmp, x[:, :, speed_idx + 1:speed_idx + 2]), axis=-1)
             if self.num_of_days and self.rep_vectors:
                 tmp = np.concatenate((tmp, records_time_idx[record_key_yesterday]), axis=-1)
-                if self.time_idx_feature:
+                if self.time_idx_enc_feature:
                     tmp = np.concatenate((tmp, x[:, :, last_dy_idx + 1:last_dy_idx + 2]), axis=-1)
             if self.num_of_weeks and self.rep_vectors:
                 tmp = np.concatenate((tmp, records_time_idx[record_key]), axis=-1)
-                if self.time_idx_feature:
+                if self.time_idx_enc_feature:
                     tmp = np.concatenate((tmp, x[:, :, last_wk_idx + 1:last_wk_idx + 2]), axis=-1)
 
             new_x_set[i] = tmp
@@ -188,7 +190,7 @@ class DataLoader:
             records_time_idx = derive_rep_timeline(training_x_set,
                                                    self.points_per_week,
                                                    self.num_of_vertices,
-                                                   load_file=True,
+                                                   load_file=self.rep_vector_from_file,
                                                    output_filename=self.rep_vector_filename)
 
         training_x_set = self._generate_new_x_arr(training_x_set, records_time_idx)
@@ -202,6 +204,11 @@ class DataLoader:
             (validation_x_set[:, -1 * self.dec_seq_offset:, :, 0:2], validation_y_set), axis=1)
         testing_y_set = np.concatenate(
             (testing_x_set[:, -1 * self.dec_seq_offset:, :, 0:2], testing_y_set), axis=1)
+
+        if not self.time_idx_dec_feature:
+            training_y_set = training_y_set[:, :, :, 0:1]
+            validation_y_set = validation_y_set[:, :, :, 0:1]
+            testing_y_set = testing_y_set[:, :, :, 0:1]
 
         # max-min normalization on input and target values
         (stats_x, x_train, x_val, x_test) = min_max_normalize(training_x_set, validation_x_set, testing_x_set)
@@ -316,7 +323,7 @@ class DataLoader:
 
         # reshaping
         xs_shp = xs.shape
-        input_dim_per_record = 2 if self.time_idx_feature else 1
+        input_dim_per_record = 2 if self.time_idx_enc_feature else 1
         xs = np.reshape(xs, (xs_shp[0], xs_shp[1], xs_shp[2], self.num_f, input_dim_per_record))  # (4, 12, 307, 12) -> (4, 12, 307, 6, 2)
 
         # self.enc_features use to determine whether model accept representative time sequence as input

@@ -34,13 +34,13 @@ def train_validate(model: SGATTransformer,
         if is_lr_sh:
             logger.info(f"LR: {lr_scheduler.get_last_lr()}")
 
-        mae_train_loss, rmse_train_loss, mape_train_loss = train(model=model,
-                                                                 data_loader=data_loader,
-                                                                 optimizer=optimizer,
-                                                                 loss_fn=ls_fn,
-                                                                 device=configs['device'],
-                                                                 seq_offset=dec_offset,
-                                                                 _train=_train)
+        # mae_train_loss, rmse_train_loss, mape_train_loss = train(model=model,
+        #                                                          data_loader=data_loader,
+        #                                                          optimizer=optimizer,
+        #                                                          loss_fn=ls_fn,
+        #                                                          device=configs['device'],
+        #                                                          seq_offset=dec_offset,
+        #                                                          _train=_train)
 
         mae_val_loss, rmse_val_loss, mape_val_loss = test(_type='test',
                                                           model=model,
@@ -50,10 +50,10 @@ def train_validate(model: SGATTransformer,
         if is_lr_sh:
             lr_scheduler.step()
 
-        out_txt = f"Epoch: {epoch} | mae_train_loss: {mae_train_loss} | rmse_train_loss: {rmse_train_loss} " \
-                  f"| mape_train_loss: {mape_train_loss} | mae_val_loss: {mae_val_loss} " \
-                  f"| rmse_val_loss: {rmse_val_loss} | mape_val_loss: {mape_val_loss}"
-        logger.info(out_txt)
+        # out_txt = f"Epoch: {epoch} | mae_train_loss: {mae_train_loss} | rmse_train_loss: {rmse_train_loss} " \
+        #           f"| mape_train_loss: {mape_train_loss} | mae_val_loss: {mae_val_loss} " \
+        #           f"| rmse_val_loss: {rmse_val_loss} | mape_val_loss: {mape_val_loss}"
+        # logger.info(out_txt)
 
         if min_val_loss > mae_val_loss:
             min_val_loss = mae_val_loss
@@ -83,6 +83,7 @@ def run(model: SGATTransformer, configs: dict, data_loader: DataLoader):
     mse_loss_fn = Masked_MAE_Loss()
 
     # Initial Training
+    logger.info('Training model...')
     train_validate(model=model,
                    configs=configs,
                    lr=0.001,
@@ -91,7 +92,6 @@ def run(model: SGATTransformer, configs: dict, data_loader: DataLoader):
                    _train=True)
 
     # Fine tuning
-    logger.info('Training model...')
     best_model_path = train_validate(model=model,
                                      configs=configs,
                                      lr=0.0005,
@@ -131,7 +131,8 @@ def prepare_data(model_configs: dict, data_configs: dict):
     dec_seq_len = model_configs['transformer']['decoder']['seq_len']
     enc_seq_len = model_configs['transformer']['encoder']['seq_len']
 
-    data_configs['time_idx_feature'] = True if model_configs['transformer']['encoder']['input_dim'] == 2 else False
+    data_configs['time_idx_enc_feature'] = True if model_configs['transformer']['encoder']['input_dim'] == 2 else False
+    data_configs['time_idx_dec_feature'] = True if model_configs['transformer']['decoder']['input_dim'] == 2 else False
     data_loader = DataLoader(data_configs)
     data_loader.load_node_data_file()
     edge_index, edge_attr = data_loader.load_edge_data_file()

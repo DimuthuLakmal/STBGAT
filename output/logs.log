@@ -1206,3 +1206,34 @@ all_batch: 2244 | batch: 1124 | mae_tmp_loss: 37.14791061486138 | rmse_tmp_loss:
 all_batch: 2244 | batch: 1249 | mae_tmp_loss: 35.735746533966065 | rmse_tmp_loss: 47.58736232147217 | mape_tmp_loss: 0.4384061679363251
 all_batch: 2244 | batch: 1374 | mae_tmp_loss: 34.35192891068892 | rmse_tmp_loss: 46.00173522949219 | mape_tmp_loss: 0.4156794772744179
 all_batch: 2244 | batch: 1499 | mae_tmp_loss: 33.163639526367184 | rmse_tmp_loss: 44.615715999603275 | mape_tmp_loss: 0.39685476866861186
+all_batch: 2244 | batch: 1624 | mae_tmp_loss: 32.209251235375035 | rmse_tmp_loss: 43.48785427680382 | mape_tmp_loss: 0.38230720610343494
+all_batch: 2244 | batch: 1749 | mae_tmp_loss: 31.276188541412353 | rmse_tmp_loss: 42.378612339019774 | mape_tmp_loss: 0.36912163657375746
+all_batch: 2244 | batch: 1874 | mae_tmp_loss: 30.383292043558757 | rmse_tmp_loss: 41.34087941792806 | mape_tmp_loss: 0.3552344332019488
+all_batch: 2244 | batch: 1999 | mae_tmp_loss: 29.688962960243224 | rmse_tmp_loss: 40.51669702720642 | mape_tmp_loss: 0.3446177797988057
+all_batch: 2244 | batch: 2124 | mae_tmp_loss: 28.99600024952608 | rmse_tmp_loss: 39.699802943510164 | mape_tmp_loss: 0.3341254435532233
+MAE 287.32061767578125
+MAE 161.47023599454673
+MAE 123.26173609643433
+MAE 118.46736920632397
+MAE 138.8455009555579
+MAE 169.80789221118312
+MAE 170.75078848078724
+MAE 158.27033824077176
+Epoch: 0 | mae_train_loss: 28.509578416691745 | rmse_train_loss: 39.10667981523456 | mape_train_loss: 0.32678072564569494 | mae_val_loss: 153.67366977936445 | rmse_val_loss: 218.14417359153217 | mape_val_loss: 2.3412045876888987
+Saving Model...
+Training model...
+LR: [0.001]
+Training model...
+LR: [0.001]
+Training model...
+LR: [0.001]
+Training model...
+LR: [0.001]
+Training model...
+LR: [0.001]
+Training model...
+LR: [0.001]
+Training model...
+LR: [0.001]
+Training model...
+LR: [0.001]
