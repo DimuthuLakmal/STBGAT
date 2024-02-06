@@ -34,13 +34,13 @@ def train_validate(model: SGATTransformer,
         if is_lr_sh:
             logger.info(f"LR: {lr_scheduler.get_last_lr()}")
 
-        # mae_train_loss, rmse_train_loss, mape_train_loss = train(model=model,
-        #                                                          data_loader=data_loader,
-        #                                                          optimizer=optimizer,
-        #                                                          loss_fn=ls_fn,
-        #                                                          device=configs['device'],
-        #                                                          seq_offset=dec_offset,
-        #                                                          _train=_train)
+        mae_train_loss, rmse_train_loss, mape_train_loss = train(model=model,
+                                                                 data_loader=data_loader,
+                                                                 optimizer=optimizer,
+                                                                 loss_fn=ls_fn,
+                                                                 device=configs['device'],
+                                                                 seq_offset=dec_offset,
+                                                                 _train=_train)
 
         mae_val_loss, rmse_val_loss, mape_val_loss = test(_type='test',
                                                           model=model,
@@ -50,10 +50,10 @@ def train_validate(model: SGATTransformer,
         if is_lr_sh:
             lr_scheduler.step()
 
-        # out_txt = f"Epoch: {epoch} | mae_train_loss: {mae_train_loss} | rmse_train_loss: {rmse_train_loss} " \
-        #           f"| mape_train_loss: {mape_train_loss} | mae_val_loss: {mae_val_loss} " \
-        #           f"| rmse_val_loss: {rmse_val_loss} | mape_val_loss: {mape_val_loss}"
-        # logger.info(out_txt)
+        out_txt = f"Epoch: {epoch} | mae_train_loss: {mae_train_loss} | rmse_train_loss: {rmse_train_loss} " \
+                  f"| mape_train_loss: {mape_train_loss} | mae_val_loss: {mae_val_loss} " \
+                  f"| rmse_val_loss: {rmse_val_loss} | mape_val_loss: {mape_val_loss}"
+        logger.info(out_txt)
 
         if min_val_loss > mae_val_loss:
             min_val_loss = mae_val_loss
