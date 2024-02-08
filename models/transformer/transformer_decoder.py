@@ -130,26 +130,35 @@ class TransformerDecoder(nn.Module):
 
         return out
 
-    def forward(self, x, enc_x, tgt_mask, device):
+    def forward(self, x, enc_x, device):
         embed_out = self.embedding(x)
         embed_shp = embed_out.shape
+        enc_x_shp = enc_x[0].shape
         embed_out = organize_matrix(embed_out)
         out_d = self.position_embedding(embed_out, self.lookup_idx)  # 32x36x64
 
         tgt_mask_conv = self.create_conv_mask(out_d, device)  # to stop data flow from future time steps
         for idx, layer in enumerate(self.layers):
+            enc_x_conv = []
             if self.local_trends:
+                out_d = out_d.view(-1, embed_shp[1], embed_shp[3])
                 out_d = self.calculate_masked_src(out_d, self.conv_q_layers[idx], tgt_mask_conv, device)
 
-            enc_xs = []
-            for idx_k, f_layer in enumerate(self.conv_k_layers[idx]):
-                if self.enc_features > 1:
-                    enc_xs.append(f_layer(enc_x[idx_k].transpose(2, 1)).transpose(2, 1))
-                else:
-                    start = idx_k * self.per_enc_feature_len
-                    enc_xs.append(
-                        f_layer(enc_x[0][:, start: start + self.per_enc_feature_len].transpose(2, 1)).transpose(2, 1))
+                for idx_k, f_layer in enumerate(self.conv_k_layers[idx]):
+                    if self.enc_features > 1:
+                        enc_x_i = organize_matrix(enc_x[idx_k].transpose(1, 2))
+                        enc_x_conv.append(f_layer(enc_x_i.transpose(2, 1)).transpose(2, 1))
+                    else:
+                        start = idx_k * self.per_enc_feature_len
+                        enc_x_0 = organize_matrix(enc_x[0].transpose(1, 2))
+                        enc_x_conv.append(
+                            f_layer(enc_x_0[:, start: start + self.per_enc_feature_len].transpose(2, 1)).transpose(2, 1))
 
-            out_d = layer(out_d, enc_xs, tgt_mask)
+            else:
+                enc_x_conv = [x for x in enc_x]
 
-        return self._return_mat(out_d, embed_shp)
+            out_d = out_d.reshape(embed_shp[0], embed_shp[2], embed_shp[1], embed_shp[3])
+            enc_x_conv = [x.reshape(enc_x_shp[0], enc_x_shp[1], enc_x_shp[2], enc_x_shp[3]) for x in enc_x_conv]
+            out_d = layer(out_d, enc_x_conv)
+
+        return self.fc_out(out_d).transpose(1, 2)

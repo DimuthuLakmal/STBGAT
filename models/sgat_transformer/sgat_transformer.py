@@ -62,7 +62,7 @@ class SGATTransformer(nn.Module):
         -------
         enc_outs: Tensor
         """
-        enc_outs = torch.zeros((self.enc_features, x_shp[0] * x_shp[2], x_shp[1], self.enc_out_size)).to(self.device)
+        enc_outs = torch.zeros((self.enc_features, x_shp[0], x_shp[2], x_shp[1], self.enc_out_size)).to(self.device)
         return enc_outs
 
     def forward(self, x, y=None, train=True):
@@ -79,13 +79,13 @@ class SGATTransformer(nn.Module):
         # if model in test or finetune stage, decoder will be fed with input in autoregressive manner.
         # Otherwise, it will be fed in parallel at once.
         if train:
-            dec_out = self.decoder(y, enc_outs, tgt_mask=tgt_mask, device=self.device)
+            dec_out = self.decoder(y, enc_outs, device=self.device)
             return dec_out[:, self.dec_out_start_idx: self.dec_out_end_idx]
         else:
             dec_out_len = self.dec_seq_len - self.dec_seq_offset
             for i in range(dec_out_len):
                 y_input = torch.tensor(y)
-                dec_out = self.decoder(y_input, enc_outs, tgt_mask=tgt_mask, device=self.device)
+                dec_out = self.decoder(y_input, enc_outs, device=self.device)
                 y[:, i + self.dec_seq_offset, :, 0:1] = dec_out[:, i + self.dec_out_start_idx]
 
             return y[:, self.dec_seq_offset:, :, 0:1]

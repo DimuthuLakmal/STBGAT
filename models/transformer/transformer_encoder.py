@@ -1,7 +1,7 @@
 import torch
 from torch import nn, Tensor
 
-from models.sgat.sgat_embedding import SGATEmbedding
+from models.sgat.gat import GAT
 from models.transformer.positional_embedding import PositionalEmbedding
 from models.transformer.encoder_block import EncoderBlock
 from models.transformer.token_embedding import TokenEmbedding
@@ -54,10 +54,10 @@ class TransformerEncoder(nn.Module):
         configs['sgat']['seq_len'] = configs['seq_len']
         configs['sgat']['dropout_g'] = configs['sgat']['dropout_g_dis']
         if self.graph_input:
-            self.graph_embedding_dis = SGATEmbedding(configs['sgat'])
+            self.graph_embedding_dis = GAT(configs['sgat'])
         configs['sgat']['dropout_g'] = configs['sgat']['dropout_g_sem']
         if self.graph_semantic_input:
-            self.graph_embedding_semantic = SGATEmbedding(configs['sgat'])
+            self.graph_embedding_semantic = GAT(configs['sgat'])
 
         # encoder output layers
         self.out_norm = nn.LayerNorm(graph_out_size)
@@ -104,11 +104,13 @@ class TransformerEncoder(nn.Module):
 
     def forward(self, x, enc_idx):
         embed_out = self.embedding(x)
+        embed_out_shp = embed_out.shape
         embed_out = organize_matrix(embed_out)
 
         out_e = self.positional_encoder(embed_out, self.lookup_idx)
         for (layer, conv_q, conv_k) in zip(self.layers, self.conv_q_layers, self.conv_k_layers):
             if self.local_trends:
+                out_e = out_e.view(-1, embed_out_shp[1], embed_out_shp[3])
                 out_transposed = out_e.transpose(2, 1)
                 q = conv_q(out_transposed).transpose(2, 1)
                 k = conv_k(out_transposed).transpose(2, 1)
@@ -116,6 +118,9 @@ class TransformerEncoder(nn.Module):
             else:
                 q, k, v = out_e, out_e, out_e
 
+            q = q.reshape(embed_out_shp[0], embed_out_shp[2], embed_out_shp[1], embed_out_shp[3])
+            v = v.reshape(embed_out_shp[0], embed_out_shp[2], embed_out_shp[1], embed_out_shp[3])
+            k = k.reshape(embed_out_shp[0], embed_out_shp[2], embed_out_shp[1], embed_out_shp[3])
             out_e = layer(q, k, v)  # output of temporal encoder layer
 
         if enc_idx == 0:
@@ -141,7 +146,7 @@ class TransformerEncoder(nn.Module):
                 return out_e
 
             # add and norm of the output temporal encoder layer and graphs output
-            out = self.dropout_e_normal(self.out_e_lin(out_e)) + organize_matrix(out_g)
+            out = self.dropout_e_normal(self.out_e_lin(out_e)) + out_g.transpose(1, 2)
             return out  # 32x10x512
 
         # We avoided applying graph structure to the representative vector in some datasets.

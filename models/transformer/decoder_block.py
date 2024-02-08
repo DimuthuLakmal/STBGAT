@@ -1,7 +1,7 @@
 from torch import nn
-from torch.nn import MultiheadAttention
 
 from models.transformer.cross_attention import CrossAttentionLayer
+from models.transformer.multi_head_attention import MultiHeadAttention
 from models.transformer.position_wise_feed_forward import PositionWiseFeedForward
 
 
@@ -17,7 +17,7 @@ class DecoderBlock(nn.Module):
         src_dropout = configs['src_dropout']
         ff_dropout = configs['ff_dropout']
 
-        self.self_attention = MultiheadAttention(embed_dim=emb_dim, num_heads=n_heads, batch_first=True, bias=True)
+        self.self_attention = MultiHeadAttention(emb_dim, n_heads, mask=True)
         self.norm1 = nn.LayerNorm(emb_dim)
         self.dropout1 = nn.Dropout(src_dropout)
 
@@ -30,10 +30,10 @@ class DecoderBlock(nn.Module):
         self.norm3 = nn.LayerNorm(emb_dim)
         self.dropout2 = nn.Dropout(ff_dropout)
 
-    def forward(self, x, enc_x, tgt_mask):
+    def forward(self, x, enc_x):
         # self attention
-        attention = self.self_attention(x, x, x, attn_mask=tgt_mask)  # 32x10x512
-        x = self.norm1(x + self.dropout1(attention[0]))
+        attention = self.self_attention(x, x, x)  # 32x10x512
+        x = self.norm1(x + self.dropout1(attention))
 
         # cross attention
         cross_attn = None

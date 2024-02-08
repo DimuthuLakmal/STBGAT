@@ -1,6 +1,6 @@
 from torch import nn
-from torch.nn import MultiheadAttention
 
+from models.transformer.multi_head_attention import MultiHeadAttention
 from models.transformer.position_wise_feed_forward import PositionWiseFeedForward
 
 
@@ -14,7 +14,7 @@ class EncoderBlock(nn.Module):
         src_dropout = configs['src_dropout']
         ff_dropout = configs['ff_dropout']
 
-        self.attention = MultiheadAttention(embed_dim=emb_dim, num_heads=n_heads, batch_first=True)
+        self.attention = MultiHeadAttention(emb_dim, n_heads, mask=False)
 
         self.norm1 = nn.LayerNorm(emb_dim)
         self.norm2 = nn.LayerNorm(emb_dim)
@@ -26,7 +26,7 @@ class EncoderBlock(nn.Module):
 
     def forward(self, query, key, value):
         # self attention
-        attention_out = self.attention(query, key, value)[0]  # 32x10x512
+        attention_out = self.attention(query, key, value)  # 32x10x512
 
         # add and normalization
         attention_residual_out = self.dropout1(attention_out) + value  # 32x10x512
