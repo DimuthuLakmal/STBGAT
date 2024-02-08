@@ -1,6 +1,6 @@
 from torch import nn
 
-from models.sgat.gat_conv.gat_conv_v8.gat_conv_v8 import GATConvV8
+from models.sgat.gat_conv.gat_conv import GATConv
 
 
 class GATLayer(nn.Module):
@@ -15,10 +15,10 @@ class GATLayer(nn.Module):
         self.seq_len = seq_len
 
         if edge_dim == -1:
-            self.conv = GATConvV8([in_features, in_features], out_features, heads=n_heads, dropout=dropout,
+            self.conv = GATConv([in_features, in_features], out_features, heads=n_heads, dropout=dropout,
                                   concat=concat, seq_len=seq_len)
         else:
-            self.conv = GATConvV8([in_features, in_features], out_features, heads=n_heads, dropout=dropout,
+            self.conv = GATConv([in_features, in_features], out_features, heads=n_heads, dropout=dropout,
                                   concat=concat, edge_dim=edge_dim, seq_len=seq_len)
 
     def forward(self, x, edge_index, edge_attr=None):

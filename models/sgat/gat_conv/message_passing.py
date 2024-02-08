@@ -51,7 +51,7 @@ def ptr2ind(ptr: Tensor) -> Tensor:
     return ind.repeat_interleave(ptr[1:] - ptr[:-1])
 
 
-class MessagePassingV7(torch.nn.Module):
+class MessagePassing(torch.nn.Module):
     r"""Base class for creating message passing layers of the form
 
     .. math::
@@ -470,39 +470,37 @@ class MessagePassingV7(torch.nn.Module):
                     if res is not None:
                         out = res
 
-        # We just need the message to be returned
+                if self.explain:
+                    explain_msg_kwargs = self.inspector.distribute(
+                        'explain_message', coll_dict)
+                    out = self.explain_message(out, **explain_msg_kwargs)
 
-        #         if self.explain:
-        #             explain_msg_kwargs = self.inspector.distribute(
-        #                 'explain_message', coll_dict)
-        #             out = self.explain_message(out, **explain_msg_kwargs)
-        #
-        #         aggr_kwargs = self.inspector.distribute('aggregate', coll_dict)
-        #         for hook in self._aggregate_forward_pre_hooks.values():
-        #             res = hook(self, (aggr_kwargs, ))
-        #             if res is not None:
-        #                 aggr_kwargs = res[0] if isinstance(res, tuple) else res
-        #
-        #         out = self.aggregate(out, **aggr_kwargs)
-        #
-        #         for hook in self._aggregate_forward_hooks.values():
-        #             res = hook(self, (aggr_kwargs, ), out)
-        #             if res is not None:
-        #                 out = res
-        #
-        #         update_kwargs = self.inspector.distribute('update', coll_dict)
-        #         out = self.update(out, **update_kwargs)
-        #
-        #         if decomposed_layers > 1:
-        #             decomp_out.append(out)
-        #
-        #     if decomposed_layers > 1:
-        #         out = torch.cat(decomp_out, dim=-1)
-        #
-        # for hook in self._propagate_forward_hooks.values():
-        #     res = hook(self, (edge_index, size, kwargs), out)
-        #     if res is not None:
-        #         out = res
+                aggr_kwargs = self.inspector.distribute('aggregate', coll_dict)
+                for hook in self._aggregate_forward_pre_hooks.values():
+                    res = hook(self, (aggr_kwargs, ))
+                    if res is not None:
+                        aggr_kwargs = res[0] if isinstance(res, tuple) else res
+
+                out = self.aggregate(out, **aggr_kwargs)
+
+                for hook in self._aggregate_forward_hooks.values():
+                    res = hook(self, (aggr_kwargs, ), out)
+                    if res is not None:
+                        out = res
+
+                update_kwargs = self.inspector.distribute('update', coll_dict)
+                out = self.update(out, **update_kwargs)
+
+                if decomposed_layers > 1:
+                    decomp_out.append(out)
+
+            if decomposed_layers > 1:
+                out = torch.cat(decomp_out, dim=-1)
+
+        for hook in self._propagate_forward_hooks.values():
+            res = hook(self, (edge_index, size, kwargs), out)
+            if res is not None:
+                out = res
 
         return out
 
