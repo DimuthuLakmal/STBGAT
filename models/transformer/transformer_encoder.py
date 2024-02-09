@@ -142,7 +142,7 @@ class TransformerEncoder(nn.Module):
             elif not self.graph_input and self.graph_semantic_input:
                 out_g = out_g_semantic
             elif not self.graph_input and not self.graph_semantic_input:
-                out_e = self.dropout_e(self.out_e_lin(out_e))
+                out_e = self.dropout_e_normal(self.out_e_lin(out_e))
                 return out_e
 
             # add and norm of the output temporal encoder layer and graphs output

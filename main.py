@@ -136,7 +136,9 @@ def prepare_data(model_configs: dict, data_configs: dict):
     data_loader = DataLoader(data_configs)
     data_loader.load_node_data_file()
     edge_index, edge_attr = data_loader.load_edge_data_file()
-    sem_edge_details = data_loader.load_semantic_edge_data_file()
+    sem_edge_details = [[], []]
+    if model_configs['transformer']['encoder']['graph_semantic_input']:
+        sem_edge_details = data_loader.load_semantic_edge_data_file()
 
     model_configs['transformer']['encoder']['edge_index'] = edge_index
     model_configs['transformer']['encoder']['edge_attr'] = edge_attr
