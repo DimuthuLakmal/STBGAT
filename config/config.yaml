@@ -48,7 +48,7 @@ model:
       decoder_block: # temporal decoder layer configs
         n_heads: 8
         expansion_factor: 4
-        cross_attn_features: 2 # Used to indicates how many feature-wise cross attentions in the decoder. This value=2 when rep_vector is True. otherwise 1.
+        cross_attn_features: 1 # Used to indicates how many feature-wise cross attentions in the decoder. This value=2 when rep_vector is True. otherwise 1.
         src_dropout: 0.3
         cross_attn_dropout: [0.3, 0.3]
         ff_dropout: 0.2
@@ -57,7 +57,7 @@ model:
 # Data Configs
 data:
   edge_weight_filename_original: 'data/PEMS07/PEMS07.csv' # orignal distance file
-  edge_weight_filename: "data/PEMS07/PEMS07_dij.csv" # distance based edge weights (shortest path distange among nodes)
+  edge_weight_filename: "data/PEMS07/PEMS07.csv" # distance based edge weights (shortest path distange among nodes)
   semantic_adj_filename: "data/PEMS07/PEMS07_time_idx_semantic_edges.pickle" # semantic based edge weights
   edge_weight_scaling: True # to normalize the edge weights
   node_data_filename: "data/PEMS07/PEMS07.npz" # traffic flow values
@@ -71,7 +71,7 @@ data:
   rep_vectors: False # to derive representative traffic sequence
   rep_vector_from_file: True # to derive representative traffic sequence
   rep_vector_filename: "data/PEMS07/PEMS07_rep_vector.pickle" # save representative traffic sequence values
-  preprocess: False # to start preprocessing stages
+  preprocess: True # to start preprocessing stages
   preprocess_output_path: "/data/PEMS07/PEMS07_Preprocessed.pickle"
   distance_threshold: 2000 # distance threshold to drop longer irrelevant connections in distance based graphs
   semantic_threashold: 5 # # of semantically similar neighbours in semantic based graph.

@@ -57,7 +57,7 @@ if __name__ == '__main__':
     adj = load_adj(f'../{edge_filename}', data_configs['num_of_vertices'])
 
     # Output shortest distances
-    output_filename = "../data/PEMS04/PEMS04_dij.csv"
+    output_filename = "../data/PEMS07/PEMS07_dij.csv"
     columns = ['from', 'to', 'distance']
     df = pd.DataFrame(columns=columns)
 

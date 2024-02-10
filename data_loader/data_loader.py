@@ -161,16 +161,16 @@ class DataLoader:
 
             sample = None
             if self.num_of_hours > 0:
-                sample = hour_sample[:, :, [0, 3]]  # get traffic flow val and weekly time-idx
+                sample = hour_sample[:, :, [0, 1]]  # get traffic flow val and weekly time-idx
 
             if self.num_of_days > 0:
-                sample = np.concatenate((sample, day_sample[:, :, [0, 3]]), axis=2)
+                sample = np.concatenate((sample, day_sample[:, :, [0, 1]]), axis=2)
 
             if self.num_of_weeks > 0:
-                sample = np.concatenate((sample, week_sample[:, :, [0, 3]]), axis=2)
+                sample = np.concatenate((sample, week_sample[:, :, [0, 1]]), axis=2)
 
             all_samples.append(sample)
-            all_targets.append(target[:, :, [0, 3]])
+            all_targets.append(target[:, :, [0, 1]])
 
         split_line1 = int(len(all_samples) * 0.6)
         split_line2 = int(len(all_samples) * 0.8)
@@ -238,8 +238,8 @@ class DataLoader:
             batch_size=self.batch_size
         )
 
-        with open(self.preprocess_output_path, 'wb') as file:
-            pickle.dump(self.dataset, file)
+        # with open(self.preprocess_output_path, 'wb') as file:
+        #     pickle.dump(self.dataset, file)
 
     def get_dataset(self):
         return self.dataset

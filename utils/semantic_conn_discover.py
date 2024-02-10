@@ -1,4 +1,3 @@
-import pandas as pd
 import numpy as np
 from dtw import *
 import pickle
@@ -25,7 +24,7 @@ def load_rep_vector(node_data_filename, output_filename, load_file=False):
         return records_time_idx
 
     points_per_hour = 12
-    num_of_vertices = 307
+    num_of_vertices = 883
     num_of_weeks = 1
     num_of_days = 1
     num_of_hours = 1
@@ -149,13 +148,13 @@ def find_most_similar_sensors(data, n=10):
 
 if __name__ == '__main__':
 
-    graph_signal_matrix_filename = "../data/PEMS04/PEMS04.npz"
-    rep_output_file = "../data/PEMS04/PEMS04_rep_vector.pickle"
-    semantic_rels_output_file = "../data/PEMS04/PEMS04_time_idx_semantic_rels.pickle"
-    edge_details_file = "../data/PEMS04/PEMS04_time_idx_semantic_edges.pickle"
+    graph_signal_matrix_filename = "../data/PEMS07/PEMS07.npz"
+    rep_output_file = "../data/PEMS07/PEMS07_rep_vector.pickle"
+    semantic_rels_output_file = "../data/PEMS07/PEMS07_time_idx_semantic_rels.pickle"
+    edge_details_file = "../data/PEMS07/PEMS07_time_idx_semantic_edges.pickle"
     records_time_idx = load_rep_vector(graph_signal_matrix_filename, rep_output_file, load_file=False)
 
-    n_sensors = 307
+    n_sensors = 883
     semantic_rels = {}
 
     for sensor in range(0, n_sensors):
