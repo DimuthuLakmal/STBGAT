@@ -3,10 +3,10 @@ model:
   batch_size: 4
   train_epochs: 120
   finetune_epochs: 20
-  model_output_path: "output/model/pems07/multi-cross-attn/epoch_v1_{}_model.pt" # save trained model to this path
+  model_output_path: "output/model/pems08/final/epoch_v1_{}_model.pt" # save trained model to this path
   load_saved_model: False # if you want pre-trained model weights to be loaded
-  model_input_path: "output/model/pems07/multi-cross-attn/epoch_v1_88_model.pt" # pretrained model path
-  device: cuda # decides GPU or CPU for training
+  model_input_path: "output/model/pems08/final/epoch_v1_88_model.pt" # pretrained model path
+  device: cpu # decides GPU or CPU for training
   transformer:
     encoder:
       features: 2 # To indicates multiple encoders (feature-wise). default is 1. =2 when rep_vector is True
@@ -56,12 +56,12 @@ model:
 
 # Data Configs
 data:
-  edge_weight_filename_original: 'data/PEMS07/PEMS07.csv' # orignal distance file
-  edge_weight_filename: "data/PEMS07/PEMS07.csv" # distance based edge weights (shortest path distange among nodes)
-  semantic_adj_filename: "data/PEMS07/PEMS07_time_idx_semantic_edges.pickle" # semantic based edge weights
+  edge_weight_filename_original: 'data/PEMS08/PEMS08.csv' # orignal distance file
+  edge_weight_filename: "data/PEMS08/PEMS08_dij.csv" # distance based edge weights (shortest path distange among nodes)
+  semantic_adj_filename: "data/PEMS08/PEMS08_time_idx_semantic_edges.pickle" # semantic based edge weights
   edge_weight_scaling: True # to normalize the edge weights
-  node_data_filename: "data/PEMS07/PEMS07.npz" # traffic flow values
-  num_of_vertices: 883 # # of vertices
+  node_data_filename: "data/PEMS08/PEMS08.npz" # traffic flow values
+  num_of_vertices: 170 # # of vertices
   points_per_hour: 12 # # of data records per hour per vertex
   num_for_predict: 12 # prediction sequence length
   num_of_weeks: 1 # to indicate to take last week traffic flow values into account
@@ -70,8 +70,8 @@ data:
   num_days_per_week: 7 # # of days per week in the dataset. Some dataset don't have weekend data
   rep_vectors: True # to derive representative traffic sequence
   rep_vector_from_file: False # to derive representative traffic sequence
-  rep_vector_filename: "data/PEMS07/PEMS07_rep_vector.pickle" # save representative traffic sequence values
+  rep_vector_filename: "data/PEMS08/PEMS08_rep_vector.pickle" # save representative traffic sequence values
   preprocess: True # to start preprocessing stages
-  preprocess_output_path: "/data/PEMS07/PEMS07_Preprocessed.pickle"
+  preprocess_output_path: "data/PEMS08/PEMS08_Preprocessed.pickle"
   distance_threshold: 2000 # distance threshold to drop longer irrelevant connections in distance based graphs
   semantic_threashold: 5 # # of semantically similar neighbours in semantic based graph.

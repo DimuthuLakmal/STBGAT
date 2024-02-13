@@ -1,12 +1,4 @@
-# @Time     : Jan. 10, 2019 15:15
-# @Author   : Veritas YIN
-# @FileName : math_utils.py
-# @Version  : 1.0
-# @IDE      : PyCharm
-# @Github   : https://github.com/VeritasYin/Project_Orion
-
 import numpy as np
-import torch
 
 
 def denormalize(x, _max, _min):
@@ -22,16 +14,19 @@ def normalize(x, _max, _min):
 
 
 def min_max_normalize(train, val, test):
-    '''
+    """
+    min_max normalization
     Parameters
     ----------
-    train, val, test: np.ndarray (B,N,F,T)
+    train: np.ndarray, shape is (B,N,F,T)
+    val: np.ndarray, shape is (B,N,F,T)
+    test: np.ndarray, shape is (B,N,F,T)
+
     Returns
-    ----------
-    stats: dict, two keys: mean and std
-    train_norm, val_norm, test_norm: np.ndarray,
-                                     shape is the same as original
-    '''
+    -------
+    stats: dict, two keys: min and max of the training set
+    train_norm, val_norm, test_norm: np.ndarray, normalized data
+    """
 
     assert train.shape[1:] == val.shape[1:] and val.shape[1:] == test.shape[1:]  # ensure the num of nodes is the same
 
@@ -49,6 +44,19 @@ def min_max_normalize(train, val, test):
 
 
 def z_score_normalize(train, val, test):
+    """
+    Z_score normalization
+    Parameters
+    ----------
+    train: np.ndarray, shape is (B,N,F,T)
+    val: np.ndarray, shape is (B,N,F,T)
+    test: np.ndarray, shape is (B,N,F,T)
+
+    Returns
+    -------
+    stats: dict, two keys: mean and std of the training set
+    train_norm, val_norm, test_norm: np.ndarray, normalized data
+    """
     assert train.shape[1:] == val.shape[1:] and val.shape[1:] == test.shape[1:]  # ensure the num of nodes is the same
 
     _mean = train.mean(axis=(0, 1, 2), keepdims=True)
@@ -92,7 +100,7 @@ def MAPE(v, v_, null_val=0.0):
     Mean absolute percentage error.
     :param v: np.ndarray or int, ground truth.
     :param v_: np.ndarray or int, prediction.
-    :return: int, MAPE averages on all elements of input.
+    :return: float, MAPE averages on all elements of input.
     '''
     with np.errstate(divide='ignore', invalid='ignore'):
         if np.isnan(null_val):
@@ -112,12 +120,25 @@ def RMSE(v, v_):
     Mean squared error.
     :param v: np.ndarray or int, ground truth.
     :param v_: np.ndarray or int, prediction.
-    :return: int, RMSE averages on all elements of input.
+    :return: float, RMSE averages on all elements of input.
     '''
     return np.sqrt(np.mean((v_ - v) ** 2))
 
 
 def masked_RMSE(v, v_, null_val=0.0):
+    """
+    Masked RMSE.
+    0 values in v are considered as missing values, and will be masked out.
+    Parameters
+    ----------
+    v: np.ndarray, ground truth
+    v_: np.ndarray, prediction
+    null_val: int, default 0.0
+
+    Returns
+    -------
+    float, RMSE
+    """
     with np.errstate(divide='ignore', invalid='ignore'):
         if np.isnan(null_val):
             mask = ~np.isnan(v)
@@ -193,9 +214,3 @@ def calculate_loss_inference(y_pred, y, _max, _min):
     y_inv = denormalize(train_y_cpu, _max, _min)
 
     return masked_MAE(y_inv, y_pred_inv), y_pred_inv, y_inv
-
-
-def max_min_normalization_astgnn(x, _max, _min):
-    x = 1. * (x - _min)/(_max - _min)
-    x = x * 2. - 1.
-    return x

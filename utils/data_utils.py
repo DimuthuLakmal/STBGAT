@@ -6,7 +6,8 @@ from utils.math_utils import normalize
 
 def search_data(sequence_length, num_of_depend, label_start_idx,
                 num_for_predict, units, points_per_hour):
-    '''
+    """
+    Directly taken form past works.
     Parameters
     ----------
     sequence_length: int, length of all history data
@@ -18,7 +19,7 @@ def search_data(sequence_length, num_of_depend, label_start_idx,
     Returns
     ----------
     list[(start_idx, end_idx)]
-    '''
+    """
 
     if points_per_hour < 0:
         raise ValueError("points_per_hour should be greater than 0!")
@@ -44,6 +45,7 @@ def search_data(sequence_length, num_of_depend, label_start_idx,
 def get_sample_indices(data_sequence, num_of_weeks, num_of_days, num_of_hours,
                        label_start_idx, num_for_predict, points_per_hour=12, num_days_per_week=7):
     """
+    Taken form past works and modified.
     Parameters
     ----------
     data_sequence: np.ndarray, traffic data
@@ -169,9 +171,11 @@ def derive_rep_timeline(x_set: np.array, points_per_week: int, num_of_vertices: 
 
 def scale_weights(w, scaling=True, min_max=False):
     '''
-    Load weight matrix function.
+    Directly taken form past works.
+    Scale the edge attributes to a range of [0, 1].
     :param w: list of edge weights
     :param scaling: bool, whether applies numerical scaling on W.
+    :param min_max: bool, whether applies min-max scaling on W.
     :return: np.ndarray.
     '''
 
@@ -192,7 +196,7 @@ def scale_weights(w, scaling=True, min_max=False):
 
 
 def search_index(max_len, num_of_depend=1, num_for_predict=12, points_per_hour=12, units=1, offset=0):
-    '''
+    """
     Parameters
     ----------
     max_len: int, length of all encoder input
@@ -204,7 +208,7 @@ def search_index(max_len, num_of_depend=1, num_for_predict=12, points_per_hour=1
     Returns
     ----------
     list[(start_idx, end_idx)]
-    '''
+    """
     x_idx = []
     for i in range(1, num_of_depend + 1):
         start_idx = max_len - points_per_hour * units * i + offset
@@ -214,9 +218,26 @@ def search_index(max_len, num_of_depend=1, num_for_predict=12, points_per_hour=1
     return x_idx
 
 
-def create_lookup_index(last_week=True, last_dy=True, dec_seq_offset=0, dec_seq_len=12):
+def create_lookup_index(last_week=True, last_dy=True, dec_seq_offset=0, dec_seq_len=12, num_days_per_week=7):
+    """
+    Create lookup index for encoder and decoder.
+    Parameters
+    ----------
+    last_week: bool, whether use last week data
+    last_dy: bool, whether use last day data
+    dec_seq_offset, int, See config.yaml for explanation
+    dec_seq_len: int, decoder input sequence length
+    num_days_per_week, int, number of days per week. In some datasets, it is 5, not considering weekend data.
+
+    Returns
+    -------
+    max_lookup_len_enc,
+    lookup_idx_enc,
+    max_lookup_len_dec,
+    lookup_idx_dec
+    """
     wk_lookup_idx = search_index(max_len=0,
-                                 units=24 * 7,
+                                 units=24 * num_days_per_week,
                                  offset=0)
     dy_lookup_idx = search_index(max_len=0,
                                  units=24,

@@ -147,7 +147,8 @@ def prepare_data(model_configs: dict, data_configs: dict):
     max_lkup_len_enc, lkup_idx_enc, max_lkup_len_dec, lkup_idx_dec = create_lookup_index(data_configs['num_of_weeks'],
                                                                                          data_configs['num_of_days'],
                                                                                          data_configs['dec_seq_offset'],
-                                                                                         dec_seq_len)
+                                                                                         dec_seq_len,
+                                                                                         data_configs['num_days_per_week'])
 
     model_configs['transformer']['decoder']['lookup_idx'] = lkup_idx_dec
     model_configs['transformer']['decoder']['max_lookup_len'] = max_lkup_len_dec if max_lkup_len_dec else dec_seq_len

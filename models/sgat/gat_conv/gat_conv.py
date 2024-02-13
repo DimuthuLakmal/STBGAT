@@ -261,13 +261,13 @@ class GATConv(MessagePassing):
                 index: Tensor, ptr: OptTensor,
                 size_i: Optional[int]) -> Tensor:
         """
-
+        This function is responsible for computing the messages of the graph. Modified to accommodate bipartite graph
         Parameters
         ----------
         x_j: Tensor, neighbours
         x_i: Tensor, node values
         edge_attr: OptTensor, edge weights
-        index
+        index: Tensor,
         ptr
         size_i
 

@@ -1,6 +1,9 @@
 import torch
 
-
+"""
+Used to calculate Masked MAE loss for the model. 
+0 values in the target tensor are not considered in the loss calculation.
+"""
 class Masked_MAE_Loss(torch.nn.Module):
     def __init__(self):
         super(Masked_MAE_Loss, self).__init__()

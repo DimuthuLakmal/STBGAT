@@ -112,7 +112,7 @@ if __name__ == '__main__':
     model = SGATTransformer(configs=model_configs).to(device)
     model.load_state_dict(torch.load(model_configs['model_input_path']))
 
-    graph_out_dir_ours = './output/graphs/pems04'
+    graph_out_dir_ours = './output/graphs/pems08'
     draw_graphs = True
     if draw_graphs:
         n_batch = 10
