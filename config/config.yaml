@@ -12,7 +12,7 @@ model:
       features: 2 # To indicates multiple encoders (feature-wise). default is 1. =2 when rep_vector is True
       emb_dim: 16 # dimension that embedding layer maps the input of the model to.
       seq_len: 36 # input sequence length
-      input_dim: 2 # input dimension, inputs is traffic flow value, in some dataset it may be combined with time index
+      input_dim: 1 # input dimension, inputs is traffic flow value, in some dataset it may be combined with time index
       n_layers: 4 # # of temporal encoder layers
       local_trends: True # decides whether the temporal encoder apply convolution to distinguish local trends in time series data
       graph_semantic_input: False # to enable semantics based graph
@@ -22,15 +22,15 @@ model:
       encoder_block: # temporal encoder layer configs
         n_heads: 8
         expansion_factor: 4
-        src_dropout: 0.4
-        ff_dropout: 0.4
+        src_dropout: 0.2
+        ff_dropout: 0.2
       sgat: # bipartite graph attention network configs
         first_in_f_size: 576 # input size (concatenated output sequence of the final temporal encoder layer)
         n_layers: 1 # # of graph layers
         out_f_sizes: [ 64 ] # output size of the graph
         n_heads: [ 8 ] # number of heads
         alpha: 0.2
-        dropout: 0.7 # dropout applied to the output of the graph network
+        dropout: 0.6 # dropout applied to the output of the graph network
         dropout_g_dis: 0.6 # dropout inside graph network (distance graph)
         dropout_g_sem: 0.6 # dropout inside graph network (semantic graph)
         edge_dim: 1 # edge attribute dimension
@@ -38,7 +38,7 @@ model:
       emb_dim: 64 # decoder input dimension
       seq_len: 13 # decoder input sequence length
       seq_offset: 1 # Indicates how many timesteps in the previous hour consider as inputs in the decoder
-      input_dim: 2  # input dimension
+      input_dim: 1  # input dimension
       n_layers: 4 # # of temporal decoder layers
       out_dim: 1 # output dimension (predicted traffic flow value)
       out_start_idx: 0 # When set decoder offset, this indicates the start index of the decoder output to calculate loss
@@ -49,8 +49,8 @@ model:
         n_heads: 8
         expansion_factor: 4
         cross_attn_features: 2 # Used to indicates how many feature-wise cross attentions in the decoder. This value=2 when rep_vector is True. otherwise 1.
-        src_dropout: 0.3
-        cross_attn_dropout: [0.3, 0.3]
+        src_dropout: 0.2
+        cross_attn_dropout: [0.2, 0.3]
         ff_dropout: 0.2
     lookup_index: True # Use to inject weekly time index information of the input sequence to positional encoding
 
@@ -74,4 +74,4 @@ data:
   preprocess: True # to start preprocessing stages
   preprocess_output_path: "data/PEMS08/PEMS08_Preprocessed.pickle"
   distance_threshold: 2000 # distance threshold to drop longer irrelevant connections in distance based graphs
-  semantic_threashold: 5 # # of semantically similar neighbours in semantic based graph.
+  semantic_threashold: 7 # # of semantically similar neighbours in semantic based graph.
