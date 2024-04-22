@@ -42,7 +42,7 @@ def train_validate(model: SGATTransformer,
                                                                  seq_offset=dec_offset,
                                                                  _train=_train)
 
-        mae_val_loss, rmse_val_loss, mape_val_loss = test(_type='test',
+        mae_val_loss, rmse_val_loss, mape_val_loss = test(_type='val',
                                                           model=model,
                                                           data_loader=data_loader,
                                                           device=configs['device'],
@@ -84,20 +84,12 @@ def run(model: SGATTransformer, configs: dict, data_loader: DataLoader):
 
     # Initial Training
     logger.info('Training model...')
-    train_validate(model=model,
-                   configs=configs,
-                   lr=0.001,
-                   ls_fn=mse_loss_fn,
-                   is_lr_sh=True,
-                   _train=True)
-
-    # Fine tuning
     best_model_path = train_validate(model=model,
                                      configs=configs,
-                                     lr=0.0005,
+                                     lr=0.001,
                                      ls_fn=mse_loss_fn,
                                      is_lr_sh=True,
-                                     _train=False)
+                                     _train=True)
 
     # testing model
     logger.info('Testing model...')

@@ -3,9 +3,9 @@ model:
   batch_size: 4
   train_epochs: 120
   finetune_epochs: 20
-  model_output_path: "output/model/pems07/multi-cross-attn/epoch_v1_{}_model.pt" # save trained model to this path
+  model_output_path: "output/model/pems07/epoch_{}_model.pt" # save trained model to this path
   load_saved_model: False # if you want pre-trained model weights to be loaded
-  model_input_path: "output/model/pems07/multi-cross-attn/epoch_v1_88_model.pt" # pretrained model path
+  model_input_path: "output/model/pems07/epoch_88_model.pt" # pretrained model path
   device: cuda # decides GPU or CPU for training
   transformer:
     encoder:
@@ -72,6 +72,6 @@ data:
   rep_vector_from_file: False # to derive representative traffic sequence
   rep_vector_filename: "data/PEMS07/PEMS07_rep_vector.pickle" # save representative traffic sequence values
   preprocess: True # to start preprocessing stages
-  preprocess_output_path: "/data/PEMS07/PEMS07_Preprocessed.pickle"
+  preprocess_output_path: "data/PEMS07/PEMS07_Preprocessed.pickle"
   distance_threshold: 2000 # distance threshold to drop longer irrelevant connections in distance based graphs
   semantic_threashold: 5 # # of semantically similar neighbours in semantic based graph.
