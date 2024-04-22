@@ -1,21 +1,21 @@
 # Model Configs
 model:
   batch_size: 4
-  train_epochs: 120
-  finetune_epochs: 20
+  train_epochs: 60
+  finetune_epochs: 15
   model_output_path: "output/model/pems08/final/epoch_v1_{}_model.pt" # save trained model to this path
   load_saved_model: False # if you want pre-trained model weights to be loaded
   model_input_path: "output/model/pems08/final/epoch_v1_88_model.pt" # pretrained model path
-  device: cpu # decides GPU or CPU for training
+  device: cuda # decides GPU or CPU for training
   transformer:
     encoder:
-      features: 1 # To indicates multiple encoders (feature-wise). default is 1. =2 when rep_vector is True
+      features: 2 # To indicates multiple encoders (feature-wise). default is 1. =2 when rep_vector is True
       emb_dim: 16 # dimension that embedding layer maps the input of the model to.
       seq_len: 36 # input sequence length
-      input_dim: 1 # input dimension, inputs is traffic flow value, in some dataset it may be combined with time index
-      n_layers: 4 # # of temporal encoder layers
+      input_dim: 2 # input dimension, inputs is traffic flow value, in some dataset it may be combined with time index
+      n_layers: 8 # # of temporal encoder layers
       local_trends: True # decides whether the temporal encoder apply convolution to distinguish local trends in time series data
-      graph_semantic_input: False # to enable semantics based graph
+      graph_semantic_input: True # to enable semantics based graph
       graph_input: True # to enable distance based graph
       dropout_e_normal: 0.0 # dropout applied to the final output of temporal encoder layer of the first encoder
       dropout_e_rep: 0.2 # dropout applied to the final output of temporal encoder layer of the second encoder (representative time sequence)
@@ -39,7 +39,7 @@ model:
       seq_len: 13 # decoder input sequence length
       seq_offset: 1 # Indicates how many timesteps in the previous hour consider as inputs in the decoder
       input_dim: 1  # input dimension
-      n_layers: 4 # # of temporal decoder layers
+      n_layers: 8 # # of temporal decoder layers
       out_dim: 1 # output dimension (predicted traffic flow value)
       out_start_idx: 0 # When set decoder offset, this indicates the start index of the decoder output to calculate loss
       out_end_idx: -1 # When set decoder offset, this indicates the end index of the decoder output to calculate loss
@@ -48,7 +48,7 @@ model:
       decoder_block: # temporal decoder layer configs
         n_heads: 8
         expansion_factor: 4
-        cross_attn_features: 1 # Used to indicates how many feature-wise cross attentions in the decoder. This value=2 when rep_vector is True. otherwise 1.
+        cross_attn_features: 2 # Used to indicates how many feature-wise cross attentions in the decoder. This value=2 when rep_vector is True. otherwise 1.
         src_dropout: 0.2
         cross_attn_dropout: [0.2, 0.3]
         ff_dropout: 0.2
@@ -68,10 +68,10 @@ data:
   num_of_hours: 1 # to indicate to take last hour traffic flow values into account
   num_of_days: 1 # to indicate to take last day traffic flow values into account
   num_days_per_week: 7 # # of days per week in the dataset. Some dataset don't have weekend data
-  rep_vectors: False # to derive representative traffic sequence
+  rep_vectors: True # to derive representative traffic sequence
   rep_vector_from_file: False # to derive representative traffic sequence
   rep_vector_filename: "data/PEMS08/PEMS08_rep_vector.pickle" # save representative traffic sequence values
   preprocess: True # to start preprocessing stages
   preprocess_output_path: "data/PEMS08/PEMS08_Preprocessed.pickle"
-  distance_threshold: 2000 # distance threshold to drop longer irrelevant connections in distance based graphs
-  semantic_threashold: 7 # # of semantically similar neighbours in semantic based graph.
+  distance_threshold: 1500 # distance threshold to drop longer irrelevant connections in distance based graphs
+  semantic_threashold: 10 # # of semantically similar neighbours in semantic based graph.
