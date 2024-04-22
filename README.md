@@ -16,15 +16,17 @@ pip install -r requirements.txt
 ```
 
 ## Training
-We included the config files for PEMS04, PEMS07 and PEMS08 datasets (Checkout relevant branch).<br>
-Before training it's important to checkout to the correct branch and use the correct config file.<br>
-To train the model, use the following command.
+We included the config files and pre-processed graphs for PEMS04, PEMS07 and PEMS08 datasets (Checkout relevant branch).<br>
+Before training it's important to checkout to the correct branch and use the correct config file and data files.<br>
+To train the model, use the following command. Before running python script, create the directory to save model output (See config file)
 ```shell
+mkdir model_output_dir
 python main.py
 ```
 
 ## Evaluation
-You can download the pretrained models from [Google Drive](www.google.com)
+You can download the pretrained models from [Google Drive](www.google.com)<br>
+You need to place the model weight file at the 'model_input_path' specified in the config file before running the python script.
 To evaluate the model, use the following command.
 ```shell
 python evaluate.py

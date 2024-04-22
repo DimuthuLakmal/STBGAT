@@ -2,10 +2,10 @@
 model:
   batch_size: 4
   train_epochs: 60
-  finetune_epochs: 15
-  model_output_path: "output/model/pems08/final/epoch_v1_{}_model.pt" # save trained model to this path
+  finetune_epochs: 20
+  model_output_path: "output/model/pems08/epoch_{}_model.pt" # save trained model to this path
   load_saved_model: False # if you want pre-trained model weights to be loaded
-  model_input_path: "output/model/pems08/final/epoch_v1_88_model.pt" # pretrained model path
+  model_input_path: "output/model/pems08/epoch_58_model.pt" # pretrained model path
   device: cuda # decides GPU or CPU for training
   transformer:
     encoder:
