@@ -42,7 +42,7 @@ def train_validate(model: SGATTransformer,
                                                                  seq_offset=dec_offset,
                                                                  _train=_train)
 
-        mae_val_loss, rmse_val_loss, mape_val_loss = test(_type='test',
+        mae_val_loss, rmse_val_loss, mape_val_loss = test(_type='val',
                                                           model=model,
                                                           data_loader=data_loader,
                                                           device=configs['device'],
