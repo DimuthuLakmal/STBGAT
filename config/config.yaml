@@ -1,11 +1,11 @@
 # Model Configs
 model:
   batch_size: 4
-  train_epochs: 120
+  train_epochs: 100
   finetune_epochs: 20
   model_output_path: "output/model/pems04/multi-cross-attn/epoch_v1_{}_model.pt" # save trained model to this path
   load_saved_model: False # if you want pre-trained model weights to be loaded
-  model_input_path: "output/model/pems04/multi-cross-attn/epoch_v1_88_model.pt" # pretrained model path
+  model_input_path: "output/model/pems04/multi-cross-attn/epoch_v1_97_model.pt" # pretrained model path
   device: cuda # decides GPU or CPU for training
   transformer:
     encoder:
@@ -51,7 +51,7 @@ model:
         cross_attn_features: 2 # Used to indicates how many feature-wise cross attentions in the decoder. This value=2 when rep_vector is True. otherwise 1.
         src_dropout: 0.3
         cross_attn_dropout: [0.3, 0.3]
-        ff_dropout: 0.2
+        ff_dropout: 0.1
     lookup_index: True # Use to inject weekly time index information of the input sequence to positional encoding
 
 # Data Configs
@@ -69,9 +69,9 @@ data:
   num_of_days: 1 # to indicate to take last day traffic flow values into account
   num_days_per_week: 7 # # of days per week in the dataset. Some dataset don't have weekend data
   rep_vectors: True # to derive representative traffic sequence
-  rep_vector_from_file: True # to derive representative traffic sequence
+  rep_vector_from_file: False # to derive representative traffic sequence
   rep_vector_filename: "data/PEMS04/PEMS04_rep_vector.pickle" # save representative traffic sequence values
   preprocess: True # to start preprocessing stages
   preprocess_output_path: "data/PEMS04/PEMS04_Preprocessed.pickle"
-  distance_threshold: 2000 # distance threshold to drop longer irrelevant connections in distance based graphs
+  distance_threshold: 2200 # distance threshold to drop longer irrelevant connections in distance based graphs
   semantic_threashold: 5 # # of semantically similar neighbours in semantic based graph.
