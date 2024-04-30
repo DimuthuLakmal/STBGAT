@@ -25,7 +25,7 @@ python main.py
 ```
 
 ## Evaluation
-You can download the pretrained models from [Google Drive](www.google.com)<br>
+You can download the pretrained models from [Google Drive](https://drive.google.com/drive/folders/1J-njxXvaFMNXYtYvfLMDVDtKhQ2F5-9C?usp=sharing)<br>
 You need to place the model weight file at the 'model_input_path' specified in the config file before running the python script.
 To evaluate the model, use the following command.
 ```shell
