@@ -1,6 +1,6 @@
 # Spatial-Temporal Bipartite Graph Attention Network for Traffic Forecasting (STBGAT)
 
-This is the Pytorch implementation of the paper [Spatial-Temporal Bipartite Graph Attention Network for Traffic Forecasting](https://www.google.com/) published at PAKDD'24
+This is the Pytorch implementation of the paper [Spatial-Temporal Bipartite Graph Attention Network for Traffic Forecasting]([https://www.google.com/](https://link.springer.com/chapter/10.1007/978-981-97-2253-2_6)) published at PAKDD'24
 
 ## Architecture
 <img src="./docs/Transformer_Architecture_with_Bipartite_GAT.png" width="600">
